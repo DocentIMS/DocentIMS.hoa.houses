@@ -1,0 +1,47 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="docent.hoa.houses">
+
+  <subscriber
+      for="docent.hoa.houses.content.hoa_house.IHOAHouse
+      zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".event_handlers.after_edit_processor"
+      />
+
+  <subscriber
+      for="docent.hoa.houses.content.hoa_house.IHOAHouse
+      Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+      handler=".event_handlers.after_transition_processor"
+      />
+
+  <subscriber
+      for="docent.hoa.houses.content.hoa_house.IHOAHouse
+      zope.lifecycleevent.interfaces.IObjectAddedEvent"
+      handler=".event_handlers.after_object_added_processor"
+      />
+
+  <subscriber
+      for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser
+      Products.PluggableAuthService.interfaces.events.IPrincipalCreatedEvent"
+      handler=".event_handlers.after_member_added_processor"
+      />
+
+  <subscriber
+      for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser
+      Products.PluggableAuthService.interfaces.events.IPrincipalDeletedEvent"
+      handler=".event_handlers.after_member_deleted_processor"
+      />
+
+  <subscriber
+      for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser
+      Products.PluggableAuthService.interfaces.events.IPropertiesUpdatedEvent"
+      handler=".event_handlers.after_member_updated_processor"
+      />
+
+
+</configure>

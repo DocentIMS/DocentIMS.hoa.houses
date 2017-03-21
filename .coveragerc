@@ -1,0 +1,6 @@
+[report]
+include =
+    src/docent/*
+omit =
+    */test*
+    */upgrades/*
