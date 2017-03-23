@@ -1,15 +1,15 @@
 <model xmlns:form="http://namespaces.plone.org/supermodel/form" xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns:lingua="http://namespaces.plone.org/supermodel/lingua" xmlns:marshal="http://namespaces.plone.org/supermodel/marshal" xmlns:security="http://namespaces.plone.org/supermodel/security" xmlns:users="http://namespaces.plone.org/supermodel/users" xmlns="http://namespaces.plone.org/supermodel/schema">
   <schema name="member-fields">
-    <field name="property_role" type="zope.schema.Choice" users:forms="On Registration|In User Profile">
+    <field name="property_role" type="zope.schema.Choice" users:forms="On Registration">
       <description/>
       <title>Property Role</title>
       <vocabulary>docent.hoa.property_roles</vocabulary>
     </field>
-    <field name="hoa_home" type="zope.schema.Choice" users:forms="On Registration|In User Profile">
-      <description/>
-      <required>False</required>
-      <title>Home</title>
-      <vocabulary>docent.hoa.homes</vocabulary>
-    </field>
+    <!--<field name="hoa_home_uuid" type="zope.schema.Choice" users:forms="On Registration|In User Profile">-->
+      <!--<description/>-->
+      <!--<required>False</required>-->
+      <!--<title>Home</title>-->
+      <!--<vocabulary>docent.hoa.homes</vocabulary>-->
+    <!--</field>-->
   </schema>
 </model>

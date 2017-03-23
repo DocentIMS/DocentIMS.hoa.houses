@@ -1,0 +1,18 @@
+<object name="portal_catalog">
+    <index name="track" meta_type="FieldIndex">
+        <indexed_attr value="street_number"/>
+        <indexed_attr value="street_address"/>
+        <indexed_attr value="owner_one"/>
+        <indexed_attr value="owner_two"/>
+        <indexed_attr value="resident_one"/>
+        <indexed_attr value="resident_two"/>
+        <indexed_attr value="property_manager"/>
+    </index>
+    <column value="street_number"/>
+    <column value="street_address"/>
+    <column value="owner_one"/>
+    <column value="owner_two"/>
+    <column value="resident_one"/>
+    <column value="resident_two"/>
+    <column value="property_manager"/>
+</object>

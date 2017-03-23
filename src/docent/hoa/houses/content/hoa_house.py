@@ -1,44 +1,76 @@
 import logging
-
+from plone import api
 from plone.dexterity.content import Container
 from plone.directives import form
+from plone.indexer import indexer
 from plone.namedfile.field import NamedBlobImage
 from plone.supermodel.directives import fieldset
 from zope import schema
-from zope.interface import provider
+from zope.interface import provider, invariant, Invalid
 from zope.schema.interfaces import IContextAwareDefaultFactory
+
+from docent.hoa.houses.registry import IHOAHomeLookupRegistry
+from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT
+from docent.hoa.houses.registry import (addHomeToLookupRegistry,
+                                        removeHomeFromLookupRegistry,
+                                        clearAllHomesForMember,
+                                        addCurrentHomeRoles)
+
 from docent.hoa.houses import _
 
 logger = logging.getLogger("Plone")
 
 @provider(IContextAwareDefaultFactory)
 def getNeighborhoodState(context):
-    parent = context.aq_parent
-    default_state = getattr(parent, 'state', u'')
+    """
+    If called from an add view, the container will be the context,
+    however if called from an edit view, the context will be the
+    hoa_house so we need find the actual hoa_neighborhood
+    in order to search for active clubs
+    """
+    if context.portal_type == "hoa_neighborhood":
+        parent_container = context
+    else:
+        parent_container = context.aq_parent
+
+    #if the parent_container is not a neighborhood, give up!
+    if parent_container.portal_type != "hoa_neighborhood":
+        return u""
+
+    default_state = getattr(parent_container, 'state', u'')
 
     return default_state
 
 @provider(IContextAwareDefaultFactory)
 def getNeighborhoodZipCode(context):
-    parent = context.aq_parent
-    default_state = getattr(parent, 'zipcode', u'')
+    """
+    If called from an add view, the container will be the context,
+    however if called from an edit view, the context will be the
+    hoa_house so we need find the actual hoa_neighborhood
+    in order to search for active clubs
+    """
+    if context.portal_type == "hoa_neighborhood":
+        parent_container = context
+    else:
+        parent_container = context.aq_parent
 
-    return default_state
+    #if the parent_container is not a neighborhood, give up!
+    if parent_container.portal_type != "hoa_neighborhood":
+        return u""
+    default_zip = getattr(parent_container, 'zipcode', u'')
+
+    return default_zip
 
 
 class IHOAHouse(form.Schema):
     """
     """
 
-    form.mode(title='hidden')
-    title = schema.TextLine(
-        title=_(u"Title")
-    )
-
     fieldset('house_information',
         label=u'House Information',
         description=u'Home details',
-        fields=['div',
+        fields=['title',
+                'div',
                 'lot',
                 'street_number',
                 'street_address',
@@ -48,6 +80,12 @@ class IHOAHouse(form.Schema):
                 'geo_coordinates',
                 'last_sale_date',
                 'rental', ]
+    )
+
+    form.mode(title='hidden')
+    title = schema.TextLine(
+        title=_(u"Title"),
+        required=False,
     )
 
     div = schema.ASCIILine(
@@ -91,16 +129,19 @@ class IHOAHouse(form.Schema):
     geo_coordinates = schema.TextLine(
         title=_(u"Geo Coordinates"),
         description=_(u""),
+        required=False,
     )
 
     last_sale_date = schema.Date(
         title=_(u"Last Sale Date"),
-        description=_(u"")
+        description=_(u""),
+        required=False,
     )
 
     rental = schema.Bool(
         title=_(u'Is this a rental property?'),
         description=_(u''),
+        required=False,
     )
 
     fieldset('owner_information',
@@ -114,12 +155,14 @@ class IHOAHouse(form.Schema):
         title=_(u"Owner One"),
         description=_(u""),
         vocabulary=u'docent.hoa.home_owner',
+        required=False,
     )
 
     owner_two = schema.Choice(
         title=_(u"Owner Two"),
         description=_(u""),
         vocabulary=u'docent.hoa.home_owner',
+        required=False,
     )
 
     fieldset('resident_information',
@@ -133,12 +176,14 @@ class IHOAHouse(form.Schema):
         title=_(u"Resident One"),
         description=_(u""),
         vocabulary=u'docent.hoa.renters',
+        required=False,
     )
 
     resident_two = schema.Choice(
         title=_(u"Resident Two"),
         description=_(u""),
         vocabulary=u'docent.hoa.renters',
+        required=False,
     )
 
     fieldset('property_manager',
@@ -151,9 +196,128 @@ class IHOAHouse(form.Schema):
         title=_(u"Property Manager"),
         description=_(u""),
         vocabulary=u'docent.hoa.property_managers',
+        required=False,
     )
+
+    @invariant
+    def ownersInvariant(data):
+        owner_one = data.owner_one
+        owner_two = data.owner_two
+        if owner_one and owner_two:
+            if owner_one == owner_two:
+                raise Invalid(_(u"Owners One and Two cannot be the same individual."))
+
+    @invariant
+    def residentInvariant(data):
+        resident_one = data.resident_one
+        resident_two = data.resident_two
+        if resident_one and resident_two:
+            if resident_one == resident_two:
+                raise Invalid(_(u"Resident One and Two cannot be the same individual."))
+
+    @invariant
+    def lotInvariant(data):
+        lot = data.lot
+        try:
+            int(lot)
+        except ValueError:
+            raise Invalid(_(u"Lot is not a valid number."))
+        if len(lot) != 3:
+            raise Invalid(_(u"Lot is not in the correct format (ie 045 for lot 45)"))
+
+
+
+@indexer(IHOAHouse)
+def streetNumberIndexer(obj):
+    if obj.street_number is None:
+        return None
+    return obj.street_number
+
+@indexer(IHOAHouse)
+def streetAddressIndexer(obj):
+    if obj.street_address is None:
+        return None
+    return obj.street_address
+
+@indexer(IHOAHouse)
+def ownerOneIndexer(obj):
+    if obj.owner_one is None:
+        return None
+    return obj.owner_one
+
+@indexer(IHOAHouse)
+def ownerTwoIndexer(obj):
+    if obj.owner_two is None:
+        return None
+    return obj.owner_two
+
+@indexer(IHOAHouse)
+def residentOneIndexer(obj):
+    if obj.resident_one is None:
+        return None
+    return obj.resident_one
+
+@indexer(IHOAHouse)
+def residentTwoIndexer(obj):
+    if obj.resident_two is None:
+        return None
+    return obj.resident_two
+
+@indexer(IHOAHouse)
+def propertyManagerIndexer(obj):
+    if obj.street_address is None:
+        return None
+    return obj.property_manager
+
 
 
 class HOAHouse(Container):
     """
     """
+    def after_object_added_processor(self):
+        self.update_role_members()
+
+    def after_edit_processor(self):
+        self.update_role_members()
+
+    def update_role_members(self):
+        """
+        look up each member by their role and associate house with that member
+        """
+        context = self
+        context_uuid = api.content.get_uuid(obj=context)
+        #get roles data
+        # owner_one = getattr(context, 'owner_one', '')
+        # owner_two = getattr(context, 'owner_two', '')
+        # resident_one = getattr(context, 'resident_one', '')
+        # resident_two = getattr(context, 'resident_two', '')
+        # property_manager = getattr(context, 'property_manager', '')
+
+        role_ids = ['owner_one', 'owner_two',
+                    'resident_one', 'resident_two',
+                    'property_manager', ]
+
+        homes_by_uuid_dict = api.portal.get_registry_record('hoa_homes_by_uuid', interface=IHOAHomeLookupRegistry)
+        previous_values_dict = homes_by_uuid_dict.get(context_uuid, {})
+        current_values_dict = {}
+        for role_id in role_ids:
+            member_id = getattr(context, role_id, '')
+            if not member_id:
+                member_id = ''
+            current_values_dict.update({role_id:member_id})
+
+        if current_values_dict == previous_values_dict:
+            return
+
+        for r_id in role_ids:
+            new_value = current_values_dict.get(r_id, '')
+            old_value = previous_values_dict.get(r_id, '')
+            property_role = HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT.get(r_id)
+            if new_value != old_value:
+                if old_value:
+                    removeHomeFromLookupRegistry(old_value, context_uuid, property_role)
+                if new_value:
+                    addHomeToLookupRegistry(new_value, context_uuid, property_role)
+
+        addCurrentHomeRoles(context_uuid, current_values_dict)
+

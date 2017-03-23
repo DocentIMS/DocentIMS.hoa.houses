@@ -90,17 +90,18 @@ class IHousesVocabulary(object):
         catalog = getToolByName(portal, 'portal_catalog')
 
         house_brains = catalog(object_provides=IHOAHouse.__identifier__,
-                               sort_on='getObjPositionInParent',
                                sort_on='sortable_title',
                                sort_order='ascending')
 
         terms = []
         if house_brains:
-            terms.append(SimpleVocabulary.createTerm('', '', 'Choose A Home'))
             for house_brain in house_brains:
                 house_uid = house_brain.UID
+                street_number = house_brain.street_number
+                street_address = house_brain.street_address
                 house_title = house_brain.Title
-                terms.append(SimpleVocabulary.createTerm(house_uid, str(house_uid), house_title))
+                house_string = "%s - %s %s" % (house_title, street_number, street_address)
+                terms.append(SimpleVocabulary.createTerm(house_uid, str(house_uid), house_string))
         else:
             terms.append(SimpleVocabulary.createTerm('', '', 'No Homes'))
 

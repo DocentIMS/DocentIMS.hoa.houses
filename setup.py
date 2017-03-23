@@ -42,7 +42,8 @@ setup(
         'Products.GenericSetup>=1.8.2',
         'setuptools',
         'z3c.jbot',
-        'plone.app.dexterity',
+        'plone.app.dexterity [grok]',
+        'plone.behavior',
     ],
     extras_require={
         'test': [

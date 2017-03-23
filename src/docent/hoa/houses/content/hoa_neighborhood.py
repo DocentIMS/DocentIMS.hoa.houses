@@ -8,7 +8,7 @@ from docent.hoa.houses import _
 logger = logging.getLogger("Plone")
 
 class IHOANeighborhood(form.Schema):
-    """
+    """Uses IDublinCore
     """
 
     street_addresses = schema.List(

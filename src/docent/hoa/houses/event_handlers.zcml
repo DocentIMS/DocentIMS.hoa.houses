@@ -25,23 +25,21 @@
       handler=".event_handlers.after_object_added_processor"
       />
 
-  <subscriber
-      for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser
-      Products.PluggableAuthService.interfaces.events.IPrincipalCreatedEvent"
-      handler=".event_handlers.after_member_added_processor"
-      />
+    <!--<subscriber-->
+        <!--for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser-->
+            <!--Products.PluggableAuthService.interfaces.events.IPrincipalCreatedEvent"-->
+        <!--handler=".event_handlers.onPrincipalCreation"-->
+        <!--/>-->
 
-  <subscriber
-      for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser
-      Products.PluggableAuthService.interfaces.events.IPrincipalDeletedEvent"
-      handler=".event_handlers.after_member_deleted_processor"
-      />
+    <!--<subscriber-->
+        <!--for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser-->
+            <!--Products.PluggableAuthService.interfaces.events.IPrincipalDeletedEvent"-->
+        <!--handler=".event_handlers.onPrincipalDeletion"-->
+        <!--/>-->
 
-  <subscriber
-      for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser
-      Products.PluggableAuthService.interfaces.events.IPropertiesUpdatedEvent"
-      handler=".event_handlers.after_member_updated_processor"
-      />
-
+    <!--<subscriber-->
+        <!--for="plone.app.controlpanel.events.ConfigurationChangedEvent"-->
+        <!--handler=".event_handlers.onPrincipalUpdate"-->
+        <!--/>-->
 
 </configure>
