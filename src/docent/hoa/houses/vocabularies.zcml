@@ -39,4 +39,19 @@
         component="docent.hoa.houses.vocabularies.IPropertyRoleVocabularyFactory"
     />
 
+    <utility
+        name="docent.hoa.div_numbers"
+        component="docent.hoa.houses.vocabularies.IDivNumbersVocabularyFactory"
+    />
+
+    <utility
+        name="docent.hoa.lot_numbers"
+        component="docent.hoa.houses.vocabularies.ILotNumbersVocabularyFactory"
+    />
+    IWalkersVocabularyFactory
+    <utility
+        name="docent.hoa.walkers"
+        component="docent.hoa.houses.vocabularies.IWalkersVocabularyFactory"
+    />
+
 </configure>

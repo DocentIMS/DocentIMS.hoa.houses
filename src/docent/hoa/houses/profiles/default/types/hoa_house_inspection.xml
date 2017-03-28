@@ -2,41 +2,40 @@
 <object
     i18n:domain="docent.hoa.houses"
     meta_type="Dexterity FTI"
-    name="hoa_house"
+    name="hoa_house_inspection"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">House</property>
+      name="title">House Inspection</property>
   <property
       i18n:translate=""
       name="description"></property>
 
   <property name="allow_discussion">False</property>
-  <property name="icon_expr">string:\1F3E0</property>
+  <property name="icon_expr">string:\1F3D8</property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
   <property name="allowed_content_types">
-    <element value="hoa_house_inspection" />
   </property>
   <property name="filter_content_types">True</property>
-  <property name="global_allow">False</property>
+  <property name="global_allow">True</property>
 
   <!-- Schema, class and security -->
   <property name="add_permission">cmf.AddPortalContent</property>
-  <property name="klass">docent.hoa.houses.content.hoa_house.HOAHouse</property>
-  <property name="schema">docent.hoa.houses.content.hoa_house.IHOAHouse</property>
+  <property name="klass">docent.hoa.houses.content.hoa_house_inspection.HOAHouseInspection</property>
+  <property name="schema">docent.hoa.houses.content.hoa_house_inspection.IHOAHouseInspection</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors">
+    <element value="plone.app.content.interfaces.INameFromTitle" />
     <element value="plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigation"/>
-    <element value="docent.hoa.houses.behaviors.INameFromDivAndLot"/>
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++hoa_house</property>
+  <property name="add_view_expr">string:${folder_url}/++add++hoa_house_inspection</property>
   <property name="immediate_view">view</property>
   <property name="default_view">view</property>
   <property name="default_view_fallback">False</property>

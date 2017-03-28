@@ -25,6 +25,11 @@
       handler=".event_handlers.after_object_added_processor"
       />
 
+  <subscriber
+      for="Products.PluggableAuthService.interfaces.events.IPrincipalDeletedEvent"
+      handler=".event_handlers.onPrincipalDeletion"
+      />
+
     <!--<subscriber-->
         <!--for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser-->
             <!--Products.PluggableAuthService.interfaces.events.IPrincipalCreatedEvent"-->

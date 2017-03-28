@@ -5,6 +5,9 @@ from zope import schema
 
 from docent.hoa.houses import _
 
+import logging
+logger = logging.getLogger("Plone")
+
 def getDefaultDict():
     return dict()
 

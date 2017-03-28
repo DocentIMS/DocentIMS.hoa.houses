@@ -2,4 +2,6 @@
 <object name="portal_types" meta_type="Plone Types Tool">
   <object name="hoa_house" meta_type="Dexterity FTI"/>
   <object name="hoa_neighborhood" meta_type="Dexterity FTI"/>
+  <object name="hoa_annual_inspection" meta_type="Dexterity FTI"/>
+  <object name="hoa_house_inspection" meta_type="Dexterity FTI"/>
 </object>

@@ -3,7 +3,8 @@ from zope.component import adapter
 from plone import api
 from Products.CMFCore.interfaces import IMemberData
 from docent.hoa.houses.content.hoa_house import IHOAHouse
-
+from docent.hoa.houses.content.hoa_house import ROLE_IDS
+from docent.hoa.houses.registry import IHOAHomeLookupRegistry
 from docent.hoa.houses.app_config import PROPERTY_ROLE_DICT, PROPERTY_ROLE_TO_HOME_ATTRIBUTE_LOOKUP_DICT
 
 import logging
@@ -11,6 +12,7 @@ logger = logging.getLogger("Plone")
 
 
 def after_edit_processor(context, event):
+    import pdb;pdb.set_trace()
     logger.info('after_edit_processor')
     if hasattr(context, 'after_edit_processor'):
         context.after_edit_processor()
@@ -41,18 +43,36 @@ def onPrincipalCreation(context, event):
     
 
 #@adapter(IPrincipalDeletedEvent)
-def onPrincipalDeletion(context, event):
+def onPrincipalDeletion(event):
     """
     find member house and remove member from home
     """
-    logger.info('onPrincipalDeletion')
+    logger.info('onPrincipalDeletion starting')
+    member_id = getattr(event, 'principal', '')
+    if member_id:
+        homes_to_check = set()
+        for p_role in ['hoa_owners', 'hoa_renters', 'hoa_property_managers']:
+            home_lookup_dict = api.portal.get_registry_record(p_role, interface=IHOAHomeLookupRegistry)
+            member_homes_by_uuid = home_lookup_dict.get(member_id, set())
+            homes_to_check = homes_to_check|member_homes_by_uuid
+        for mh_uuid in homes_to_check:
+            mh = api.content.get(UID=mh_uuid)
+            mh.remove_member_from_home_roles(member_id)
+            mh.update_role_members()
+            mh.update_rental_status()
+            mh.reindexObject()
 
-#@adapter(IPropertiesUpdatedEvent)
-def onPrincipalUpdate(event):
-    """
-    find member house and update member
-    """
-    logger.info('HOA.HOUSES: starting event: onPrincipalUpdate')
+        # home_lookup_dict.pop(member_id, None)
+        # api.portal.set_registry_record(p_role, home_lookup_dict, interface=IHOAHomeLookupRegistry)
+
+logger.info('onPrincipalDeletion complete')
+
+# #@adapter(IPropertiesUpdatedEvent)
+# def onPrincipalUpdate(event):
+#     """
+#     find member house and update member
+#     """
+#     logger.info('HOA.HOUSES: starting event: onPrincipalUpdate')
     # if hasattr(event, 'context'):
     #     context = event.context
     #     if hasattr(context, 'member'):

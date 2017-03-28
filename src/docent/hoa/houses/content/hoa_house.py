@@ -20,6 +20,10 @@ from docent.hoa.houses import _
 
 logger = logging.getLogger("Plone")
 
+ROLE_IDS = ['owner_one', 'owner_two',
+            'resident_one', 'resident_two',
+            'property_manager', ]
+
 @provider(IContextAwareDefaultFactory)
 def getNeighborhoodState(context):
     """
@@ -77,7 +81,8 @@ class IHOAHouse(form.Schema):
                 'state',
                 'zipcode',
                 'picture',
-                'geo_coordinates',
+                'geo_coordinates_lat',
+                'geo_coordinates_long',
                 'last_sale_date',
                 'rental', ]
     )
@@ -88,14 +93,18 @@ class IHOAHouse(form.Schema):
         required=False,
     )
 
-    div = schema.ASCIILine(
-        title=_(u"Division"),
-        description=_(u"HOA Division")
+    div = schema.Choice(
+        title=_(u"Division Number"),
+        description=_(u""),
+        vocabulary=u'docent.hoa.div_numbers',
+        required=False,
     )
 
-    lot = schema.ASCIILine(
-        title=_(u"Lot"),
-        description=_(u"HOA LOT Number")
+    lot = schema.Choice(
+        title=_(u"Lot Number"),
+        description=_(u""),
+        vocabulary=u'docent.hoa.lot_numbers',
+        required=False,
     )
 
     street_number = schema.TextLine(
@@ -126,8 +135,14 @@ class IHOAHouse(form.Schema):
         required=False,
     )
 
-    geo_coordinates = schema.TextLine(
-        title=_(u"Geo Coordinates"),
+    geo_coordinates_lat = schema.TextLine(
+        title=_(u"Geo Coordinates Latitude"),
+        description=_(u""),
+        required=False,
+    )
+
+    geo_coordinates_long = schema.TextLine(
+        title=_(u"Geo Coordinates Longitude"),
         description=_(u""),
         required=False,
     )
@@ -274,11 +289,26 @@ def propertyManagerIndexer(obj):
 class HOAHouse(Container):
     """
     """
-    def after_object_added_processor(self):
+    def after_object_added_processor(self, context, event):
         self.update_role_members()
 
     def after_edit_processor(self):
         self.update_role_members()
+        self.update_rental_status()
+
+    def remove_member_from_home_roles(self, member_id):
+        for r_id in ROLE_IDS:
+            assigned_id = getattr(self, r_id, '')
+            if assigned_id == member_id:
+                setattr(self, r_id, '')
+
+    def update_rental_status(self):
+        resident_one = getattr(self, 'resident_one', '')
+        resident_two = getattr(self, 'resident_two', '')
+        if not resident_one and not resident_two:
+            setattr(self, 'rental', False)
+        else:
+            setattr(self, 'rental', True)
 
     def update_role_members(self):
         """
@@ -293,14 +323,10 @@ class HOAHouse(Container):
         # resident_two = getattr(context, 'resident_two', '')
         # property_manager = getattr(context, 'property_manager', '')
 
-        role_ids = ['owner_one', 'owner_two',
-                    'resident_one', 'resident_two',
-                    'property_manager', ]
-
         homes_by_uuid_dict = api.portal.get_registry_record('hoa_homes_by_uuid', interface=IHOAHomeLookupRegistry)
         previous_values_dict = homes_by_uuid_dict.get(context_uuid, {})
         current_values_dict = {}
-        for role_id in role_ids:
+        for role_id in ROLE_IDS:
             member_id = getattr(context, role_id, '')
             if not member_id:
                 member_id = ''
@@ -309,7 +335,7 @@ class HOAHouse(Container):
         if current_values_dict == previous_values_dict:
             return
 
-        for r_id in role_ids:
+        for r_id in ROLE_IDS:
             new_value = current_values_dict.get(r_id, '')
             old_value = previous_values_dict.get(r_id, '')
             property_role = HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT.get(r_id)

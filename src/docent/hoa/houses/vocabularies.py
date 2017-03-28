@@ -10,7 +10,10 @@ from docent.hoa.houses.app_config import (BOARD_MEMBERS_GID,
                                           HOME_OWNERS_GID,
                                           RENTERS_GID,
                                           PROPERTY_MANAGERS_GID,
-                                          PROPERTY_ROLE_DICT)
+                                          WALKERS_MEMBERS_GID,
+                                          PROPERTY_ROLE_DICT,
+                                          DIV_NUMBER_STRINGS,
+                                          LOT_NUMBER_STRINGS)
 
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 
@@ -38,6 +41,31 @@ def getGroupMemberVocabulary(group_name):
         terms.append(SimpleVocabulary.createTerm('', '', 'No Members'))
 
     return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class IWalkersVocabulary(object):
+    def __call__(self, context):
+        return getGroupMemberVocabulary(WALKERS_MEMBERS_GID)
+IWalkersVocabularyFactory = IWalkersVocabulary()
+
+@implementer(IVocabularyFactory)
+class IDivNumbersVocabulary(object):
+    def __call__(self, context):
+        terms = []
+        for i in DIV_NUMBER_STRINGS:
+            terms.append(SimpleVocabulary.createTerm(i, str(i), i))
+        return SimpleVocabulary(terms)
+IDivNumbersVocabularyFactory = IDivNumbersVocabulary()
+
+@implementer(IVocabularyFactory)
+class ILotNumbersVocabulary(object):
+    def __call__(self, context):
+        terms = []
+        for i in LOT_NUMBER_STRINGS:
+            terms.append(SimpleVocabulary.createTerm(i, str(i), i))
+        return SimpleVocabulary(terms)
+ILotNumbersVocabularyFactory = ILotNumbersVocabulary()
 
 @implementer(IVocabularyFactory)
 class IBoardMemberVocabulary(object):
