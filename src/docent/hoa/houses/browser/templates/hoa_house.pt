@@ -1,0 +1,67 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="docent.hoa.houses">
+<head>
+<!--<metal:block fill-slot="style_slot">-->
+        <!--<link rel="stylesheet" type="text/css"-->
+            <!--tal:define="navroot context/@@plone_portal_state/navigation_root_url"-->
+            <!--tal:attributes="href string:${navroot}/++resource++docent.hoa.houses/hoa.css"-->
+            <!--/>-->
+<!--</metal:block>-->
+</head>
+<body>
+
+<metal:main fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+    <div tal:replace="structure provider:plone.abovecontenttitle" />
+    <h1 tal:content="context/Title"></h1>
+    <div tal:replace="structure provider:plone.belowcontenttitle" />
+    <div class="address_block">
+        <p><span tal:replace="context/street_number|Nothing" /> <span tal:replace="context/street_address|Nothing" /></p>
+        <p><span tal:replace="context/city|Nothing" />, <span tal:replace="context/state|Nothing" /> <span tal:replace="context/zipcode|Nothing" /></p>
+    </div>
+    <div tal:replace="structure provider:plone.abovecontentbody" />
+    <div class="home_details">
+        <div class="details_block">
+            <ul>
+                <li><strong>Div:</strong> <span tal:replace="context/div|Nothing" /> <strong>Lot:</strong> <span tal:replace="context/lot|Nothing"/></li>
+                <li><strong>Geo-Coordinates:</strong> <span tal:replace="context/geo_coordinates_lat|Nothing" /> : <span tal:replace="context/geo_coordinates_long|Nothing" /></li>
+                <li><strong>Last Sale Date:</strong> <span tal:replace="context/last_sale_date|Nothing" /></li>
+                <li><strong>Rental Status:</strong> <span tal:replace="view/getRentalStatus" /></li>
+            </ul>
+        </div>
+        <div class="image_block">
+            <div tal:define="picture nocall:context/picture" tal:condition="nocall:picture">
+                <img tal:replace="structure context/@@images/picture/mini" />
+            </div>
+        </div>
+    </div>
+    <tal:block tal:define="hasOwners view/hasOwners;
+                           hasRenters view/hasRenters;
+                           hasPM view/hasPM;">
+    <h2 tal:condition="hasOwners">Owners</h2>
+        <ul tal:condition="hasOwners">
+            <li><strong>Owner One:</strong> <span tal:replace="structure view/owner_one" /></li>
+            <li><strong>Owner Two:</strong> <span tal:replace="structure view/owner_two" /></li>
+        </ul>
+    <h2 tal:condition="hasRenters">Renters</h2>
+        <ul tal:condition="hasRenters">
+            <li><strong>Resident One:</strong> <span tal:replace="structure view/resident_one" /></li>
+            <li><strong>Resident Two:</strong> <span tal:replace="structure view/resident_two" /></li>
+        </ul>
+    <h2 tal:condition="hasPM">Property Managers</h2>
+        <ul tal:condition="hasPM">
+            <li><strong>Property Manager:</strong> <span tal:replace="structure view/property_manager" /></li>
+        </ul>
+    </tal:block>
+    <div tal:replace="structure provider:plone.belowcontentbody" />
+    </tal:main-macro>
+</metal:main>
+
+</body>
+</html>

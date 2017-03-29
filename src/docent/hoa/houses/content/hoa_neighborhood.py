@@ -19,6 +19,11 @@ class IHOANeighborhood(form.Schema):
         value_type=schema.TextLine(),
     )
 
+    city = schema.TextLine(
+        title=_(u"City"),
+        description=_(u"Please provide the city to be used with addresses in this neighborhood.")
+    )
+
     state = schema.TextLine(
         title=_(u"State Abbreviation"),
         description=_(u"Please provide the state abbreviation to be used with addresses in this neighborhood.")

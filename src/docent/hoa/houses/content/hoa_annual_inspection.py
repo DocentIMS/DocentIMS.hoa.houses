@@ -57,7 +57,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         required=False,
     )
-    
+
     end_date = schema.Date(
         title=_(u"End Date"),
         description=_(u"This field is calculated at the end of the Annual Inspection"),

@@ -65,6 +65,26 @@ def getNeighborhoodZipCode(context):
 
     return default_zip
 
+@provider(IContextAwareDefaultFactory)
+def getNeighborhoodCity(context):
+    """
+    If called from an add view, the container will be the context,
+    however if called from an edit view, the context will be the
+    hoa_house so we need find the actual hoa_neighborhood
+    in order to search for active clubs
+    """
+    if context.portal_type == "hoa_neighborhood":
+        parent_container = context
+    else:
+        parent_container = context.aq_parent
+
+    #if the parent_container is not a neighborhood, give up!
+    if parent_container.portal_type != "hoa_neighborhood":
+        return u""
+    default_city = getattr(parent_container, 'city', u'')
+
+    return default_city
+
 
 class IHOAHouse(form.Schema):
     """
@@ -78,6 +98,7 @@ class IHOAHouse(form.Schema):
                 'lot',
                 'street_number',
                 'street_address',
+                'city',
                 'state',
                 'zipcode',
                 'picture',
@@ -116,6 +137,12 @@ class IHOAHouse(form.Schema):
         title=_(u"Street Address"),
         description=_(u""),
         vocabulary=u'docent.hoa.street_addresses',
+    )
+
+    city = schema.TextLine(
+        title=_(u"City"),
+        description=_(u"Please provide the city to be used with addresses in this neighborhood."),
+        defaultFactory=getNeighborhoodCity,
     )
 
     state = schema.TextLine(
@@ -170,7 +197,6 @@ class IHOAHouse(form.Schema):
         title=_(u"Owner One"),
         description=_(u""),
         vocabulary=u'docent.hoa.home_owner',
-        required=False,
     )
 
     owner_two = schema.Choice(
