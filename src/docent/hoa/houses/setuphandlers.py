@@ -10,7 +10,9 @@ from docent.hoa.houses.app_config import (GROUP_TITLE_DICT,
                                           HOME_OWNERS_GID,
                                           RENTERS_GID,
                                           PROPERTY_MANAGERS_GID,
-                                          WALKERS_MEMBERS_GID)
+                                          WALKERS_MEMBERS_GID,
+                                          DIVISION_ONE,
+                                          DIVISION_TWO)
 
 @implementer(INonInstallable)
 class HiddenProfiles(object):
@@ -41,6 +43,8 @@ def post_install(context):
     portal_groups = getToolByName(portal, 'portal_groups')
     for g_id in [BOARD_MEMBERS_GID, HOME_OWNERS_GID, RENTERS_GID, PROPERTY_MANAGERS_GID]:
         portal_groups.addPrincipalToGroup(g_id, WALKERS_MEMBERS_GID)
+
+
 
 
 def uninstall(context):

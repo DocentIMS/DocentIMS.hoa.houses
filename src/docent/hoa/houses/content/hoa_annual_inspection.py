@@ -14,7 +14,7 @@ from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
-from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT
+from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT, LOT_DIVISION_DICT, WALKERS_GROUP_IDS
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,
                                         removeHomeFromLookupRegistry,
                                         clearAllHomesForMember,
@@ -57,7 +57,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         required=False,
     )
-
+    
     end_date = schema.Date(
         title=_(u"End Date"),
         description=_(u"This field is calculated at the end of the Annual Inspection"),
@@ -74,14 +74,14 @@ class IHOAAnnualInspection(form.Schema):
         title=_(u"Number of Groups"),
         description=_(u""),
         vocabulary=group_numbers_vocab,
-        required=False,
+        required=True,
     )
 
     fieldset('team_a',
         label=u'Team A',
         description=u'',
         fields=['group_a_member_one',
-                'group_a_member_one', ]
+                'group_a_member_two', ]
     )
 
     group_a_member_one = schema.Choice(
@@ -102,7 +102,7 @@ class IHOAAnnualInspection(form.Schema):
         label=u'Team B',
         description=u'',
         fields=['group_b_member_one',
-                'group_b_member_one', ]
+                'group_b_member_two', ]
     )
 
     group_b_member_one = schema.Choice(
@@ -123,7 +123,7 @@ class IHOAAnnualInspection(form.Schema):
         label=u'Team C',
         description=u'',
         fields=['group_c_member_one',
-                'group_c_member_one', ]
+                'group_c_member_two', ]
     )
 
     group_c_member_one = schema.Choice(
@@ -144,7 +144,7 @@ class IHOAAnnualInspection(form.Schema):
         label=u'Team D',
         description=u'',
         fields=['group_d_member_one',
-                'group_d_member_one', ]
+                'group_d_member_two', ]
     )
 
     group_d_member_one = schema.Choice(
@@ -165,7 +165,7 @@ class IHOAAnnualInspection(form.Schema):
         label=u'Team E',
         description=u'',
         fields=['group_e_member_one',
-                'group_e_member_one', ]
+                'group_e_member_two', ]
     )
 
     group_e_member_one = schema.Choice(
@@ -191,13 +191,40 @@ class HOAAnnualInspection(Container):
     def after_object_added_processor(self, context, event):
         self.generate_house_inspection_title()
 
+    def after_transition_processor(self):
+        context_state = api.content.get_state(obj=self)
+        if context_state == 'initial_inspection':
+            self.propagate_house_inspections()
+            self.assign_security()
+
+    def assign_security(self):
+        context = self
+        parent_container = context.aq_parent
+        if parent_container.portal_type != "hoa_neighborhood":
+            #woah something went wrong
+            return
+        number_of_groups = getattr(context, 'number_of_groups', 3)
+        lot_division_dict = LOT_DIVISION_DICT.get(number_of_groups)
+        for walker_group_id in lot_division_dict:
+            homes_assigned_by_id = lot_division_dict.get(walker_group_id)
+            for home_id in homes_assigned_by_id:
+                home_obj = parent_container.get(home_id)
+                if home_obj:
+                    #clear previous group roles
+                    home_obj.manage_delLocalRoles(WALKERS_GROUP_IDS)
+                    #set new role
+                    api.group.grant_roles(groupname=walker_group_id,
+                                          roles=['Editor'],
+                                          obj=home_obj)
+                    home_obj.reindexObjectSecurity()
+
     def generate_house_inspection_title(self):
         today = date.today()
         setattr(self, 'house_inspection_title', today.strftime('%Y-%m'))
 
-    def propogate_house_inspections(self):
+    def propagate_house_inspections(self):
         context = self
-        parent_container = context.aquire_parent
+        parent_container = context.aq_parent
         pc_path = '/'.join(parent_container.getPhysicalPath())
         catalog = getToolByName(parent_container, 'portal_catalog')
         house_brains = catalog(path={'query': pc_path, 'depth': 1},
@@ -217,4 +244,6 @@ class HOAAnnualInspection(Container):
                                safe_id=True)
             added_inspections += 1
 
-        api.portal.show_message(message=u"%s houses prepared for annual inspection." % added_inspections)
+        api.portal.show_message(message=u"%s houses prepared for annual inspection." % added_inspections,
+                                request=context.REQUEST,
+                                type='info')

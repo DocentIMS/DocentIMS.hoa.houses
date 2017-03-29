@@ -19,7 +19,8 @@
 
   <!-- Hierarchy control -->
   <property name="allowed_content_types">
-    <element value="hoa_house" />
+      <element value="hoa_annual_inspection" />
+      <element value="hoa_house" />
   </property>
   <property name="filter_content_types">True</property>
   <property name="global_allow">True</property>

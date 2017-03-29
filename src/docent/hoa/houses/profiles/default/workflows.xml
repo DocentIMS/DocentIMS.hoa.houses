@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<object name="portal_workflow" meta_type="Plone Workflow Tool">
+ <property
+    name="title">Contains workflow definitions for your portal</property>
+ <object name="annual_inspection_workflow" meta_type="Workflow"/>
+ <object name="house_inspection_workflow" meta_type="Workflow"/>
+ <bindings>
+  <type type_id="hoa_annual_inspection">
+   <bound-workflow workflow_id="annual_inspection_workflow"/>
+  </type>
+  <type type_id="hoa_house_inspection">
+   <bound-workflow workflow_id="house_inspection_workflow"/>
+  </type>
+ </bindings>
+</object>

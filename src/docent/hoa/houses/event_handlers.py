@@ -12,7 +12,6 @@ logger = logging.getLogger("Plone")
 
 
 def after_edit_processor(context, event):
-    import pdb;pdb.set_trace()
     logger.info('after_edit_processor')
     if hasattr(context, 'after_edit_processor'):
         context.after_edit_processor()

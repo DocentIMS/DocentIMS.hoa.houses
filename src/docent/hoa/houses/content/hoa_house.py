@@ -324,6 +324,8 @@ class HOAHouse(Container):
         # property_manager = getattr(context, 'property_manager', '')
 
         homes_by_uuid_dict = api.portal.get_registry_record('hoa_homes_by_uuid', interface=IHOAHomeLookupRegistry)
+        if not homes_by_uuid_dict:
+            homes_by_uuid_dict = {}
         previous_values_dict = homes_by_uuid_dict.get(context_uuid, {})
         current_values_dict = {}
         for role_id in ROLE_IDS:

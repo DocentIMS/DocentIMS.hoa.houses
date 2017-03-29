@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 from plone import api
 from plone.dexterity.content import Container
 from plone.directives import form
@@ -20,25 +21,25 @@ from docent.hoa.houses import _
 
 logger = logging.getLogger("Plone")
 
-
+def computeTitle():
+    today = date.today()
+    house_inspection_title = today.strftime(u'%Y-%m')
+    return u'House Inspection %s' % house_inspection_title,
 
 class IHOAHouseInspection(form.Schema):
     """
     """
+    #form.mode(title='hidden')
+    title = schema.TextLine(
+        title=_(u"Title"),
+    )
 
     fieldset('flowerpots',
         label=u'Flowerpots',
         description=u'',
-        fields=['title',
-                'flowerpots_bool',
+        fields=['flowerpots_bool',
                 'flowerpots_text',
                 'flowerpots_image']
-    )
-
-    form.mode(title='hidden')
-    title = schema.TextLine(
-        title=_(u"Title"),
-        required=False,
     )
 
     flowerpots_bool = schema.Bool(
