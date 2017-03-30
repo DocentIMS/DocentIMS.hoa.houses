@@ -1,0 +1,52 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="docent.hoa.houses">
+<head>
+<!--<metal:block fill-slot="style_slot">-->
+        <!--<link rel="stylesheet" type="text/css"-->
+            <!--tal:define="navroot context/@@plone_portal_state/navigation_root_url"-->
+            <!--tal:attributes="href string:${navroot}/++resource++docent.hoa.houses/hoa.css"-->
+            <!--/>-->
+<!--</metal:block>-->
+</head>
+<body>
+
+<metal:main fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+    <div tal:replace="structure provider:plone.abovecontenttitle" />
+    <h1>Assigned Homes - <span tal:replace="view/current_inspection" /></h1>
+    <p>These are the homes assigned to your team. Select one home, click next, and perform the weedwalk.
+        When you are finished with the home, it will be moved from this list to the "Completed" Tab. Return
+        here and select another home.</p>
+    <div tal:replace="structure provider:plone.belowcontenttitle" />
+
+    <div tal:replace="structure provider:plone.abovecontentbody" />
+        <tal:tabs tal:define="streets view/streets;
+                              street_dict view/street_dict">
+        <section tal:repeat="street streets">
+            <h2><span tal:replace="street" /></h2>
+            <table tal:define="home_listings python:street_dict.get(street)">
+                <tr>
+                    <th>Select</th>
+                    <th>Division</th>
+                    <th>Lot</th>
+                    <th>Address</th>
+                    <th>Map</th>
+                </tr>
+                <tr tal:repeat="home_listing_dict home_listings">
+                    <span tal:replace="structure python:view.getTableRowStructure(home_listing_dict)" />
+                </tr>
+            </table>
+        </section>
+        </tal:tabs>
+        <div tal:replace="structure provider:plone.belowcontentbody" />
+    </tal:main-macro>
+</metal:main>
+
+</body>
+</html>
