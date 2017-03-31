@@ -191,12 +191,55 @@ class HOAAnnualInspection(Container):
 
     def after_object_added_processor(self, context, event):
         self.generate_house_inspection_title()
+        self.add_walkers_to_groups()
+
+    def after_edit_processor(self):
+        self.add_walkers_to_groups()
 
     def after_transition_processor(self):
         context_state = api.content.get_state(obj=self)
         if context_state == 'initial_inspection':
             self.propagate_house_inspections()
             self.assign_security()
+
+    def add_walkers_to_groups(self):
+        for g_id in WALKERS_GROUP_IDS:
+            current_members = api.user.get_users(groupname=g_id)
+            for a_member in current_members:
+                api.group.remove_user(groupname=g_id, user=a_member)
+
+        group_a_member_one = getattr(self, 'group_a_member_one', None)
+        group_a_member_two = getattr(self, 'group_a_member_two', None)
+        group_b_member_one = getattr(self, 'group_b_member_one', None)
+        group_b_member_two = getattr(self, 'group_b_member_two', None)
+        group_c_member_one = getattr(self, 'group_c_member_one', None)
+        group_c_member_two = getattr(self, 'group_c_member_two', None)
+        group_d_member_one = getattr(self, 'group_d_member_one', None)
+        group_d_member_two = getattr(self, 'group_d_member_two', None)
+        group_e_member_one = getattr(self, 'group_e_member_one', None)
+        group_e_member_two = getattr(self, 'group_e_member_two', None)
+
+        if group_a_member_one:
+            api.group.add_user(groupname='walkers_a', username=group_a_member_one)
+        if group_a_member_two:
+            api.group.add_user(groupname='walkers_a', username=group_a_member_two)
+        if group_b_member_one:
+            api.group.add_user(groupname='walkers_b', username=group_b_member_one)
+        if group_b_member_two:
+            api.group.add_user(groupname='walkers_b', username=group_b_member_two)
+        if group_c_member_one:
+            api.group.add_user(groupname='walkers_c', username=group_c_member_one)
+        if group_c_member_two:
+            api.group.add_user(groupname='walkers_c', username=group_c_member_two)
+        if group_d_member_one:
+            api.group.add_user(groupname='walkers_d', username=group_d_member_one)
+        if group_d_member_two:
+            api.group.add_user(groupname='walkers_d', username=group_d_member_two)
+        if group_e_member_one:
+            api.group.add_user(groupname='walkers_e', username=group_e_member_one)
+        if group_e_member_two:
+            api.group.add_user(groupname='walkers_e', username=group_e_member_two)
+
 
     def assign_security(self):
         context = self

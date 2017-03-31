@@ -31,6 +31,12 @@
       handler=".event_handlers.after_object_added_processor"
       />
 
+  <subscriber
+      for="docent.hoa.houses.content.hoa_annual_inspection.IHOAAnnualInspection
+       zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".event_handlers.after_edit_processor"
+      />
+
     <subscriber
       for="docent.hoa.houses.content.hoa_house.IHOAHouse
       zope.lifecycleevent.interfaces.IObjectAddedEvent"
