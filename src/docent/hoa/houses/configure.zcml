@@ -41,6 +41,11 @@
     provides="docent.hoa.houses.behaviors.INameFromDivAndLot"
         />
 
+  <permission
+      id="hoa.home.manager"
+      title="HOA: Manage Homes"
+      />
+
   <adapter factory="docent.hoa.houses.behaviors.NameFromDivAndLot" />
   <adapter factory="docent.hoa.houses.content.hoa_house.streetAddressIndexer" name="street_address" />
   <adapter factory="docent.hoa.houses.content.hoa_house.streetNumberIndexer" name="street_number" />

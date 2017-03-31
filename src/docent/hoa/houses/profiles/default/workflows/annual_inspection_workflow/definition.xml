@@ -140,7 +140,7 @@
  <transition transition_id="close" title="Close Inspections" new_state="closed" trigger="USER" before_script="" after_script="" >
   <action url="%(content_url)s/content_status_modify?workflow_action=close" category="workflow" icon="">Close Inspections</action>
   <guard >
-   <guard-permission>Review portal content</guard-permission>
+   <guard-expression>here/verifySecondInspectionComplete</guard-expression>
   </guard>
 
  </transition>
@@ -154,7 +154,7 @@
  <transition transition_id="second_walk" title="Begin Secondary Inspections" new_state="secondary_inspection" trigger="USER" before_script="" after_script="" >
   <action url="%(content_url)s/content_status_modify?workflow_action=second_walk" category="workflow" icon="">Begin Secondary Inspections</action>
   <guard >
-   <guard-permission>Review portal content</guard-permission>
+   <guard-expression>here/verifyFirstInspectionComplete</guard-expression>
   </guard>
 
  </transition>

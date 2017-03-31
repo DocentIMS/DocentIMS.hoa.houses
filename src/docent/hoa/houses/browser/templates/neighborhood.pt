@@ -19,23 +19,24 @@
     <tal:main-macro metal:define-macro="main">
 
     <div tal:replace="structure provider:plone.abovecontenttitle" />
-    <h1>Assigned Homes - <span tal:replace="view/current_inspection" /></h1>
-    <p>These are the homes assigned to your team. Select one home, click next, and perform the weedwalk.
-        When you are finished with the home, it will be moved from this list to the "Completed" Tab. Return
-        here and select another home.</p>
+    <h1 tal:content="context/title"></h1>
+
     <div tal:replace="structure provider:plone.belowcontenttitle" />
 
     <div tal:replace="structure provider:plone.abovecontentbody" />
+        <div tal:condition="view/active_inspection">
+            <p>House <a href="" tal:attributes="href string:${context/absolute_url}/@@walker-assignments">Inspection Assignments.</a></p>
+        </div>
         <tal:tabs tal:define="streets view/streets;
-                              street_dict view/street_dict">
-        <div class="pat-autotoc autotabs" data-pat-autotoc="section:section;levels:h2;">
+                              street_dict view/street_dict;
+                              inspections view/inspections;
+                              home_admin view/home_admin">
+        <div tal:condition="home_admin" class="pat-autotoc autotabs" data-pat-autotoc="section:section;levels:h2;">
         <section tal:repeat="street streets">
             <h2><span tal:replace="street" /></h2>
             <table tal:define="home_listings python:street_dict.get(street)">
                 <tr>
-                    <th>Select</th>
-                    <th>Division</th>
-                    <th>Lot</th>
+                    <th>Division/Lot</th>
                     <th>Address</th>
                     <th>Map</th>
                 </tr>
@@ -43,6 +44,13 @@
                     <span tal:replace="structure python:view.getTableRowStructure(home_listing_dict)" />
                 </tr>
             </table>
+        </section>
+        <section tal:condition="inspections">
+            <h2>Annual Inspections</h2>
+            <ul>
+                <li tal:repeat="inspection inspections"><a href="" tal:attributes="href inspection/getURL">
+                    <span tal:replace="inspection/Title"/></a> - <span tal:replace="python:view.getState(inspection)" /></li>
+            </ul>
         </section>
         </div>
         </tal:tabs>

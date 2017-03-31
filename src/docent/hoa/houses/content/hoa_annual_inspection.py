@@ -13,6 +13,7 @@ from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 from docent.hoa.houses.content.hoa_house import IHOAHouse
+from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
 from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT, LOT_DIVISION_DICT, WALKERS_GROUP_IDS
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,
@@ -237,13 +238,66 @@ class HOAAnnualInspection(Container):
         added_inspections = 0
         for house_brain in house_brains:
             house_obj = house_brain.getObject()
-            api.content.create(container=house_obj,
-                               type='hoa_house_inspection',
-                               id=house_inspection_title,
-                               title=u'House Inspection %s' % house_inspection_title,
-                               safe_id=True)
-            added_inspections += 1
+            if house_inspection_title not in house_obj:
+                api.content.create(container=house_obj,
+                                   type='hoa_house_inspection',
+                                   id=house_inspection_title,
+                                   title=u'House Inspection %s' % house_inspection_title,
+                                   safe_id=True)
+                added_inspections += 1
 
         api.portal.show_message(message=u"%s houses prepared for annual inspection." % added_inspections,
                                 request=context.REQUEST,
                                 type='info')
+
+    def verifyFirstInspectionComplete(self):
+        context = self
+        parent_container = context.aq_parent
+        parent_container_path = '/'.join(parent_container.getPhysicalPath())
+        current_inspection_brains = context.portal_catalog.searchResults(
+                   path={'query': parent_container_path, 'depth': 3},
+                   object_provides=IHOAHouseInspection.__identifier__,
+                   review_state='pending')
+        if current_inspection_brains:
+            pending_inspections = len(current_inspection_brains)
+            portal_msg = ""
+            if pending_inspections > 20:
+                portal_msg += "There are %s homes remaining to inspect." % pending_inspections
+            else:
+                portal_msg += "The following homes have not been inspected: "
+                portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
+                for ci_brain in current_inspection_brains[1:]:
+                    portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
+
+            api.portal.show_message(message=portal_msg,
+                                    request=context.REQUEST,
+                                    type='info')
+            return False
+
+        return True
+
+    def verifySecondInspectionComplete(self):
+        context = self
+        parent_container = context.aq_parent
+        parent_container_path = '/'.join(parent_container.getPhysicalPath())
+        current_inspection_brains = context.portal_catalog.searchResults(
+                   path={'query': parent_container_path, 'depth': 3},
+                   object_provides=IHOAHouseInspection.__identifier__,
+                   review_state='failed_initial')
+        if current_inspection_brains:
+            pending_inspections = len(current_inspection_brains)
+            portal_msg = ""
+            if pending_inspections > 20:
+                portal_msg += "There are %s homes remaining to inspect." % pending_inspections
+            else:
+                portal_msg += "The following homes have not been inspected: "
+                portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
+                for ci_brain in current_inspection_brains[1:]:
+                    portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
+
+            api.portal.show_message(message=portal_msg,
+                                    request=context.REQUEST,
+                                    type='info')
+            return False
+
+        return True

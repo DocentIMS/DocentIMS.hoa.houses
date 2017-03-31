@@ -50,26 +50,33 @@ class WalkerAssignments(grok.View):
         if home_inspection_state:
             house_inspection_brains = catalog(path={'query': context_path, 'depth': 2},
                                               object_provides=IHOAHouseInspection.__identifier__,
-                                              review_state=home_inspection_state,
-                                              sort_on='getObjPositionInParent')
+                                              review_state=home_inspection_state)
 
         street_dict = defaultdict(list)
         for hi_brain in house_inspection_brains:
             hi_obj = hi_brain.getObject()
+            #import pdb;pdb.set_trace()
+            if hi_obj.id == '1_008':
+                print 'hi_obj.id: 1_008'
             hi_home_obj = hi_obj.aq_parent
             street = getattr(hi_home_obj, 'street_number', '')
             address = getattr(hi_home_obj, 'street_address', '')
             street_address = '%s %s' % (street, address)
-            home_listing_dict = {'url':hi_home_obj.absolute_url(),
+            home_listing_dict = {'url':'%s/@@home-inspection' % hi_home_obj.absolute_url(),
                                  'div':getattr(hi_home_obj, 'div', ''),
                                  'lot':getattr(hi_home_obj, 'lot', ''),
                                  'address':street_address,
                                  'map':''}
-
+            # home_listing_tuple = (hi_home_obj.absolute_url(),
+            #                       getattr(hi_home_obj, 'div', ''),
+            #                       getattr(hi_home_obj, 'lot', ''),
+            #                       street_address,
+            #                       '')
+            # street_dict[address].add(home_listing_tuple)
             street_dict[address].append(home_listing_dict)
 
         streets = sorted(street_dict.keys())
-
+        #import pdb;pdb.set_trace()
         for street in streets:
             street_dict[street] = sorted(street_dict[street], key=itemgetter('address'))
 

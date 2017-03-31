@@ -146,3 +146,14 @@ DIVISION_BY_FIVE = {
 LOT_DIVISION_DICT = {3: DIVISION_BY_THREE,
                      4: DIVISION_BY_FOUR,
                      5: DIVISION_BY_FIVE}
+
+HOUSE_INSPECTION_STATE_TITLES = {'draft':'Draft',
+                                 'initial_inspection':'Initial Inspection',
+                                 'secondary_inspection':'Secondary Inspection',
+                                 'closed':'Closed'}
+
+HOME_INSPECTION_STATE_TITLES = {'failed_final':'Failed Secondary Inspection',
+                                'failed_initial':'Failed Initial Inspection',
+                                'passed':'Passed',
+                                'pending':'Pending',
+                                'remedied':'Remedied'}

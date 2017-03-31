@@ -17,16 +17,30 @@ from docent.hoa.houses.app_config import (BOARD_MEMBERS_GID,
 
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 
-def getGroupMemberVocabulary(group_name):
+def getGroupMemberVocabulary(group_name, multi_group=False):
     """Return a set of groupmembers, return an empty set if group not found
     """
-    try:
-        group_members = api.user.get_users(groupname=group_name)
-    except GroupNotFoundError:
-        group_members = ()
+
+    if multi_group:
+        group_members = []
+        try:
+            sub_groups = api.user.get_users(groupname=group_name)
+        except GroupNotFoundError:
+            sub_groups = []
+        for sub_group in sub_groups:
+            try:
+                sub_group_members = api.user.get_users(group=sub_group)
+            except GroupNotFoundError:
+                sub_group_members = []
+            group_members += sub_group_members
+    else:
+        try:
+            group_members = api.user.get_users(groupname=group_name)
+        except GroupNotFoundError:
+            group_members = []
 
     member_fullname_by_id_dict = {}
-    for member_data in group_members:
+    for member_data in set(group_members):
         member_id = member_data.getId()
         member_fullname = member_data.getProperty('fullname')
         member_fullname_by_id_dict.update({member_id:member_fullname})
@@ -46,7 +60,7 @@ def getGroupMemberVocabulary(group_name):
 @implementer(IVocabularyFactory)
 class IWalkersVocabulary(object):
     def __call__(self, context):
-        return getGroupMemberVocabulary(WALKERS_MEMBERS_GID)
+        return getGroupMemberVocabulary(WALKERS_MEMBERS_GID, multi_group=True)
 IWalkersVocabularyFactory = IWalkersVocabulary()
 
 @implementer(IVocabularyFactory)

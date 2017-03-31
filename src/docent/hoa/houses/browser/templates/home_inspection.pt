@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="example.dexterityforms"
+      metal:use-macro="context/main_template/macros/master">
+
+    <metal:block fill-slot="main">
+        <div tal:replace="structure provider:plone.abovecontenttitle" />
+        <h1 class="documentFirstHeading" tal:content="view/label | nothing" />
+
+        <div tal:replace="structure provider:plone.belowcontenttitle" />
+        <div class="address_block">
+            </div>
+        <div tal:replace="structure provider:plone.abovecontentbody" />
+        <div class="home_details">
+        <div class="details_block">
+            <p><span tal:replace="context/street_number|Nothing" /> <span tal:replace="context/street_address|Nothing" /></p>
+        </div>
+        <div class="image_block">
+            <div tal:define="picture nocall:context/picture" tal:condition="nocall:picture">
+                <img tal:replace="structure context/@@images/picture/mini" />
+            </div>
+        </div>
+
+        <div id="content-core">
+            <p><strong><em>Passing</em></strong> the home will add it to your "Completed" list. You will be returned to the "Assigned" tab to choose the next home to inspect.</p>
+            <p><strong><em>Failing</em></strong> the home will load the Home Inspection Form.</p>
+            <metal:block use-macro="context/@@ploneform-macros/titlelessform" />
+        </div>
+
+    </metal:block>
+
+</html>

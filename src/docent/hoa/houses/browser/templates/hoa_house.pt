@@ -43,7 +43,8 @@
     </div>
     <tal:block tal:define="hasOwners view/hasOwners;
                            hasRenters view/hasRenters;
-                           hasPM view/hasPM;">
+                           hasPM view/hasPM;
+                           inspections view/inspections">
     <h2 tal:condition="hasOwners">Owners</h2>
         <ul tal:condition="hasOwners">
             <li><strong>Owner One:</strong> <span tal:replace="structure view/owner_one" /></li>
@@ -58,6 +59,14 @@
         <ul tal:condition="hasPM">
             <li><strong>Property Manager:</strong> <span tal:replace="structure view/property_manager" /></li>
         </ul>
+
+    <div tal:condition="inspections">
+        <h3>Inspections</h3>
+        <ul>
+            <li tal:repeat="inspection inspections"><a href="" tal:attributes="href inspection/absolute_url">
+                    <span tal:replace="inspection/Title"/></a> - <span tal:replace="python:view.getState(inspection)" /></li>
+        </ul>
+    </div>
     </tal:block>
     <div tal:replace="structure provider:plone.belowcontentbody" />
     </tal:main-macro>

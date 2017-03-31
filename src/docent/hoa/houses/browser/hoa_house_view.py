@@ -3,7 +3,7 @@ from five import grok
 from plone import api
 from plone.api.exc import MissingParameterError
 from plone.protect.utils import addTokenToUrl
-
+from docent.hoa.houses.app_config import HOME_INSPECTION_STATE_TITLES
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 
 grok.templatedir('templates')
@@ -54,9 +54,19 @@ class View(grok.View):
         if property_manager:
             self.hasPM = True
 
+        house_inspection_objs = context.listFolderContents(contentFilter={"portal_type":"hoa_house_inspection",
+                                                                            "sort_on":"created",
+                                                                            "sort_order":"ascending"})
+
+        self.inspections = house_inspection_objs
 
     def getRentalStatus(self):
         if getattr(self.context, 'rental'):
             return 'Is Rental'
         else:
             return ''
+
+    def getState(self, obj):
+        status = api.content.get_state(obj=obj)
+
+        return HOME_INSPECTION_STATE_TITLES.get(status)
