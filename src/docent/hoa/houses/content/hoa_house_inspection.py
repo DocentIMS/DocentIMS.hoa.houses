@@ -34,12 +34,14 @@ class IHOAHouseInspection(form.Schema):
         title=_(u"Title"),
     )
 
+    form.mode(inspection_datetime='hidden')
     inspection_datetime = schema.Datetime(
         title=_(u'First Inspection Datetime'),
         description=_(u''),
         required=False,
     )
 
+    form.mode(passed_datetime='hidden')
     passed_datetime = schema.Datetime(
         title=_(u'Secondary Inspection Datetime'),
         description=_(u''),

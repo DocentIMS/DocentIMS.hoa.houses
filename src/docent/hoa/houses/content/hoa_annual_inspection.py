@@ -79,12 +79,12 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    number_of_groups = schema.Choice(
-        title=_(u"Number of Groups"),
-        description=_(u""),
-        vocabulary=group_numbers_vocab,
-        required=True,
-    )
+    # number_of_groups = schema.Choice(
+    #     title=_(u"Number of Groups"),
+    #     description=_(u""),
+    #     vocabulary=group_numbers_vocab,
+    #     required=True,
+    # )
 
     fieldset('team_a',
         label=u'Team A',
