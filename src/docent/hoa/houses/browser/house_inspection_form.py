@@ -105,7 +105,6 @@ class HouseInspectionForm(form.SchemaForm):
         If fail, transition to first or second failure
         """
         context = self.context
-        import pdb;pdb.set_trace()
         active_home_inspection_id = getActiveHomeInspectionId()
 
         if not active_home_inspection_id:

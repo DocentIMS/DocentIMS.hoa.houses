@@ -1,11 +1,13 @@
 import logging
+from Acquisition import aq_base
 from plone import api
 from plone.dexterity.content import Container
 from plone.directives import form
+from plone.supermodel.directives import fieldset
 from zope import schema
 from docent.hoa.houses import _
 
-from docent.hoa.houses.app_config import DIVISION_ONE, DIVISION_TWO
+from docent.hoa.houses.app_config import DIVISION_ONE, DIVISION_TWO, WALKERS_GROUP_IDS
 
 logger = logging.getLogger("Plone")
 
@@ -34,6 +36,44 @@ class IHOANeighborhood(form.Schema):
         description=_(u"Which zipcode does this neighborhood use?")
     )
 
+    fieldset('initial_messages',
+        label=u'Initial Inspection Messages',
+        description=u'',
+        fields=['initial_pass_message',
+                'initial_fail_message',]
+    )
+
+    initial_pass_message = schema.Text(
+        title=_(u"Initial Passed Inspection Message"),
+        description=_(u"This message is used for both email and postal messages to be sent."),
+        required=False,
+    )
+
+    initial_fail_message = schema.Text(
+        title=_(u"Initial Fail Inspection Message"),
+        description=_(u"This message is used for both email and postal messages to be sent."),
+        required=False,
+    )
+
+    fieldset('rewalk_messages',
+        label=u'Re-walk Inspection Messages',
+        description=u'',
+        fields=['rewalk_pass_message',
+                'rewalk_fail_message',]
+    )
+
+    rewalk_pass_message = schema.Text(
+        title=_(u"Rewalk Passed Inspection Message"),
+        description=_(u"This message is used for both email and postal messages to be sent."),
+        required=False,
+    )
+
+    rewalk_fail_message = schema.Text(
+        title=_(u"Rewalk Fail Message"),
+        description=_(u"This message is used for both email and postal messages to be sent."),
+        required=False,
+    )
+
 
 class HOANeighborhood(Container):
     """
@@ -49,3 +89,10 @@ class HOANeighborhood(Container):
                                            title=house_id,
                                            div=div,
                                            lot=lot)
+            aq_base(house_obj).__ac_local_roles_block = True
+
+        for g_id in WALKERS_GROUP_IDS:
+            api.group.grant_roles(groupname=g_id,
+                                  roles=['Reader'],
+                                  obj=context)
+        context.reindexObjectSecurity()

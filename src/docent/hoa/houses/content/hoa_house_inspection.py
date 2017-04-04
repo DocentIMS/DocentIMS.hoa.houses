@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import date, datetime
 from plone import api
 from plone.dexterity.content import Container
 from plone.directives import form
@@ -32,6 +32,18 @@ class IHOAHouseInspection(form.Schema):
     #form.mode(title='hidden')
     title = schema.TextLine(
         title=_(u"Title"),
+    )
+
+    inspection_datetime = schema.Datetime(
+        title=_(u'First Inspection Datetime'),
+        description=_(u''),
+        required=False,
+    )
+
+    passed_datetime = schema.Datetime(
+        title=_(u'Secondary Inspection Datetime'),
+        description=_(u''),
+        required=False,
     )
 
     fieldset('flowerpots',
@@ -194,3 +206,11 @@ class IHOAHouseInspection(form.Schema):
 class HOAHouseInspection(Container):
     """
     """
+
+    def after_transition_processor(self):
+        context_state = api.content.get_state(obj=self)
+        now = datetime.now()
+        if context_state == 'passed':
+            setattr(self, 'passed_datetime', now)
+
+        setattr(self, 'inspection_datetime', now)

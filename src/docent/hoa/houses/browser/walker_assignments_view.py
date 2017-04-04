@@ -35,10 +35,13 @@ class WalkerAssignments(grok.View):
 
         current_inspection_state = ''
         current_inspection = ''
+        house_inspection_title = ''
         if len(current_inspection_brains) >= 1:
             current_inspection_brain = current_inspection_brains[0]
             current_inspection_state = current_inspection_brain.review_state
             current_inspection = current_inspection_brain.Title
+            ci_obj = current_inspection_brain.getObject()
+            house_inspection_title = getattr(ci_obj, 'house_inspection_title', '')
 
         home_inspection_state = ''
         if current_inspection_state == 'initial_inspection':
@@ -55,25 +58,24 @@ class WalkerAssignments(grok.View):
         street_dict = defaultdict(list)
         for hi_brain in house_inspection_brains:
             hi_obj = hi_brain.getObject()
-            #import pdb;pdb.set_trace()
-            if hi_obj.id == '1_008':
-                print 'hi_obj.id: 1_008'
-            hi_home_obj = hi_obj.aq_parent
-            street = getattr(hi_home_obj, 'street_number', '')
-            address = getattr(hi_home_obj, 'street_address', '')
-            street_address = '%s %s' % (street, address)
-            home_listing_dict = {'url':'%s/@@home-inspection' % hi_home_obj.absolute_url(),
-                                 'div':getattr(hi_home_obj, 'div', ''),
-                                 'lot':getattr(hi_home_obj, 'lot', ''),
-                                 'address':street_address,
-                                 'map':''}
-            # home_listing_tuple = (hi_home_obj.absolute_url(),
-            #                       getattr(hi_home_obj, 'div', ''),
-            #                       getattr(hi_home_obj, 'lot', ''),
-            #                       street_address,
-            #                       '')
-            # street_dict[address].add(home_listing_tuple)
-            street_dict[address].append(home_listing_dict)
+            hi_obj_id = hi_obj.getId()
+            if hi_obj_id == house_inspection_title:
+                hi_home_obj = hi_obj.aq_parent
+                street = getattr(hi_home_obj, 'street_number', '')
+                address = getattr(hi_home_obj, 'street_address', '')
+                street_address = '%s %s' % (street, address)
+                home_listing_dict = {'url':'%s/@@home-inspection' % hi_home_obj.absolute_url(),
+                                     'div':getattr(hi_home_obj, 'div', ''),
+                                     'lot':getattr(hi_home_obj, 'lot', ''),
+                                     'address':street_address,
+                                     'map':''}
+                # home_listing_tuple = (hi_home_obj.absolute_url(),
+                #                       getattr(hi_home_obj, 'div', ''),
+                #                       getattr(hi_home_obj, 'lot', ''),
+                #                       street_address,
+                #                       '')
+                # street_dict[address].add(home_listing_tuple)
+                street_dict[address].append(home_listing_dict)
 
         streets = sorted(street_dict.keys())
         #import pdb;pdb.set_trace()

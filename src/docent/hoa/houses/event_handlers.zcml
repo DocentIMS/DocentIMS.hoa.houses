@@ -54,6 +54,11 @@
       handler=".event_handlers.onPrincipalDeletion"
       />
 
+  <subscriber
+        for="Products.PluggableAuthService.interfaces.events.IUserLoggedInEvent"
+        handler=".event_handlers.logged_in_handler"
+        />
+
     <!--<subscriber-->
         <!--for="Products.PluggableAuthService.interfaces.authservice.IPropertiedUser-->
             <!--Products.PluggableAuthService.interfaces.events.IPrincipalCreatedEvent"-->

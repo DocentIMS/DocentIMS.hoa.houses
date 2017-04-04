@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from collections import Counter
 from plone import api
 from plone.dexterity.content import Container
 from plone.directives import form
@@ -35,6 +36,13 @@ def computeTitle():
 
     return u'Annual Inspection %s' % date_str
 
+class DoubleMemberInGroup(Invalid):
+    __doc__ = _(u"You can't have the same member listed twice in a weed walk group.")
+
+
+class MinimumGroups(Invalid):
+    __doc__ = _(u"Groups A, B, and C must have week walkers assigned.")
+
 
 class IHOAAnnualInspection(form.Schema):
     """
@@ -56,9 +64,9 @@ class IHOAAnnualInspection(form.Schema):
     start_date = schema.Date(
         title=_(u"Start Date"),
         description=_(u""),
-        required=False,
     )
 
+    form.mode(end_date='display')
     end_date = schema.Date(
         title=_(u"End Date"),
         description=_(u"This field is calculated at the end of the Annual Inspection"),
@@ -183,6 +191,71 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
+    # @invariant
+    # def minimumThreeGroups(data):
+    #     assigned_members = 0
+    #     group_a_member_one = getattr(data, 'group_a_member_one', None)
+    #     if group_a_member_one:
+    #         assigned_members += 1
+    #     group_a_member_two = getattr(data, 'group_a_member_two', None)
+    #     if group_a_member_two:
+    #         assigned_members += 1
+    #     group_b_member_one = getattr(data, 'group_b_member_one', None)
+    #     if group_b_member_one:
+    #         assigned_members += 1
+    #     group_b_member_two = getattr(data, 'group_b_member_two', None)
+    #     if group_b_member_two:
+    #         assigned_members += 1
+    #     group_c_member_one = getattr(data, 'group_c_member_one', None)
+    #     if group_c_member_one:
+    #         assigned_members += 1
+    #     group_c_member_two = getattr(data, 'group_c_member_two', None)
+    #     if group_c_member_two:
+    #         assigned_members += 1
+    #
+    #     if group_a_member_one == group_a_member_two:
+    #         raise DoubleMemberInGroup(_(u"You can't have the same member twice in Group A."))
+    #
+    #     if group_b_member_one == group_b_member_two:
+    #         raise DoubleMemberInGroup(_(u"You can't have the same member twice in Group B."))
+    #
+    #     if group_c_member_one == group_c_member_two:
+    #         raise DoubleMemberInGroup(_(u"You can't have the same member twice in Group C."))
+    #
+    #     if assigned_members != 6:
+    #         raise MinimumGroups()
+
+    # @invariant
+    # def validateGroups(data):
+    #     assigned_members = []
+    #     for m_id in ['group_a_member_one'
+    #                  'group_a_member_two',
+    #                  'group_b_member_one',
+    #                  'group_b_member_two',
+    #                  'group_c_member_one',
+    #                  'group_c_member_two',
+    #                  'group_d_member_one',
+    #                  'group_d_member_two',
+    #                  'group_e_member_one',
+    #                  'group_e_member_two']:
+    #         a_value = getattr(data, m_id, None)
+    #         if a_value:
+    #             assigned_members.append(a_value)
+    #
+    #     sorted_dict = Counter(assigned_members)
+    #     import pdb;pdb.set_trace()
+    #     for k, v in sorted_dict.iteritems():
+    #         if v >= 2:
+    #             member_data = api.user.get(userid=k)
+    #             fullname = member_data.getProperty('fullname')
+    #             portal = api.portal.get()
+    #             api.portal.show_message(message="%s has been assigned to multiple groups." % fullname,
+    #                                     request=portal.REQUEST,
+    #                                     type='warning')
+
+
+
+
 
 
 class HOAAnnualInspection(Container):
@@ -192,9 +265,15 @@ class HOAAnnualInspection(Container):
     def after_object_added_processor(self, context, event):
         self.generate_house_inspection_title()
         self.add_walkers_to_groups()
+        context_state = api.content.get_state(obj=self)
+        if context_state not in ['draft', 'closed']:
+            self.assign_security()
 
     def after_edit_processor(self):
         self.add_walkers_to_groups()
+        context_state = api.content.get_state(obj=self)
+        if context_state not in ['draft', 'closed']:
+            self.assign_security()
 
     def after_transition_processor(self):
         context_state = api.content.get_state(obj=self)
@@ -241,13 +320,42 @@ class HOAAnnualInspection(Container):
             api.group.add_user(groupname='walkers_e', username=group_e_member_two)
 
 
+    def getNumberOfGroups(self):
+        context = self
+        group_a_member_one = getattr(self, 'group_a_member_one', None)
+        group_a_member_two = getattr(self, 'group_a_member_two', None)
+        group_b_member_one = getattr(self, 'group_b_member_one', None)
+        group_b_member_two = getattr(self, 'group_b_member_two', None)
+        group_c_member_one = getattr(self, 'group_c_member_one', None)
+        group_c_member_two = getattr(self, 'group_c_member_two', None)
+        group_d_member_one = getattr(self, 'group_d_member_one', None)
+        group_d_member_two = getattr(self, 'group_d_member_two', None)
+        group_e_member_one = getattr(self, 'group_e_member_one', None)
+        group_e_member_two = getattr(self, 'group_e_member_two', None)
+
+        number_of_groups = 0
+        if group_a_member_one or group_a_member_two:
+            number_of_groups += 1
+        if group_b_member_one or group_b_member_one:
+            number_of_groups += 1
+        if group_c_member_one or group_c_member_two:
+            number_of_groups += 1
+        if group_d_member_one or group_d_member_two:
+            number_of_groups += 1
+        if group_e_member_one or group_e_member_two:
+            number_of_groups += 1
+
+        return number_of_groups
+
+
     def assign_security(self):
         context = self
         parent_container = context.aq_parent
         if parent_container.portal_type != "hoa_neighborhood":
             #woah something went wrong
             return
-        number_of_groups = getattr(context, 'number_of_groups', 3)
+        #number_of_groups = getattr(context, 'number_of_groups', 3)
+        number_of_groups = context.getNumberOfGroups()
         lot_division_dict = LOT_DIVISION_DICT.get(number_of_groups)
         for walker_group_id in lot_division_dict:
             homes_assigned_by_id = lot_division_dict.get(walker_group_id)
@@ -255,12 +363,34 @@ class HOAAnnualInspection(Container):
                 home_obj = parent_container.get(home_id)
                 if home_obj:
                     #clear previous group roles
-                    home_obj.manage_delLocalRoles(WALKERS_GROUP_IDS)
+                    for wg_id in WALKERS_GROUP_IDS:
+                        api.group.revoke_roles(groupname=wg_id,
+                                               roles=['Reader'],
+                                               obj=home_obj)
+                    #home_obj.manage_delLocalRoles(WALKERS_GROUP_IDS)
                     #set new role
                     api.group.grant_roles(groupname=walker_group_id,
-                                          roles=['Editor'],
+                                          roles=['Reader'],
                                           obj=home_obj)
                     home_obj.reindexObjectSecurity()
+                    home_inspections = home_obj.listFolderContents(contentFilter={"portal_type":"hoa_house_inspection",
+                                                                         "sort_on":"created",
+                                                                         "sort_order":"ascending"})
+                    for home_insp in home_inspections:
+                        for wg_id in WALKERS_GROUP_IDS:
+                            api.group.revoke_roles(groupname=wg_id,
+                                                   roles=['Editor', 'Reviewer'],
+                                                   obj=home_insp)
+                            home_insp.reindexObjectSecurity()
+
+                    house_inspection_title = getattr(context, 'house_inspection_title', '')
+                    current_hi = getattr(home_obj, house_inspection_title, None)
+                    if current_hi:
+                        api.group.grant_roles(groupname=walker_group_id,
+                                              roles=['Editor', 'Reviewer'],
+                                              obj=current_hi)
+                        current_hi.reindexObjectSecurity()
+
 
     def generate_house_inspection_title(self):
         today = date.today()

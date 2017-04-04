@@ -139,18 +139,21 @@ class IHOAHouse(form.Schema):
         vocabulary=u'docent.hoa.street_addresses',
     )
 
+    form.mode(city='hidden')
     city = schema.TextLine(
         title=_(u"City"),
         description=_(u"Please provide the city to be used with addresses in this neighborhood."),
         defaultFactory=getNeighborhoodCity,
     )
 
+    form.mode(state='hidden')
     state = schema.TextLine(
         title=_(u"State Abbreviation"),
         description=_(u"Please provide the state abbreviation to be used with addresses in this neighborhood."),
         defaultFactory=getNeighborhoodState,
     )
 
+    form.mode(zipcode='hidden')
     zipcode = schema.TextLine(
         title=_(u"Zipcode"),
         description=_(u"Which zipcode does this neighborhood use?"),
@@ -315,6 +318,8 @@ def propertyManagerIndexer(obj):
 class HOAHouse(Container):
     """
     """
+    __ac_local_roles_block__ = True
+
     def after_object_added_processor(self, context, event):
         self.update_role_members()
 

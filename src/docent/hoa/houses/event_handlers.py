@@ -5,7 +5,7 @@ from Products.CMFCore.interfaces import IMemberData
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.content.hoa_house import ROLE_IDS
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
-from docent.hoa.houses.app_config import PROPERTY_ROLE_DICT, PROPERTY_ROLE_TO_HOME_ATTRIBUTE_LOOKUP_DICT
+from docent.hoa.houses.app_config import PROPERTY_ROLE_DICT, PROPERTY_ROLE_TO_HOME_ATTRIBUTE_LOOKUP_DICT, WALKERS_GROUP_IDS
 
 import logging
 logger = logging.getLogger("Plone")
@@ -30,6 +30,40 @@ def after_object_added_processor(context, event):
     logger.info('after_object_added_processor')
     if hasattr(context, 'after_object_added_processor'):
         context.after_object_added_processor(context, event)
+
+
+def logged_in_handler(event):
+    #get the currently logged in member
+    current_member = api.user.get_current()
+    current_member_groups = api.group.get_groups(user=current_member)
+    member_fullname = current_member.getProperty('fullname')
+
+    logger.info("Login event for: %s" % member_fullname)
+    for mgroup in current_member_groups:
+        if mgroup.getId() in WALKERS_GROUP_IDS:
+            logger.info("Login event: %s is a weedwalker.")
+            portal = api.portal.get()
+            neighborhood_objs = portal.listFolderContents(contentFilter={"portal_type":"hoa_neighborhood",
+                                                                         "sort_on":"created",
+                                                                         "sort_order":"ascending"})
+            if neighborhood_objs and len(neighborhood_objs) == 1:
+                n_obj = neighborhood_objs[0]
+                #is there an open inspection?
+                inspections = n_obj.listFolderContents(contentFilter={"portal_type":"hoa_annual_inspection",
+                                                                      "sort_on":"created",
+                                                                      "sort_order":"ascending"})
+                if inspections:
+                    current_inspection = inspections[0]
+                    ci_state = api.content.get_state(obj=current_inspection)
+                    if ci_state != 'closed':
+                        logger.info("Login event: redirecting %s to walker-assignments." % member_fullname)
+                        request = portal.REQUEST
+                        response = request.response
+                        return response.redirect('%s/@@walker-assignments' % n_obj.absolute_url())
+                    else:
+                        logger.warn("Login event: There are no active inspections.")
+            else:
+                logger.warn("Login event: There are too many neighborhoods to redirect to.")
 
 
 #@adapter(IPrincipalCreatedEvent)

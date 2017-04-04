@@ -41,7 +41,7 @@ def post_install(context):
 
     portal = api.portal.get()
     portal_groups = getToolByName(portal, 'portal_groups')
-    for g_id in [BOARD_MEMBERS_GID, HOME_OWNERS_GID, RENTERS_GID, PROPERTY_MANAGERS_GID]:
+    for g_id in [HOME_OWNERS_GID, RENTERS_GID]:
         portal_groups.addPrincipalToGroup(g_id, WALKERS_MEMBERS_GID)
 
 
