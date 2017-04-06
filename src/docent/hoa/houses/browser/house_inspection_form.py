@@ -1,8 +1,8 @@
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from AccessControl.SecurityManagement import newSecurityManager, setSecurityManager
 from AccessControl.User import UnrestrictedUser as BaseUnrestrictedUser
-from DateTime import DateTime
 
+from datetime import datetime
 from five import grok
 
 from plone import api
@@ -34,6 +34,18 @@ from docent.hoa.houses import _
 
 grok.templatedir('templates')
 
+def getAnnualInspection():
+    portal = api.portal.get()
+    annual_inspection_brains = portal.portal_catalog.searchResults(
+                                               object_provides=IHOAAnnualInspection.__identifier__,
+                                               sort_on="created",
+                                               sort_order="descending")
+    annual_inspection_brain = None
+    if annual_inspection_brains:
+        annual_inspection_brain = annual_inspection_brains[0]
+
+    return annual_inspection_brain
+
 def getActiveHomeInspectionId():
     portal = api.portal.get()
     annual_inspection_brains = portal.portal_catalog.searchResults(
@@ -64,13 +76,15 @@ class HouseInspectionForm(form.SchemaForm):
     schema = IHouseInspectionForm
     ignoreContext = False
 
-
     @button.buttonAndHandler(u"Pass")
     def handlePass(self, action):
         """User cancelled. Redirect back to the front page.
         """
         context = self.context
+        annual_inspection_brain = getAnnualInspection()
+        ai_review_state = annual_inspection_brain.review_state
         active_home_inspection_id = getActiveHomeInspectionId()
+
         if not active_home_inspection_id:
             #nothing to do
             api.portal.show_message(message=u"Could not find a home inspection form to update, was the annual "
@@ -78,11 +92,20 @@ class HouseInspectionForm(form.SchemaForm):
                                     request=context.REQUEST,
                                     type='info')
         else:
+            current_member = api.user.get_current()
+            current_member_id = current_member.getId()
             hi_obj = context.get(active_home_inspection_id)
             current_state = api.content.get_state(obj=hi_obj)
             had_errors = False
             try:
                 api.content.transition(obj=hi_obj, transition='pass')
+                if ai_review_state == 'initial_inspection':
+                    setattr(hi_obj, 'inspected_by_first', current_member_id)
+                elif ai_review_state == 'secondary_inspection':
+                    setattr(hi_obj, 'inspected_by_second', current_member_id)
+                now = datetime.now()
+                setattr(hi_obj, 'passed_datetime', now)
+                setattr(hi_obj, 'inspection_datetime', now)
             except MissingParameterError:
                 had_errors = True
             except InvalidParameterError:
@@ -105,7 +128,9 @@ class HouseInspectionForm(form.SchemaForm):
         If fail, transition to first or second failure
         """
         context = self.context
-        active_home_inspection_id = getActiveHomeInspectionId()
+        annual_inspection_brain = getActiveInspection()
+        ai_review_state = annual_inspection_brain.review_state
+        active_home_inspection_id = getActiveHomeInspectionId(annual_inspection_brain)
 
         if not active_home_inspection_id:
             #nothing to do
@@ -125,7 +150,15 @@ class HouseInspectionForm(form.SchemaForm):
 
             if transition_id:
                 try:
+                    current_member = api.user.get_current()
+                    current_member_id = current_member.getId()
                     api.content.transition(obj=hi_obj, transition=transition_id)
+                    now = datetime.now()
+                    setattr(hi_obj, 'inspection_datetime', now)
+                    if transition_id == 'fail_initial':
+                        setattr(hi_obj, 'inspected_by_first', current_member_id)
+                    elif transition_id == 'fail_second':
+                        setattr(hi_obj, 'inspected_by_second', current_member_id)
                 except MissingParameterError:
                     had_errors = True
                 except InvalidParameterError:

@@ -12,6 +12,7 @@ from zope import schema
 from zope.interface import provider, invariant, Invalid
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+from z3c.form.browser.radio import RadioFieldWidget
 
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
@@ -66,17 +67,19 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
     )
 
-    form.mode(end_date='display')
     end_date = schema.Date(
         title=_(u"End Date"),
-        description=_(u"This field is calculated at the end of the Annual Inspection"),
-        required=False,
+        description=_(u""),
     )
 
-    rental = schema.Bool(
+    form.widget(pic_req=RadioFieldWidget)
+    pic_req = schema.Choice(
         title=_(u'Picture Rqd if Failed?'),
         description=_(u''),
-        required=False,
+        source=SimpleVocabulary([SimpleTerm(value=True,
+                                            title=u"Yes"),
+                                 SimpleTerm(value=False,
+                                            title=U"No")])
     )
 
     # number_of_groups = schema.Choice(
@@ -394,7 +397,7 @@ class HOAAnnualInspection(Container):
 
     def generate_house_inspection_title(self):
         today = date.today()
-        setattr(self, 'house_inspection_title', today.strftime('%Y-%m'))
+        setattr(self, 'house_inspection_title', today.strftime('%Y'))
 
     def propagate_house_inspections(self):
         context = self
@@ -406,16 +409,17 @@ class HOAAnnualInspection(Container):
         house_inspection_title = getattr(self, 'house_inspection_title', '')
         if not house_inspection_title:
             today = date.today()
-            house_inspection_title = today.strftime('%Y-%m')
+            house_inspection_title = today.strftime('%Y')
 
         added_inspections = 0
         for house_brain in house_brains:
             house_obj = house_brain.getObject()
+            house_obj_title = getattr(house_obj, 'title', 'unknown house')
             if house_inspection_title not in house_obj:
                 api.content.create(container=house_obj,
                                    type='hoa_house_inspection',
                                    id=house_inspection_title,
-                                   title=u'House Inspection %s' % house_inspection_title,
+                                   title=house_obj_title,
                                    safe_id=True)
                 added_inspections += 1
 
