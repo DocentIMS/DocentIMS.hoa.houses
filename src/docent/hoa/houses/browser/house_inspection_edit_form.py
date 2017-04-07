@@ -17,6 +17,7 @@ from z3c.form import interfaces
 from z3c.form import field
 from z3c.form.browser.radio import RadioFieldWidget
 from plone.directives import form
+
 from docent.hoa.houses import _
 
 inspection_keys_to_fieldset_dict = {'flowerpots_text': 'flowerpots',
@@ -46,7 +47,8 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
 
         context = self.context
         current_state = api.content.get_state(obj=context)
-        if current_state in ['failed_initial', 'failed_final', 'remedied']:
+
+        if current_state in ['failed_final', 'remedied']:
             for_show = []
             groups = self.groups
             fieldset_dict = {}

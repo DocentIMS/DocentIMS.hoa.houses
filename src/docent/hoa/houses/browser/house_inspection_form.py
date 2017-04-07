@@ -128,9 +128,9 @@ class HouseInspectionForm(form.SchemaForm):
         If fail, transition to first or second failure
         """
         context = self.context
-        annual_inspection_brain = getActiveInspection()
+        annual_inspection_brain = getAnnualInspection()
         ai_review_state = annual_inspection_brain.review_state
-        active_home_inspection_id = getActiveHomeInspectionId(annual_inspection_brain)
+        active_home_inspection_id = getActiveHomeInspectionId()
 
         if not active_home_inspection_id:
             #nothing to do

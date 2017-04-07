@@ -439,7 +439,7 @@ class HOAAnnualInspection(Container):
         if current_inspection_brains:
             house_inspection_title = getattr(context, 'house_inspection_title', '')
             current_inspections = []
-            [current_inspections.append(i) for i in current_inspection_brains if i.getId() == house_inspection_title]
+            [current_inspections.append(i) for i in current_inspection_brains if i.getId == house_inspection_title]
             pending_inspections = len(current_inspections)
             portal_msg = ""
             if pending_inspections > 20:
@@ -468,7 +468,7 @@ class HOAAnnualInspection(Container):
         if current_inspection_brains:
             house_inspection_title = getattr(context, 'house_inspection_title', '')
             current_inspections = []
-            [current_inspections.append(i) for i in current_inspection_brains if i.getId() == house_inspection_title]
+            [current_inspections.append(i) for i in current_inspection_brains if i.getId == house_inspection_title]
             pending_inspections = len(current_inspections)
             pending_inspections = len(current_inspection_brains)
             portal_msg = ""
