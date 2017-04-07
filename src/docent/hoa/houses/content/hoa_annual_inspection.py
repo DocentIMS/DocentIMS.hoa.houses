@@ -435,8 +435,12 @@ class HOAAnnualInspection(Container):
                    path={'query': parent_container_path, 'depth': 3},
                    object_provides=IHOAHouseInspection.__identifier__,
                    review_state='pending')
+
         if current_inspection_brains:
-            pending_inspections = len(current_inspection_brains)
+            house_inspection_title = getattr(context, 'house_inspection_title', '')
+            current_inspections = []
+            [current_inspections.append(i) for i in current_inspection_brains if i.getId() == house_inspection_title]
+            pending_inspections = len(current_inspections)
             portal_msg = ""
             if pending_inspections > 20:
                 portal_msg += "There are %s homes remaining to inspect." % pending_inspections
@@ -462,6 +466,10 @@ class HOAAnnualInspection(Container):
                    object_provides=IHOAHouseInspection.__identifier__,
                    review_state='failed_initial')
         if current_inspection_brains:
+            house_inspection_title = getattr(context, 'house_inspection_title', '')
+            current_inspections = []
+            [current_inspections.append(i) for i in current_inspection_brains if i.getId() == house_inspection_title]
+            pending_inspections = len(current_inspections)
             pending_inspections = len(current_inspection_brains)
             portal_msg = ""
             if pending_inspections > 20:

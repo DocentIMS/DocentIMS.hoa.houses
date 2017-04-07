@@ -1,0 +1,163 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="docent.hoa.houses">
+<head>
+<!--<metal:block fill-slot="style_slot">-->
+        <!--<link rel="stylesheet" type="text/css"-->
+            <!--tal:define="navroot context/@@plone_portal_state/navigation_root_url"-->
+            <!--tal:attributes="href string:${navroot}/++resource++docent.hoa.houses/hoa.css"-->
+            <!--/>-->
+<!--</metal:block>-->
+</head>
+<body>
+
+<metal:main fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+    <div tal:replace="structure provider:plone.abovecontenttitle" />
+    <h1 tal:content="view/getAddress"></h1>
+    <p tal:content="context/Title"></p>
+    <div tal:replace="structure provider:plone.belowcontenttitle" />
+    <div class="walker_controls">
+        <a class="assignments" href=""
+           tal:attributes="href view/getAssignmentsURL">Correct</a> |
+        <a class="update" href=""
+           tal:attributes="href string:${context/absolute_url}/edit">Update</a>
+    </div>
+    <div tal:replace="structure provider:plone.abovecontentbody" />
+
+    <tal:block tal:define="flowerpotsErrors view/flowerpotsErrors;
+                           paintErrors view/paintErrors;
+                           sidewalk_driveErrors view/sidewalk_driveErrors;
+                           general_maintenanceErrors view/general_maintenanceErrors;
+                           stepsErrors view/stepsErrors;
+                           decks_patioErrors view/decks_patioErrors;
+                           inspected_by_second view/inspected_by_second;
+                           passed_date view/passed_datetime">
+        <h2>Inspection Details</h2>
+        <ul>
+            <li tal:condition="passed_date">Inspection Passed: <span tal:replace="passed_date" /></li>
+            <li>Inspection Date: <span tal:replace="context/inspection_datetime|Nothing" /></li>
+            <li>Inspected By: <span tal:replace="view/inspected_by_first" /></li>
+            <li tal:condition="inspected_by_second">Second Inspection By: <span tal:replace="structure inspected_by_second" /></li>
+        </ul>
+        <section>
+            <h2>Flowerpots</h2>
+            <div tal:condition="not:flowerpotsErrors">
+                <p>No Failures.</p>
+            </div>
+            <div tal:condition="flowerpotsErrors">
+                <h4>Initial Failures</h4>
+                <p tal:content="flowerpotsErrors"></p>
+                <div tal:define="flowerpots_image nocall:context/flowerpots_image" tal:condition="nocall:flowerpots_image">
+                    <img tal:replace="structure context/@@images/flowerpots_image/mini" />
+                </div>
+                <h4>Rewalk</h4>
+                <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(context.flowerpots_cond_remains)" /></p>
+                <div tal:define="flowerpots_second_image nocall:context/flowerpots_second_image" tal:condition="nocall:flowerpots_second_image">
+                    <img tal:replace="structure context/@@images/flowerpots_second_image/mini" />
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Paint</h2>
+            <div tal:condition="not:paintErrors">
+                <p>No Failures.</p>
+            </div>
+            <div tal:condition="paintErrors">
+                <h4>Initial Failures</h4>
+                <p tal:content="paintErrors"></p>
+                <div tal:define="paint_image nocall:context/paint_image" tal:condition="nocall:paint_image">
+                    <img tal:replace="structure context/@@images/paint_image/mini" />
+                </div>
+                <h4>Rewalk</h4>
+                <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(context.paint_cond_remains)" /></p>
+                <div tal:define="paint_second_image nocall:context/paint_second_image" tal:condition="nocall:paint_second_image">
+                    <img tal:replace="structure context/@@images/paint_second_image/mini" />
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Sidewalk/Drive</h2>
+            <div tal:condition="not:sidewalk_driveErrors">
+                <p>No Failures.</p>
+            </div>
+            <div tal:condition="sidewalk_driveErrors">
+                <h4>Initial Failures</h4>
+                <p tal:content="sidewalk_driveErrors"></p>
+                <div tal:define="sidewalk_drive_image nocall:context/sidewalk_drive_image" tal:condition="nocall:sidewalk_drive_image">
+                    <img tal:replace="structure context/@@images/sidewalk_drive_image/mini" />
+                </div>
+                <h4>Rewalk</h4>
+                <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(context.sidewalk_drive_cond_remains)" /></p>
+                <div tal:define="sidewalk_drive_second_image nocall:context/sidewalk_drive_second_image" tal:condition="nocall:sidewalk_drive_second_image">
+                    <img tal:replace="structure context/@@images/sidewalk_drive_second_image/mini" />
+                </div>
+
+            </div>
+        </section>
+        <section>
+            <h2>Steps</h2>
+            <div tal:condition="not:stepsErrors">
+                <p>No Failures.</p>
+            </div>
+            <div tal:condition="stepsErrors">
+                <h4>Initial Failures</h4>
+                <p tal:content="stepsErrors"></p>
+                <div tal:define="steps_image nocall:context/steps_image" tal:condition="nocall:steps_image">
+                    <img tal:replace="structure context/@@images/steps_image/mini" />
+                </div>
+                <h4>Rewalk</h4>
+                <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(context.steps_cond_remains)" /></p>
+                <div tal:define="steps_second_image nocall:context/steps_second_image" tal:condition="nocall:steps_second_image">
+                    <img tal:replace="structure context/@@images/steps_second_image/mini" />
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Decks/Patio</h2>
+            <div tal:condition="not:decks_patioErrors">
+                <p>No Failures.</p>
+            </div>
+            <div tal:condition="decks_patioErrors">
+                <h4>Initial Failures</h4>
+                <p tal:content="decks_patioErrors"></p>
+                <div tal:define="decks_patio_image nocall:context/decks_patio_image" tal:condition="nocall:decks_patio_image">
+                    <img tal:replace="structure context/@@images/decks_patio_image/mini" />
+                </div>
+                <h4>Rewalk</h4>
+                <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(context.decks_patio_cond_remains)" /></p>
+                <div tal:define="decks_patio_second_image nocall:context/decks_patio_second_image" tal:condition="nocall:decks_patio_second_image">
+                    <img tal:replace="structure context/@@images/decks_patio_second_image/mini" />
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>General Maintenance</h2>
+            <div tal:condition="not:general_maintenanceErrors">
+                <p>No Failures.</p>
+            </div>
+            <div tal:condition="general_maintenanceErrors">
+                <h4>Initial Failures</h4>
+                <p tal:content="general_maintenanceErrors"></p>
+                <div tal:define="general_maintenance_image nocall:context/general_maintenance_image" tal:condition="nocall:general_maintenance_image">
+                    <img tal:replace="structure context/@@images/general_maintenance_image/mini" />
+                </div>
+                <h4>Rewalk</h4>
+                <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(context.general_maintenance_cond_remains)" /></p>
+                <div tal:define="general_maintenance_second_image nocall:context/general_maintenance_second_image" tal:condition="nocall:general_maintenance_second_image">
+                    <img tal:replace="structure context/@@images/general_maintenance_second_image/mini" />
+                </div>
+            </div>
+        </section>
+    </tal:block>
+    <div tal:replace="structure provider:plone.belowcontentbody" />
+    </tal:main-macro>
+</metal:main>
+
+</body>
+</html>

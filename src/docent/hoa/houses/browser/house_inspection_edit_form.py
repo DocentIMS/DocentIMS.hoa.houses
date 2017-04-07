@@ -48,7 +48,6 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
         current_state = api.content.get_state(obj=context)
         if current_state in ['failed_initial', 'failed_final', 'remedied']:
             for_show = []
-            for_hide = []
             groups = self.groups
             fieldset_dict = {}
             [fieldset_dict.update({group.__name__:group}) for group in groups]
@@ -56,8 +55,6 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
             for key in inspection_keys_to_fieldset_dict.keys():
                 if getattr(context, key):
                     for_show.append(key)
-                else:
-                    for_hide.append(key)
 
             new_schema = field.Fields(IEmptySchema)
             new_groups = []
@@ -65,24 +62,23 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
                 fieldset_key = inspection_keys_to_fieldset_dict.get(skey)
                 s_group = fieldset_dict.get(fieldset_key)
                 #import pdb;pdb.set_trace()
-                s_group.fields['%s_image' % fieldset_key].mode = interfaces.HIDDEN_MODE
+
+                s_group.fields['%s_second_image' % fieldset_key].mode = None
                 s_group.fields['%s_cond_remains' % fieldset_key].mode = None
                 s_group.fields['%s_cond_remains' % fieldset_key].widgetFactory = RadioFieldWidget
-                s_group.fields['%s_second_image' % fieldset_key].mode = None
+                s_group.fields['%s_image' % fieldset_key].mode = interfaces.DISPLAY_MODE
+                #s_group.fields['%s_second_image' % fieldset_key].mode = interfaces.HIDDEN_MODE
+                #s_group.fields['%s_second_image' % fieldset_key].mode = None
                 #new_schema += s_group.fields
                 new_groups.append(s_group)
 
             self.groups = new_groups
-
-            # for hkey in for_hide:
-            #     fieldset_key = inspection_keys_to_fieldset_dict.get(hkey)
-            #     h_group = fieldset_dict.get(fieldset_key)
-            #     empty_fields = field.Fields(IEmptySchema)
-            #     # for field_key in group_fields.keys():
-            #     #     group_fields.omit(field_key)
-            #     h_group.fields = empty_fields
-            #     # import pdb;pdb.set_trace()
-            #     # print "yay"
+        else:
+            groups = self.groups
+            for group in groups:
+                g_name = group.__name__
+                if getattr(context, '%s_second_image' % g_name, None):
+                    group.fields['%s_second_image' % g_name].mode = interfaces.DISPLAY_MODE
 
 
     @property

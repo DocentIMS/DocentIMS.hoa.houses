@@ -380,3 +380,7 @@ class HOAHouse(Container):
 
         addCurrentHomeRoles(context_uuid, current_values_dict)
 
+    def get_address(self):
+        street_number = getattr(self, 'street_number', '')
+        street_address = getattr(self, 'street_address', '')
+        return '%s %s' % (street_number, street_address)

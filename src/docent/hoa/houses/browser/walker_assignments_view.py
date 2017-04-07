@@ -52,9 +52,8 @@ class WalkerAssignments(grok.View):
         house_inspection_brains = []
         if home_inspection_state:
             house_inspection_brains = catalog(path={'query': context_path, 'depth': 2},
-                                              object_provides=IHOAHouseInspection.__identifier__,
-                                              review_state=home_inspection_state)
-
+                                              object_provides=IHOAHouseInspection.__identifier__)
+        completed_listings = []
         street_dict = defaultdict(list)
         for hi_brain in house_inspection_brains:
             hi_obj = hi_brain.getObject()
@@ -65,34 +64,32 @@ class WalkerAssignments(grok.View):
                 address = getattr(hi_home_obj, 'street_address', '')
                 street_address = '%s %s' % (street, address)
                 home_listing_dict = {'url':'%s/@@home-inspection' % hi_home_obj.absolute_url(),
+                                     'address':street_address,
                                      'div':getattr(hi_home_obj, 'div', ''),
                                      'lot':getattr(hi_home_obj, 'lot', ''),
-                                     'address':street_address,
                                      'map':''}
-                # home_listing_tuple = (hi_home_obj.absolute_url(),
-                #                       getattr(hi_home_obj, 'div', ''),
-                #                       getattr(hi_home_obj, 'lot', ''),
-                #                       street_address,
-                #                       '')
-                # street_dict[address].add(home_listing_tuple)
-                street_dict[address].append(home_listing_dict)
+
+                if hi_brain.review_state == home_inspection_state:
+                    street_dict[address].append(home_listing_dict)
+                else:
+                    home_listing_dict.update({'url':hi_brain.getURL()})
+                    completed_listings.append(home_listing_dict)
 
         streets = sorted(street_dict.keys())
-        #import pdb;pdb.set_trace()
         for street in streets:
             street_dict[street] = sorted(street_dict[street], key=itemgetter('address'))
 
         self.current_inspection = current_inspection
         self.streets = streets
         self.street_dict = street_dict
-
+        self.completed_listings = sorted(completed_listings, key=itemgetter('address'))
 
     def getTableRowStructure(self, home_listing_dict):
         table_row_structure = ''
         table_row_structure += '<td><a class="inspect-button" href="%s">Inspect</a></td>' % home_listing_dict.get('url')
+        table_row_structure += '<td>%s</td>' % home_listing_dict.get('address')
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('div')
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('lot')
-        table_row_structure += '<td>%s</td>' % home_listing_dict.get('address')
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('map')
 
         return table_row_structure

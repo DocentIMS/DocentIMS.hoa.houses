@@ -84,7 +84,6 @@ class IHOAHouseInspection(form.Schema):
         required=False,
     )
 
-
     form.mode(flowerpots_cond_remains='hidden')
     form.widget(flowerpots_cond_remains=RadioFieldWidget)
     flowerpots_cond_remains = schema.Choice(
@@ -157,7 +156,7 @@ class IHOAHouseInspection(form.Schema):
 
     form.mode(paint_second_image='hidden')
     paint_second_image = NamedBlobImage(
-        title=_(u"Flowerpots Re-walk Photo"),
+        title=_(u"Paint Re-walk Photo"),
         description=_(u""),
         required=False,
     )
@@ -203,7 +202,7 @@ class IHOAHouseInspection(form.Schema):
 
     form.mode(sidewalk_drive_second_image='hidden')
     sidewalk_drive_second_image = NamedBlobImage(
-        title=_(u"Flowerpots Re-walk Photo"),
+        title=_(u"Sidewalk/Drive Re-walk Photo"),
         description=_(u""),
         required=False,
     )
@@ -249,7 +248,7 @@ class IHOAHouseInspection(form.Schema):
 
     form.mode(steps_second_image='hidden')
     steps_second_image = NamedBlobImage(
-        title=_(u"Flowerpots Re-walk Photo"),
+        title=_(u"Steps Re-walk Photo"),
         description=_(u""),
         required=False,
     )
@@ -295,7 +294,7 @@ class IHOAHouseInspection(form.Schema):
 
     form.mode(decks_patio_second_image='hidden')
     decks_patio_second_image = NamedBlobImage(
-        title=_(u"Flowerpots Re-walk Photo"),
+        title=_(u"Decks/Patio Re-walk Photo"),
         description=_(u""),
         required=False,
     )
@@ -341,7 +340,7 @@ class IHOAHouseInspection(form.Schema):
 
     form.mode(general_maintenance_second_image='hidden')
     general_maintenance_second_image = NamedBlobImage(
-        title=_(u"Flowerpots Re-walk Photo"),
+        title=_(u"General Maintenance Re-walk Photo"),
         description=_(u""),
         required=False,
     )

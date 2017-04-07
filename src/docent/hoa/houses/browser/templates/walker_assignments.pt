@@ -34,13 +34,28 @@
             <table tal:define="home_listings python:street_dict.get(street)">
                 <tr>
                     <th>Select</th>
+                    <th>Address</th>
                     <th>Division</th>
                     <th>Lot</th>
-                    <th>Address</th>
                     <th>Map</th>
                 </tr>
                 <tr tal:repeat="home_listing_dict home_listings">
                     <span tal:replace="structure python:view.getTableRowStructure(home_listing_dict)" />
+                </tr>
+            </table>
+        </section>
+        <section>
+            <h2>Completed</h2>
+            <table tal:define="completed_listings view/completed_listings">
+                <tr>
+                    <th>Select</th>
+                    <th>Address</th>
+                    <th>Division</th>
+                    <th>Lot</th>
+                    <th>Map</th>
+                </tr>
+                <tr tal:repeat="completed_listing_dict completed_listings">
+                    <span tal:replace="structure python:view.getTableRowStructure(completed_listing_dict)" />
                 </tr>
             </table>
         </section>
