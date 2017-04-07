@@ -7,6 +7,7 @@
  <permission>View</permission>
  <state state_id="failed_final" title="Failed Final Inspection" >
   <exit-transition transition_id="remedy" />
+  <exit-transition transition_id="retract" />
   <permission-map name="Access contents information" acquired="False">
    <permission-role>Contributor</permission-role>
    <permission-role>Editor</permission-role>
@@ -41,6 +42,7 @@
  <state state_id="failed_initial" title="Failed Initial Inspection" >
   <exit-transition transition_id="fail_second" />
   <exit-transition transition_id="pass" />
+  <exit-transition transition_id="retract" />
   <permission-map name="Access contents information" acquired="False">
    <permission-role>Contributor</permission-role>
    <permission-role>Editor</permission-role>

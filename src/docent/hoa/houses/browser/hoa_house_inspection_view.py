@@ -51,11 +51,20 @@ class View(grok.View):
         neighborhood_container = home_container.aq_parent
         self.neighborhood_container = neighborhood_container
 
+        self.retractable = False
+        if api.content.get_state(obj=context) != 'pending':
+            self.retractable = True
+
     def getRewalkCondition(self, rewalk_condition):
         if rewalk_condition:
             return 'YES'
 
         return 'NO'
+
+    def getTransitionURL(self):
+        url = "%s/content_status_modify?workflow_action=retract" % self.context.absolute_url()
+        return url
+        #return addTokenToUrl(url)
 
     def getAddress(self):
         return self.home_container.get_address()

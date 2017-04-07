@@ -83,9 +83,9 @@ class View(grok.View):
 
     def getTableRowStructure(self, home_listing_dict):
         table_row_structure = ''
+        table_row_structure += '<td>%s</td>' % home_listing_dict.get('address')
         table_row_structure += '<td><a href="%s">%s</a></td>' % (home_listing_dict.get('url'),
                                                                  home_listing_dict.get('div_lot'))
-        table_row_structure += '<td>%s</td>' % home_listing_dict.get('address')
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('map')
 
         return table_row_structure

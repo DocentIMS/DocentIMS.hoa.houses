@@ -26,7 +26,10 @@
         <a class="assignments" href=""
            tal:attributes="href view/getAssignmentsURL">Correct</a> |
         <a class="update" href=""
-           tal:attributes="href string:${context/absolute_url}/edit">Update</a>
+           tal:attributes="href string:${context/absolute_url}/edit">Update</a> <span tal:condition="view/retractable">|
+        <a class="retract" href=""
+           tal:attributes="href view/getTransitionURL">Retract</a></span>
+
     </div>
     <div tal:replace="structure provider:plone.abovecontentbody" />
 

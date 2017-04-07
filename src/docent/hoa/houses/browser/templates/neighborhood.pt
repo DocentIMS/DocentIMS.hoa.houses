@@ -36,8 +36,8 @@
             <h2><span tal:replace="street" /></h2>
             <table tal:define="home_listings python:street_dict.get(street)">
                 <tr>
-                    <th>Division/Lot</th>
                     <th>Address</th>
+                    <th>Division/Lot</th>
                     <th>Map</th>
                 </tr>
                 <tr tal:repeat="home_listing_dict home_listings">

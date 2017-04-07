@@ -11,6 +11,7 @@ from Products.CMFCore.utils import getToolByName
 from docent.hoa.houses.content.hoa_neighborhood import IHOANeighborhood
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
+from docent.hoa.houses.app_config import HOME_INSPECTION_STATE_TITLES
 
 grok.templatedir('templates')
 
@@ -72,7 +73,10 @@ class WalkerAssignments(grok.View):
                 if hi_brain.review_state == home_inspection_state:
                     street_dict[address].append(home_listing_dict)
                 else:
-                    home_listing_dict.update({'url':hi_brain.getURL()})
+                    review_state = hi_brain.review_state
+                    review_state_string = HOME_INSPECTION_STATE_TITLES.get(review_state)
+                    home_listing_dict.update({'url':hi_brain.getURL(),
+                                              'map':review_state_string})
                     completed_listings.append(home_listing_dict)
 
         streets = sorted(street_dict.keys())

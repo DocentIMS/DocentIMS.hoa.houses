@@ -52,7 +52,7 @@
                     <th>Address</th>
                     <th>Division</th>
                     <th>Lot</th>
-                    <th>Map</th>
+                    <th>State</th>
                 </tr>
                 <tr tal:repeat="completed_listing_dict completed_listings">
                     <span tal:replace="structure python:view.getTableRowStructure(completed_listing_dict)" />
