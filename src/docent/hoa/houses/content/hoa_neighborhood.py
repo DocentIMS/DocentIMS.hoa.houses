@@ -81,7 +81,8 @@ class HOANeighborhood(Container):
 
     def after_object_added_processor(self, context, event):
         context = self
-        all_house_ids = DIVISION_ONE + DIVISION_TWO
+        #all_house_ids = DIVISION_ONE + DIVISION_TWO
+        all_house_ids = ['1_001', '1_002', '1_003', '1_004', '1_005']
         for house_id in all_house_ids:
             div, lot = house_id.split('_')
             house_obj = api.content.create(container=context,
