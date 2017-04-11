@@ -5,6 +5,8 @@ from plone.dexterity.content import Container
 from plone.directives import form
 from plone.supermodel.directives import fieldset
 from zope import schema
+from plone.schema import Email
+
 from docent.hoa.houses import _
 
 from docent.hoa.houses.app_config import DIVISION_ONE, DIVISION_TWO, WALKERS_GROUP_IDS
@@ -34,6 +36,12 @@ class IHOANeighborhood(form.Schema):
     zipcode = schema.TextLine(
         title=_(u"Zipcode"),
         description=_(u"Which zipcode does this neighborhood use?")
+    )
+
+    secretary_email = Email(
+        title=_(u"Executive Secretary Email"),
+        description=_(u"Email address of the Executive Secretary"),
+        required=True,
     )
 
     fieldset('initial_messages',

@@ -82,6 +82,44 @@ class IHOAAnnualInspection(form.Schema):
                                             title=U"No")])
     )
 
+
+
+    form.mode(house_failure_log='hidden')
+    house_failure_log = schema.Dict(
+        title=_(u'Homes Sent Initial Failure Notices'),
+        description=_(u"Emails sent to the following home owners."),
+        key_type=schema.ASCIILine(),
+        value_type=schema.List(value_type=schema.ASCIILine()),
+        required=False,
+    )
+
+    form.mode(house_pass_log='hidden')
+    house_pass_log = schema.Dict(
+        title=_(u'Homes Sent Initial Pass Notices'),
+        description=_(u"Emails sent to the following home owners."),
+        key_type=schema.ASCIILine(),
+        value_type=schema.List(value_type=schema.ASCIILine()),
+        required=False,
+    )
+
+    form.mode(rewalk_failure_log='hidden')
+    rewalk_failure_log = schema.Dict(
+        title=_(u'Homes Sent Rewalk Pass Notices'),
+        description=_(u"Emails sent to the following home owners."),
+        key_type=schema.ASCIILine(),
+        value_type=schema.List(value_type=schema.ASCIILine()),
+        required=False,
+    )
+
+    form.mode(rewalk_pass_log='hidden')
+    rewalk_pass_log = schema.Dict(
+        title=_(u'Homes Sent Rewalk Pass Notices'),
+        description=_(u"Emails sent to the following home owners."),
+        key_type=schema.ASCIILine(),
+        value_type=schema.List(value_type=schema.ASCIILine()),
+        required=False,
+    )
+
     # number_of_groups = schema.Choice(
     #     title=_(u"Number of Groups"),
     #     description=_(u""),
@@ -283,6 +321,12 @@ class HOAAnnualInspection(Container):
         if context_state == 'initial_inspection':
             self.propagate_house_inspections()
             self.assign_security()
+
+        if context_state == 'secondary_inspection':
+            self.sendEmailNotices()
+
+        if context_state == 'closed':
+            self.sendEmailNotices(rewalk=True)
 
     def add_walkers_to_groups(self):
         for g_id in WALKERS_GROUP_IDS:
@@ -486,3 +530,116 @@ class HOAAnnualInspection(Container):
             return False
 
         return True
+
+    def sendEmailNotices(self, rewalk=False):
+        context = self
+        house_inspection_title = getattr(self, 'house_inspection_title', None)
+        if not house_inspection_title:
+            api.portal.show_message(message="We cannot locate the appropriate home inspections. Please verify this "
+                                            "inspection was properly configured.",
+                                    request=context.REQUEST,
+                                    type='warning')
+            return
+
+        current_state = 'secondary_inspection'
+        if rewalk:
+            current_state = 'closed'
+
+        neighborhood_container = context.aq_parent
+        neighborhood_path = '/'.join(neighborhood_container.getPhysicalPath())
+        #get all house passed inspections
+        passed_inspection_brains = context.portal_catalog.searchResults(
+            path={'query': neighborhood_path, 'depth': 3},
+            object_provides=IHOAHouseInspection.__identifier__,
+            review_state='passed')
+
+        failed_inspection_brains = context.portal_catalog.searchResults(
+            path={'query': neighborhood_path, 'depth': 3},
+            object_provides=IHOAHouseInspection.__identifier__,
+            review_state=current_state)
+
+        inspection_passed_message = getattr(neighborhood_container, 'initial_pass_message', u'')
+        inspection_failure_message = getattr(neighborhood_container, 'initial_fail_message', u'')
+        if rewalk:
+            inspection_passed_message = getattr(neighborhood_container, 'rewalk_pass_message', u'')
+            inspection_failure_message = getattr(neighborhood_container, 'rewalk_fail_message', u'')
+
+        house_pass_log = getattr(context, 'house_pass_log', {})
+        previously_passed_houses = house_pass_log.keys()
+
+        working_house_pass_log_dict = {}
+        working_house_fail_log_dict = {}
+
+        secretary_email = getattr(neighborhood_container, 'secretary_email', None)
+        pass_message_subject = "%s - Passed" % getattr(context, 'title', u'Annual Inspection')
+        fail_message_subject = "%s - Failed" % getattr(context, 'title', u'Annual Inspection')
+
+        for pi_brain in passed_inspection_brains:
+            pi_brain_id = pi_brain.getId
+            if pi_brain_id != house_inspection_title:
+                continue
+            pi_obj = pi_brain.getObject()
+            pi_home_obj = pi_obj.ac_parent
+            pi_home_obj_id = pi_home_obj.id
+            if pi_home_obj_id in previously_passed_houses:
+                continue
+
+            people_to_email = []
+            for to_notify in ['owner_one', 'owner_two', 'property_manager']:
+                ptn = getattr(pi_home_obj, to_notify, None)
+                if ptn:
+                    people_to_email.append(ptn)
+
+            working_house_pass_log_dict.update({pi_home_obj_id:people_to_email})
+
+            for ptn in people_to_email:
+                member_data = api.user.get(userid=ptn)
+                member_fullname = member_data.getProperty('fullname')
+                member_email = member_data.getProperty('email')
+                pass_message = "Dear %s\n\n" % member_fullname
+                pass_message += inspection_passed_message
+                pass_message += "\n\nRegards,\n\nSOMEBODY"
+
+                api.portal.send_email(sender=secretary_email,
+                                      recipient=member_email,
+                                      subject=pass_message_subject,
+                                      body=pass_message,
+                                      immediate=True)
+
+        for fi_brain in failed_inspection_brains:
+            fi_brain_id = fi_brain.getId
+            if fi_brain_id != house_inspection_title:
+                continue
+            fi_obj = fi_brain.getObject()
+            fi_home_obj = fi_obj.ac_parent
+            fi_home_obj_id = fi_home_obj.id
+
+            people_to_email = []
+            for to_notify in ['owner_one', 'owner_two', 'property_manager']:
+                ptn = getattr(fi_home_obj, to_notify, None)
+                if ptn:
+                    people_to_email.append(ptn)
+
+            working_house_fail_log_dict.update({fi_brain_id:people_to_email})
+
+            for ptn in people_to_email:
+                member_data = api.user.get(userid=ptn)
+                member_fullname = member_data.getProperty('fullname')
+                member_email = member_data.getProperty('email')
+                pass_message = "Dear %s\n\n" % member_fullname
+                pass_message += inspection_failure_message
+                pass_message += "\n\nRegards,\n\nSOMEBODY"
+
+                api.portal.send_email(sender=secretary_email,
+                                      recipient=member_email,
+                                      subject=fail_message_subject,
+                                      body=pass_message,
+                                      immediate=True)
+
+        if rewalk:
+            setattr(context, 'rewalk_pass_log', working_house_pass_log_dict)
+            setattr(context, 'rewalk_fail_log', working_house_fail_log_dict)
+        else:
+            setattr(context, 'house_pass_log', working_house_pass_log_dict)
+            setattr(context, 'house_fail_log', working_house_fail_log_dict)
+

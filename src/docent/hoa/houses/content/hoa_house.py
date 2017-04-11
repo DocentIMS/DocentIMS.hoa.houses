@@ -217,14 +217,14 @@ class IHOAHouse(form.Schema):
     )
 
     resident_one = schema.Choice(
-        title=_(u"Resident One"),
+        title=_(u"Renter One"),
         description=_(u""),
         vocabulary=u'docent.hoa.renters',
         required=False,
     )
 
     resident_two = schema.Choice(
-        title=_(u"Resident Two"),
+        title=_(u"Renter Two"),
         description=_(u""),
         vocabulary=u'docent.hoa.renters',
         required=False,
