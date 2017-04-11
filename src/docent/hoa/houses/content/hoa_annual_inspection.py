@@ -628,7 +628,7 @@ class HOAAnnualInspection(Container):
                 member_email = member_data.getProperty('email')
                 pass_message = "Dear %s\n\n" % member_fullname
                 pass_message += inspection_failure_message
-                pass_message += "\n\nRegards,\n\nSOMEBODY"
+                pass_message += "\n\nThanks,\n\nThe Meadows Board"
 
                 api.portal.send_email(sender=secretary_email,
                                       recipient=member_email,
