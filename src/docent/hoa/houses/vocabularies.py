@@ -177,7 +177,8 @@ class IStreetAddressVocabulary(object):
         if street_addresses:
             terms.append(SimpleVocabulary.createTerm('', '', 'Choose A Street'))
             for street_address in street_addresses:
-                terms.append(SimpleVocabulary.createTerm(street_address, str(street_address), street_address))
+                if street_address:
+                    terms.append(SimpleVocabulary.createTerm(street_address, str(street_address), street_address))
         else:
             terms.append(SimpleVocabulary.createTerm('', '', 'No Configured Addresses'))
 
