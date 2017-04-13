@@ -466,11 +466,12 @@ class HOAAnnualInspection(Container):
             house_obj = house_brain.getObject()
             house_obj_title = getattr(house_obj, 'title', 'unknown house')
             if house_inspection_title not in house_obj:
-                api.content.create(container=house_obj,
+                new_insp = api.content.create(container=house_obj,
                                    type='hoa_house_inspection',
                                    id=house_inspection_title,
-                                   title=house_obj_title,
+                                   title=house_inspection_title,
                                    safe_id=True)
+                setattr(new_insp, 'title', house_obj_title)
                 added_inspections += 1
 
         api.portal.show_message(message=u"%s houses prepared for annual inspection." % added_inspections,
@@ -496,9 +497,11 @@ class HOAAnnualInspection(Container):
                 portal_msg += "There are %s homes remaining to inspect." % pending_inspections
             else:
                 portal_msg += "The following homes have not been inspected: "
-                portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
+                #portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
+                portal_msg += '%s' % current_inspection_brains[0].Title
                 for ci_brain in current_inspection_brains[1:]:
-                    portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
+                    #portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
+                    portal_msg += ', %s' % ci_brain.Title
 
             api.portal.show_message(message=portal_msg,
                                     request=context.REQUEST,
@@ -526,9 +529,11 @@ class HOAAnnualInspection(Container):
                 portal_msg += "There are %s homes remaining to inspect." % pending_inspections
             else:
                 portal_msg += "The following homes have not been inspected: "
-                portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
+                #portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
+                portal_msg += '%s' % current_inspection_brains[0].Title
                 for ci_brain in current_inspection_brains[1:]:
-                    portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
+                    #portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
+                    portal_msg += ', %s' % ci_brain.Title
 
             api.portal.show_message(message=portal_msg,
                                     request=context.REQUEST,
