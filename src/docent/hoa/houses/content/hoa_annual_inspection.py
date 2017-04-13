@@ -1,5 +1,11 @@
 import logging
 from datetime import date
+
+import smtplib
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from collections import Counter
 from plone import api
 from plone.dexterity.content import Container
@@ -532,6 +538,7 @@ class HOAAnnualInspection(Container):
         return True
 
     def sendEmailNotices(self, rewalk=False):
+        portal = api.portal.get()
         context = self
         house_inspection_title = getattr(self, 'house_inspection_title', None)
         if not house_inspection_title:
@@ -564,7 +571,10 @@ class HOAAnnualInspection(Container):
             inspection_passed_message = getattr(neighborhood_container, 'rewalk_pass_message', u'')
             inspection_failure_message = getattr(neighborhood_container, 'rewalk_fail_message', u'')
 
-        house_pass_log = getattr(context, 'house_pass_log', {})
+        house_pass_log = getattr(context, 'house_pass_log')
+        if house_pass_log is None:
+            house_pass_log = {}
+
         previously_passed_houses = house_pass_log.keys()
 
         working_house_pass_log_dict = {}
@@ -592,13 +602,24 @@ class HOAAnnualInspection(Container):
 
             working_house_pass_log_dict.update({pi_home_obj_id:people_to_email})
 
+            street_number = getattr(pi_home_obj, 'street_number', '')
+            street_address = getattr(pi_home_obj, 'street_address', '')
+            city = getattr(pi_home_obj, 'city', '')
+            state = getattr(pi_home_obj, 'state', '')
+            zipcode = getattr(pi_home_obj, 'zipcode', '')
+            address_string = "%s %s, %s %s, %s" % (street_number,
+                                                   street_address,
+                                                   city,
+                                                   state,
+                                                   zipcode)
             for ptn in people_to_email:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
                 member_email = member_data.getProperty('email')
-                pass_message = "Dear %s\n\n" % member_fullname
+                pass_message = "Dear %s,\n\n" % member_fullname
+                pass_message += "Your home at: %s passed it's inspection.\n\n" % address_string
                 pass_message += inspection_passed_message
-                pass_message += "\n\nRegards,\n\nSOMEBODY"
+                pass_message += "\n\nRegards,\n\nThe Meadows Board"
 
                 api.portal.send_email(sender=secretary_email,
                                       recipient=member_email,
@@ -622,19 +643,78 @@ class HOAAnnualInspection(Container):
 
             working_house_fail_log_dict.update({fi_brain_id:people_to_email})
 
+            street_number = getattr(fi_home_obj, 'street_number', '')
+            street_address = getattr(fi_home_obj, 'street_address', '')
+            city = getattr(fi_home_obj, 'city', '')
+            state = getattr(fi_home_obj, 'state', '')
+            zipcode = getattr(fi_home_obj, 'zipcode', '')
+            address_string = "%s %s, %s %s, %s" % (street_number,
+                                                   street_address,
+                                                   city,
+                                                   state,
+                                                   zipcode)
+
+            fieldsets = [ 'flowerpots', 'paint', 'sidewalk_drive', 'steps', 'decks_patio', 'general_maintenance' ]
+            failure_dicts = []
+            for fieldset in fieldsets:
+                text = getattr(fi_obj, '%s_text' % fieldset, '')
+                if text:
+                    cond_remains = getattr(fi_obj, '%s_cond_remains' % fieldset, '')
+                    image = getattr(fi_obj, '%s_image' % fieldset, None)
+                    second_image = getattr(fi_obj, '%s_second_image', None)
+                    f_dict = {'fieldset':fieldset,
+                              'text':text,
+                              'cond_remains':cond_remains,
+                              'image':image,
+                              'second_image':second_image
+                              }
+                    failure_dicts.append(f_dict)
+
+            images_to_attach = []
+
+            fail_message = ""
+            fail_message += "Your home at: %s failed it's inspection for the following reasons:\n\n" % address_string
+            for failure_dict in failure_dicts:
+                fail_message += failure_dict.get('fieldset\n').title()
+                if rewalk:
+                    cond_remains = failure_dict.get('cond_remains')
+                    if cond_remains:
+                        fail_message += 'Condition Remains: YES\n'
+                    else:
+                        fail_message += 'Condition Remains: NO\n'
+                fail_message += 'Failed for: %s\n\n' % failure_dict.get('text')
+                first_image = failure_dict.get('image')
+                if first_image:
+                    images_to_attach.append(first_image)
+                second_image = failure_dict.get('second_image')
+                if second_image:
+                    images_to_attach.append(second_image)
+
+            fail_message += inspection_failure_message
+            fail_message += "\n\nThanks,\n\nThe Meadows Board"
+
             for ptn in people_to_email:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
                 member_email = member_data.getProperty('email')
-                pass_message = "Dear %s\n\n" % member_fullname
-                pass_message += inspection_failure_message
-                pass_message += "\n\nThanks,\n\nThe Meadows Board"
+                msg = MIMEMultipart('alternative')
 
-                api.portal.send_email(sender=secretary_email,
-                                      recipient=member_email,
-                                      subject=fail_message_subject,
-                                      body=pass_message,
-                                      immediate=True)
+                msg['Subject'] = fail_message_subject
+                msg['From'] = secretary_email
+                msg['To'] = member_email
+                msg.preamble = 'The Meadows Annual Inspection'
+
+                for file in images_to_attach:
+                    with open(file, 'rb') as fp:
+                        img = MIMEImage(fp.read())
+                    msg.attach(img)
+
+                send_message = "Dear %s\n\n" % member_fullname
+                send_message += fail_message
+                msg.attach(MIMEText(send_message), 'plain')
+
+                host = portal.MailHost
+                host.send(msg, immediate=True)
 
         if rewalk:
             setattr(context, 'rewalk_pass_log', working_house_pass_log_dict)
