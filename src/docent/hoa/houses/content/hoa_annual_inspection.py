@@ -715,7 +715,9 @@ class HOAAnnualInspection(Container):
 
                 send_message = "Dear %s\n\n" % member_fullname
                 send_message += fail_message
-                msg.attach(MIMEText(send_message))
+                msg_alt = MIMEMultipart('alternative')
+                msg.attach(msg_alt)
+                msg_alt.attach(MIMEText(send_message, 'plain'))
 
                 host = portal.MailHost
                 host.send(msg, immediate=True)
