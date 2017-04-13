@@ -680,7 +680,7 @@ class HOAAnnualInspection(Container):
             fail_message = ""
             fail_message += "Your home at: %s failed it's inspection for the following reasons:\n\n" % address_string
             for failure_dict in failure_dicts:
-                fail_message += failure_dict.get('fieldset\n').title()
+                fail_message += '%s\n' % failure_dict.get('fieldset').title()
                 if rewalk:
                     cond_remains = failure_dict.get('cond_remains')
                     if cond_remains:
