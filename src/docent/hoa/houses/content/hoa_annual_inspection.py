@@ -589,7 +589,7 @@ class HOAAnnualInspection(Container):
             if pi_brain_id != house_inspection_title:
                 continue
             pi_obj = pi_brain.getObject()
-            pi_home_obj = pi_obj.ac_parent
+            pi_home_obj = pi_obj.aq_parent
             pi_home_obj_id = pi_home_obj.id
             if pi_home_obj_id in previously_passed_houses:
                 continue
@@ -632,7 +632,7 @@ class HOAAnnualInspection(Container):
             if fi_brain_id != house_inspection_title:
                 continue
             fi_obj = fi_brain.getObject()
-            fi_home_obj = fi_obj.ac_parent
+            fi_home_obj = fi_obj.aq_parent
             fi_home_obj_id = fi_home_obj.id
 
             people_to_email = []
