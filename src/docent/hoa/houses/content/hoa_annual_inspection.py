@@ -702,7 +702,7 @@ class HOAAnnualInspection(Container):
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
                 member_email = member_data.getProperty('email')
-                msg = MIMEMultipart('alternative')
+                msg = MIMEMultipart('related')
 
                 msg['Subject'] = fail_message_subject
                 msg['From'] = secretary_email
@@ -710,13 +710,12 @@ class HOAAnnualInspection(Container):
                 msg.preamble = 'The Meadows Annual Inspection'
 
                 for file in images_to_attach:
-                    with open(file, 'rb') as fp:
-                        img = MIMEImage(fp.read())
+                    img = MIMEImage(file.data)
                     msg.attach(img)
 
                 send_message = "Dear %s\n\n" % member_fullname
                 send_message += fail_message
-                msg.attach(MIMEText(send_message), 'plain')
+                msg.attach(MIMEText(send_message))
 
                 host = portal.MailHost
                 host.send(msg, immediate=True)
