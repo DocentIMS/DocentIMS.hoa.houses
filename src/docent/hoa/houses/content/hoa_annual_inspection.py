@@ -553,9 +553,9 @@ class HOAAnnualInspection(Container):
                                     type='warning')
             return
 
-        current_state = 'secondary_inspection'
+        current_state = 'failed_initial'
         if rewalk:
-            current_state = 'closed'
+            current_state = 'failed_final'
 
         neighborhood_container = context.aq_parent
         neighborhood_path = '/'.join(neighborhood_container.getPhysicalPath())
