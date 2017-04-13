@@ -678,16 +678,23 @@ class HOAAnnualInspection(Container):
             images_to_attach = []
 
             fail_message = ""
+            fail_html = ""
             fail_message += "Your home at: %s failed it's inspection for the following reasons:\n\n" % address_string
+            fail_html += "<p>Your home at: %s failed it's inspection for the following reasons:</p>" % address_string
             for failure_dict in failure_dicts:
                 fail_message += '%s\n' % failure_dict.get('fieldset').title()
+                fail_html += "<h4>%s</h4><ul>" % failure_dict.get('fieldset').title()
                 if rewalk:
                     cond_remains = failure_dict.get('cond_remains')
                     if cond_remains:
                         fail_message += 'Condition Remains: YES\n'
+                        fail_html += "<li>Condition Remains: YES</li>"
                     else:
                         fail_message += 'Condition Remains: NO\n'
+                        fail_html += "<li>Condition Remains: NO</li>"
                 fail_message += 'Failed for: %s\n\n' % failure_dict.get('text')
+                fail_html += "<li>Failed for: %s</li></ul>" % failure_dict.get('text')
+
                 first_image = failure_dict.get('image')
                 if first_image:
                     images_to_attach.append(first_image)
@@ -696,29 +703,36 @@ class HOAAnnualInspection(Container):
                     images_to_attach.append(second_image)
 
             fail_message += inspection_failure_message
+            fail_html += "<p>%s</p>" % inspection_failure_message
+
             fail_message += "\n\nThanks,\n\nThe Meadows Board"
+            fail_html += "<p>Thanks,<br /><br />The Meadows Board</p>"
 
             for ptn in people_to_email:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
                 member_email = member_data.getProperty('email')
                 msg = MIMEMultipart('related')
+                msg_alt = MIMEMultipart('alternative')
 
                 msg['Subject'] = fail_message_subject
                 msg['From'] = secretary_email
                 msg['To'] = member_email
-                msg.preamble = 'The Meadows Annual Inspection'
+                msg.preamble = 'This is a multi-part message in MIME format.'
+                msg.attach(msg_alt)
 
-                for file in images_to_attach:
-                    img = MIMEImage(file.data)
+                for i_t_a in images_to_attach:
+                    img = MIMEImage(i_t_a.data)
                     msg.attach(img)
 
-                send_message = "Dear %s\n\n" % member_fullname
+                send_message = "Dear %s,\n\n" % member_fullname
+                send_message_html = "<p>Dear %s," % member_fullname
                 send_message += fail_message
-                msg_alt = MIMEMultipart('alternative')
-                msg.attach(msg_alt)
-                msg_alt.attach(MIMEText(send_message, 'plain'))
+                send_message_html += fail_html
 
+                msg_alt.attach(MIMEText(send_message, 'plain'))
+                msg_alt.attach(MIMEText(send_message_html, 'html'))
+                
                 host = portal.MailHost
                 host.send(msg, immediate=True)
 
