@@ -97,3 +97,13 @@ class WalkerAssignments(grok.View):
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('map')
 
         return table_row_structure
+
+    def getCompletedTableRowStructure(self, home_listing_dict):
+        table_row_structure = ''
+        table_row_structure += '<td><a class="inspect-button" href="%s">Review</a></td>' % home_listing_dict.get('url')
+        table_row_structure += '<td>%s</td>' % home_listing_dict.get('address')
+        table_row_structure += '<td>%s</td>' % home_listing_dict.get('div')
+        table_row_structure += '<td>%s</td>' % home_listing_dict.get('lot')
+        table_row_structure += '<td>%s</td>' % home_listing_dict.get('map')
+
+        return table_row_structure

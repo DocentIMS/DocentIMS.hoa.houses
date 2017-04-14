@@ -20,9 +20,11 @@
 
     <div tal:replace="structure provider:plone.abovecontenttitle" />
     <h1>Assigned Homes - <span tal:replace="view/current_inspection" /></h1>
-    <p>These are the homes assigned to your team. Select one home, click next, and perform the weedwalk.
-        When you are finished with the home, it will be moved from this list to the "Completed" Tab. Return
-        here and select another home.</p>
+    <p>These are the homes assigned to your team. Select "Inspect" and perform the inspection.
+        When you are finished with the inspection, you will be returned to this page.  The home you inspected (pass or
+        fail) will be moved from this list to the "Completed" tab.</p>
+    <p>Before the Annual Property Inspection is closed by the manager, you may go to the "Completed" tab and edit
+        any home.  See the Completed tab for instructions.</p>
     <div tal:replace="structure provider:plone.belowcontenttitle" />
 
     <div tal:replace="structure provider:plone.abovecontentbody" />
@@ -46,6 +48,16 @@
         </section>
         <section>
             <h2>Completed</h2>
+            <p>If you wish to Re-Inspect (revise existing inspection findings) a home, select the Review and the
+                current findings will be displayed. There are three options from here: Correct, Update, Re-Inspect.</p>
+            <p><strong>Correct:</strong> The current findings are correct. Select and you will be returned, with no
+                inspection changes, to the main page.</p>
+            <p><strong>Update:</strong> This only applies to homes that failed. Selecting this will allow you to
+                revise the findings for failed homes. (E.g. change the findings text, add pictures) but not
+                allow you to change pass/fail finding. After making changes, you are brought back to this page.</p>
+            <p><strong>Re-Inspect:</strong> This is used if a home was passed; however, new evidence shows it should
+                have failed. Selecting Re-Inspect will return the home to the list of homes to be inspected.
+                Simply inspect the home.</p>
             <table tal:define="completed_listings view/completed_listings">
                 <tr>
                     <th>Select</th>
@@ -55,7 +67,7 @@
                     <th>State</th>
                 </tr>
                 <tr tal:repeat="completed_listing_dict completed_listings">
-                    <span tal:replace="structure python:view.getTableRowStructure(completed_listing_dict)" />
+                    <span tal:replace="structure python:view.getCompletedTableRowStructure(completed_listing_dict)" />
                 </tr>
             </table>
         </section>

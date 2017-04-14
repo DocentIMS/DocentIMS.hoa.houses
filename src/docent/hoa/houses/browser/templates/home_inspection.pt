@@ -7,8 +7,9 @@
 
     <metal:block fill-slot="main">
         <div tal:replace="structure provider:plone.abovecontenttitle" />
-        <h1 class="documentFirstHeading" tal:content="context/Title" />
-        <h2>Home Inspection <span tal:replace="context/id" /></h2>
+        <h1 class="documentFirstHeading"><span tal:replace="context/street_number" />
+                                         <span tal:replace="context/street_address" /></h1>
+        <h2>Home Inspection</h2>
         <div tal:replace="structure provider:plone.belowcontenttitle" />
         <div class="address_block">
             </div>

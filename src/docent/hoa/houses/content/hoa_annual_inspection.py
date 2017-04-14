@@ -732,7 +732,7 @@ class HOAAnnualInspection(Container):
 
                 msg_alt.attach(MIMEText(send_message, 'plain'))
                 msg_alt.attach(MIMEText(send_message_html, 'html'))
-                
+
                 host = portal.MailHost
                 host.send(msg, immediate=True)
 
