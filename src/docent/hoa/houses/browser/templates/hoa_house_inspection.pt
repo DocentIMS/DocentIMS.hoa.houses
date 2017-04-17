@@ -25,15 +25,17 @@
     <p>This pages summarizes your Inspection.  Please choose one of these options:</p>
     <ul>
         <li><a class="assignments" href=""
-           tal:attributes="href view/getAssignmentsURL">Done</a>: The current findings are correct and you are done
-            with the inspection.   The inspection results will be saved and you will be returned to the main page.</li>
+           tal:attributes="href view/getAssignmentsURL">Save</a>:  The displayed findings are correct. Select and the
+            inspection will be saved and you will be returned to the main page.</li>
         <li><a class="update" href=""
-           tal:attributes="href string:${context/absolute_url}/edit">Update</a>: This returns you to the inspection
-            screen and allows you to revise the inspection findings, but not allow you to change pass/fail finding.</li>
+           tal:attributes="href string:${context/absolute_url}/edit">Edit</a>: This returns you to the inspection
+            screen and allows you to revise the inspection findings. When done, save and you'll be returned here.
+            Select "Keep" and you be returned to your inspection list. Note: When using "Edit", you are not allowed to
+            change pass/fail finding. Use "Re-Start" for revising a pass/fail finding.</li>
         <li tal:condition="view/retractable"><a class="retract" href=""
-           tal:attributes="href view/getTransitionURL">Retract</a>: This is used if a home was passed; however,
-            new evidence shows it should have failed. Selecting Re-Inspect will return the home to the list of homes
-            to be inspected. Simply inspect the home.</li>
+           tal:attributes="href view/getTransitionURL">Re-Start</a>: This is used if a home was passed; however, new
+            evidence shows it should have failed. Selecting Re-Start will return the home to the list of homes to be
+            inspected. Simply inspect the home.</li>
     </ul>
     <div tal:replace="structure provider:plone.abovecontentbody" />
 

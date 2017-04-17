@@ -48,16 +48,8 @@
         </section>
         <section>
             <h2>Completed</h2>
-            <p>If you wish to Re-Inspect (revise existing inspection findings) a home, select the Review and the
-                current findings will be displayed. There are three options from here: Correct, Update, Re-Inspect.</p>
-            <p><strong>Correct:</strong> The current findings are correct. Select and you will be returned, with no
-                inspection changes, to the main page.</p>
-            <p><strong>Update:</strong> This only applies to homes that failed. Selecting this will allow you to
-                revise the findings for failed homes. (E.g. change the findings text, add pictures) but not
-                allow you to change pass/fail finding. After making changes, you are brought back to this page.</p>
-            <p><strong>Re-Inspect:</strong> This is used if a home was passed; however, new evidence shows it should
-                have failed. Selecting Re-Inspect will return the home to the list of homes to be inspected.
-                Simply inspect the home.</p>
+            <p>If you wish to revise existing inspection findings, select "Review" and the current findings will be
+                displayed along with your options to make changes.</p>
             <table tal:define="completed_listings view/completed_listings">
                 <tr>
                     <th>Select</th>
