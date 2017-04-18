@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="docent.hoa.houses">
+<head>
+
+</head>
+<body>
+
+<metal:main fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+    <div tal:replace="structure provider:plone.abovecontenttitle" />
+    <h1 tal:content="context/Title"></h1>
+    <div tal:replace="structure provider:plone.belowcontenttitle" />
+    <p>This summarizes the annual inspection parameters.</p>
+
+    <div tal:replace="structure provider:plone.abovecontentbody" />
+        <ul>
+            <li>Start Date: <span tal:replace="context/start_date|Nothing" /></li>
+            <li>End Date: <span tal:replace="context/end_date|Nothing" /></li>
+            <li>Picture Required: <span tal:replace="view/pic_req|Nothing" /></li>
+        </ul>
+
+        <h2>Teams</h2>
+        <section tal:condition="view/team_a">
+            <h4>Team A</h4>
+            <ul>
+                <li>Member One: <span tal:replace="structure view/group_a_member_one" /></li>
+                <li>Member Two: <span tal:replace="structure view/group_a_member_two" /></li>
+            </ul>
+        </section>
+        <section tal:condition="view/team_b">
+            <h4>Team B</h4>
+            <ul>
+                <li>Member One: <span tal:replace="structure view/group_b_member_one" /></li>
+                <li>Member Two: <span tal:replace="structure view/group_b_member_two" /></li>
+            </ul>
+        </section>
+        <section tal:condition="view/team_c">
+            <h4>Team C</h4>
+            <ul>
+                <li>Member One: <span tal:replace="structure view/group_c_member_one" /></li>
+                <li>Member Two: <span tal:replace="structure view/group_c_member_two" /></li>
+            </ul>
+        </section>
+        <section tal:condition="view/team_d">
+            <h4>Team D</h4>
+            <ul>
+                <li>Member One: <span tal:replace="structure view/group_d_member_one" /></li>
+                <li>Member Two: <span tal:replace="structure view/group_d_member_two" /></li>
+            </ul>
+        </section>
+        <section tal:condition="view/team_e">
+            <h4>Team E</h4>
+            <ul>
+                <li>Member One: <span tal:replace="structure view/group_e_member_one" /></li>
+                <li>Member Two: <span tal:replace="structure view/group_e_member_two" /></li>
+            </ul>
+        </section>
+        <tal:block tal:define="house_failure_log_structure view/house_failure_log_structure;
+                                house_pass_log_structure view/house_pass_log_structure;
+                                rewalk_failure_log_structure view/rewalk_failure_log_structure;
+                                rewalk_pass_log_structure view/rewalk_pass_log_structure">
+        <h2>Emails Sent</h2>
+            <section tal:condition="house_pass_log_structure">
+                <h4>Initial Pass</h4>
+                <table>
+                    <tr>
+                        <th>House</th><th>People Emailed</th>
+                    </tr>
+                    <tr tal:repeat="row_cells house_pass_log_structure"><span tal:replace="structure row_cells" /></tr>
+                </table>
+            </section>
+            <section tal:condition="house_failure_log_structure">
+                <h4>Initial Failure</h4>
+                <table>
+                    <tr>
+                        <th>House</th><th>People Emailed</th>
+                    </tr>
+                    <tr tal:repeat="row_cells house_failure_log_structure"><span tal:replace="structure row_cells" /></tr>
+                </table>
+            </section>
+            <section tal:condition="rewalk_pass_log_structure">
+                <h4>Rewalk Pass</h4>
+                <table>
+                    <tr>
+                        <th>House</th><th>People Emailed</th>
+                    </tr>
+                    <tr tal:repeat="row_cells rewalk_pass_log_structure"><span tal:replace="structure row_cells" /></tr>
+                </table>
+            </section>
+            <section tal:condition="rewalk_failure_log_structure">
+                <h4>Rewalk Failure</h4>
+                <table>
+                    <tr>
+                        <th>House</th><th>People Emailed</th>
+                    </tr>
+                    <tr tal:repeat="row_cells rewalk_failure_log_structure"><span tal:replace="structure row_cells" /></tr>
+                </table>
+            </section>
+        </tal:block>
+
+    <div tal:replace="structure provider:plone.belowcontentbody" />
+    </tal:main-macro>
+</metal:main>
+
+</body>
+</html>
