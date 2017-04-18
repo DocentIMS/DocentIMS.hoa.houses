@@ -19,6 +19,7 @@ from z3c.form.browser.radio import RadioFieldWidget
 from plone.directives import form
 
 from docent.hoa.houses import _
+from docent.hoa.houses.browser.house_inspection_form import getAnnualInspection
 
 inspection_keys_to_fieldset_dict = {'flowerpots_text': 'flowerpots',
                                     'paint_text': 'paint',
@@ -47,8 +48,8 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
 
         context = self.context
         current_state = api.content.get_state(obj=context)
-
-        if current_state in ['failed_final', 'remedied']:
+        #import pdb;pdb.set_trace()
+        if current_state in ['failed_initial', 'failed_final', 'remedied']:
             for_show = []
             groups = self.groups
             fieldset_dict = {}
@@ -81,6 +82,21 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
                 g_name = group.__name__
                 if getattr(context, '%s_second_image' % g_name, None):
                     group.fields['%s_second_image' % g_name].mode = interfaces.DISPLAY_MODE
+
+        active_annual_inspection = getAnnualInspection()
+        aai_obj = active_annual_inspection.getObject()
+        pic_req = getattr(aai_obj, 'pic_req', False)
+        #import pdb;pdb.set_trace()
+        if pic_req:
+            fieldsets = self.groups
+            for fieldset in fieldsets:
+                f_name = fieldset.__name__
+                image_one_mode = fieldset.fields['%s_image' % f_name].mode
+                image_two_mode = fieldset.fields['%s_second_image' % f_name].mode
+                if not image_one_mode:
+                    fieldset.fields['%s_image' % f_name].field.required = True
+                if not image_two_mode:
+                    fieldset.fields['%s_second_image' % f_name].field.required = True
 
 
     @property

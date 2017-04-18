@@ -90,7 +90,7 @@ class IHOAAnnualInspection(form.Schema):
 
 
 
-    form.mode(house_failure_log='hidden')
+    form.mode(house_failure_log='display')
     house_failure_log = schema.Dict(
         title=_(u'Homes Sent Initial Failure Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -99,7 +99,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(house_pass_log='hidden')
+    form.mode(house_pass_log='display')
     house_pass_log = schema.Dict(
         title=_(u'Homes Sent Initial Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -108,7 +108,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(rewalk_failure_log='hidden')
+    form.mode(rewalk_failure_log='display')
     rewalk_failure_log = schema.Dict(
         title=_(u'Homes Sent Rewalk Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -117,7 +117,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(rewalk_pass_log='hidden')
+    form.mode(rewalk_pass_log='display')
     rewalk_pass_log = schema.Dict(
         title=_(u'Homes Sent Rewalk Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -145,6 +145,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     group_a_member_two = schema.Choice(
@@ -152,6 +153,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     fieldset('team_b',
@@ -166,6 +168,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     group_b_member_two = schema.Choice(
@@ -173,6 +176,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     fieldset('team_c',
@@ -187,6 +191,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     group_c_member_two = schema.Choice(
@@ -194,6 +199,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     fieldset('team_d',
@@ -208,6 +214,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     group_d_member_two = schema.Choice(
@@ -215,6 +222,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     fieldset('team_e',
@@ -229,6 +237,7 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
     group_e_member_two = schema.Choice(
@@ -236,41 +245,78 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
         vocabulary=u'docent.hoa.walkers',
         required=False,
+        default='',
     )
 
-    # @invariant
-    # def minimumThreeGroups(data):
-    #     assigned_members = 0
-    #     group_a_member_one = getattr(data, 'group_a_member_one', None)
-    #     if group_a_member_one:
-    #         assigned_members += 1
-    #     group_a_member_two = getattr(data, 'group_a_member_two', None)
-    #     if group_a_member_two:
-    #         assigned_members += 1
-    #     group_b_member_one = getattr(data, 'group_b_member_one', None)
-    #     if group_b_member_one:
-    #         assigned_members += 1
-    #     group_b_member_two = getattr(data, 'group_b_member_two', None)
-    #     if group_b_member_two:
-    #         assigned_members += 1
-    #     group_c_member_one = getattr(data, 'group_c_member_one', None)
-    #     if group_c_member_one:
-    #         assigned_members += 1
-    #     group_c_member_two = getattr(data, 'group_c_member_two', None)
-    #     if group_c_member_two:
-    #         assigned_members += 1
-    #
-    #     if group_a_member_one == group_a_member_two:
-    #         raise DoubleMemberInGroup(_(u"You can't have the same member twice in Group A."))
-    #
-    #     if group_b_member_one == group_b_member_two:
-    #         raise DoubleMemberInGroup(_(u"You can't have the same member twice in Group B."))
-    #
-    #     if group_c_member_one == group_c_member_two:
-    #         raise DoubleMemberInGroup(_(u"You can't have the same member twice in Group C."))
-    #
-    #     if assigned_members != 6:
-    #         raise MinimumGroups()
+    @invariant
+    def minimumThreeGroups(data):
+        assigned_members = 0
+        team_a = 0
+        team_b = 0
+        team_c = 0
+        team_d = 0
+        team_e = 0
+        group_a_member_one = getattr(data, 'group_a_member_one', None)
+        if group_a_member_one:
+            assigned_members += 1
+            team_a += 1
+        group_a_member_two = getattr(data, 'group_a_member_two', None)
+        if group_a_member_two:
+            assigned_members += 1
+            team_a += 1
+        group_b_member_one = getattr(data, 'group_b_member_one', None)
+        if group_b_member_one:
+            assigned_members += 1
+            team_b += 1
+        group_b_member_two = getattr(data, 'group_b_member_two', None)
+        if group_b_member_two:
+            assigned_members += 1
+            team_b += 1
+        group_c_member_one = getattr(data, 'group_c_member_one', None)
+        if group_c_member_one:
+            assigned_members += 1
+            team_c += 1
+        group_c_member_two = getattr(data, 'group_c_member_two', None)
+        if group_c_member_two:
+            assigned_members += 1
+            team_c += 1
+        group_d_member_one = getattr(data, 'group_d_member_one', None)
+        if group_d_member_one:
+            assigned_members += 1
+            team_d += 1
+        group_d_member_two = getattr(data, 'group_d_member_two', None)
+        if group_d_member_two:
+            assigned_members += 1
+            team_d += 1
+        group_e_member_one = getattr(data, 'group_e_member_one', None)
+        if group_e_member_one:
+            assigned_members += 1
+            team_e += 1
+        group_e_member_two = getattr(data, 'group_e_member_two', None)
+        if group_e_member_two:
+            assigned_members += 1
+            team_e += 1
+
+        if not team_a:
+            raise Invalid(_(u"You must have at least one walker for Team A."))
+
+        if not team_b:
+            raise Invalid(_(u"You must have at least one walker for Team B."))
+
+        if not team_c:
+            raise Invalid(_(u"You must have at least one walker for Team C."))
+
+        if group_a_member_one == group_a_member_two:
+            raise Invalid(_(u"You have the same member listed twice in Team A."))
+
+        if group_b_member_one == group_b_member_two:
+            raise Invalid(_(u"You have the same member listed twice in Team B."))
+
+        if group_c_member_one == group_c_member_two:
+            raise Invalid(_(u"You have the same member listed twice in Team C."))
+
+        if team_e and not team_d:
+            raise Invalid(_(u"Please assign walkers to Team D before Team E."))
 
     # @invariant
     # def validateGroups(data):

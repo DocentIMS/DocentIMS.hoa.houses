@@ -21,7 +21,7 @@
   <browser:page
     for="docent.hoa.houses.content.hoa_house_inspection.IHOAHouseInspection"
     name="edit"
-    class="docent.hoa.houses.browser.house_inspection_edit_form.HouseInspectionEditForm"
+    class="docent.hoa.houses.browser.house_inspection_edit_form.DefaultEditView"
     permission="cmf.ModifyPortalContent"
     />
 
