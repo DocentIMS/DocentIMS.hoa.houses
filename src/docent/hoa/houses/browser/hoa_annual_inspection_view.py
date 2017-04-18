@@ -34,7 +34,7 @@ def getRowStructureForEmailReports(context, report_dict):
     parent_container = context.aq_parent
     #get_address()
     row_cells = []
-    for house_id in report_dict.keys():
+    for house_id in sorted(report_dict.keys()):
         structure = ''
         house_obj = getattr(parent_container, house_id, None)
         if house_obj:

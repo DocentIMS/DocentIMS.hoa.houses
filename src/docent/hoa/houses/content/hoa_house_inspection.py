@@ -14,6 +14,8 @@ from z3c.form.browser.radio import RadioFieldWidget
 from zope.interface import provider, invariant, Invalid
 from zope.schema.interfaces import IContextAwareDefaultFactory
 
+
+
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
 from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,
@@ -25,10 +27,24 @@ from docent.hoa.houses import _
 
 logger = logging.getLogger("Plone")
 
+def getAnnualInspection():
+    portal = api.portal.get()
+    from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
+    annual_inspection_brains = portal.portal_catalog.searchResults(
+                                               object_provides=IHOAAnnualInspection.__identifier__,
+                                               sort_on="created",
+                                               sort_order="descending")
+    annual_inspection_brain = None
+    if annual_inspection_brains:
+        annual_inspection_brain = annual_inspection_brains[0]
+
+    return annual_inspection_brain
+
 def computeTitle():
     today = date.today()
     house_inspection_title = today.strftime(u'%Y-%m')
     return u'House Inspection %s' % house_inspection_title,
+
 
 class IHOAHouseInspection(form.Schema):
     """
@@ -344,6 +360,22 @@ class IHOAHouseInspection(form.Schema):
         description=_(u""),
         required=False,
     )
+
+    @invariant
+    def imagesRequired(data):
+        active_annual_inspection = getAnnualInspection()
+        if not active_annual_inspection:
+            return
+        aai_obj = active_annual_inspection.getObject()
+        pic_req = getattr(aai_obj, 'pic_req', False)
+        if pic_req:
+            for fieldset_id in ['flowerpots', 'paint', 'sidewalk_drive', 'steps', 'decks_patio', 'general_maintenance']:
+                if getattr(data, '%s_text' % fieldset_id):
+                    image = getattr(data, '%s_image' % fieldset_id)
+                    if not image:
+                        error_keys = fieldset_id.split('_')
+                        error_str = ' '.join(error_keys)
+                        raise Invalid(_(u"You must provide an image for %s." % error_str))
 
 class HOAHouseInspection(Container):
     """

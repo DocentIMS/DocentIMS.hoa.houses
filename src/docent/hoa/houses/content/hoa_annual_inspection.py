@@ -22,6 +22,7 @@ from z3c.form.browser.radio import RadioFieldWidget
 
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
+
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
 from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT, LOT_DIVISION_DICT, WALKERS_GROUP_IDS
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,

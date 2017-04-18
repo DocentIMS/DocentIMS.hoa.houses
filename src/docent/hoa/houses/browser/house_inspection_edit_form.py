@@ -61,6 +61,9 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
 
             new_schema = field.Fields(IEmptySchema)
             new_groups = []
+            active_annual_inspection = getAnnualInspection()
+            aai_obj = active_annual_inspection.getObject()
+            pic_req = getattr(aai_obj, 'pic_req', False)
             for skey in for_show:
                 fieldset_key = inspection_keys_to_fieldset_dict.get(skey)
                 s_group = fieldset_dict.get(fieldset_key)
@@ -70,6 +73,8 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
                 s_group.fields['%s_cond_remains' % fieldset_key].mode = None
                 s_group.fields['%s_cond_remains' % fieldset_key].widgetFactory = RadioFieldWidget
                 s_group.fields['%s_image' % fieldset_key].mode = interfaces.DISPLAY_MODE
+                if pic_req:
+                    s_group.fields['%s_second_image' % fieldset_key].field.required = True
                 #s_group.fields['%s_second_image' % fieldset_key].mode = interfaces.HIDDEN_MODE
                 #s_group.fields['%s_second_image' % fieldset_key].mode = None
                 #new_schema += s_group.fields
@@ -82,21 +87,6 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
                 g_name = group.__name__
                 if getattr(context, '%s_second_image' % g_name, None):
                     group.fields['%s_second_image' % g_name].mode = interfaces.DISPLAY_MODE
-
-        active_annual_inspection = getAnnualInspection()
-        aai_obj = active_annual_inspection.getObject()
-        pic_req = getattr(aai_obj, 'pic_req', False)
-        #import pdb;pdb.set_trace()
-        if pic_req:
-            fieldsets = self.groups
-            for fieldset in fieldsets:
-                f_name = fieldset.__name__
-                image_one_mode = fieldset.fields['%s_image' % f_name].mode
-                image_two_mode = fieldset.fields['%s_second_image' % f_name].mode
-                if not image_one_mode:
-                    fieldset.fields['%s_image' % f_name].field.required = True
-                if not image_two_mode:
-                    fieldset.fields['%s_second_image' % f_name].field.required = True
 
 
     @property
