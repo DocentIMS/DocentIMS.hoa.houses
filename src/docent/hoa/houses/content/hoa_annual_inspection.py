@@ -89,9 +89,7 @@ class IHOAAnnualInspection(form.Schema):
                                             title=U"No")])
     )
 
-
-
-    form.mode(house_failure_log='display')
+    form.mode(house_failure_log='hidden')
     house_failure_log = schema.Dict(
         title=_(u'Homes Sent Initial Failure Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -100,7 +98,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(house_pass_log='display')
+    form.mode(house_pass_log='hidden')
     house_pass_log = schema.Dict(
         title=_(u'Homes Sent Initial Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -109,7 +107,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(rewalk_failure_log='display')
+    form.mode(rewalk_failure_log='hidden')
     rewalk_failure_log = schema.Dict(
         title=_(u'Homes Sent Rewalk Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -118,7 +116,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(rewalk_pass_log='display')
+    form.mode(rewalk_pass_log='hidden')
     rewalk_pass_log = schema.Dict(
         title=_(u'Homes Sent Rewalk Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -249,75 +247,75 @@ class IHOAAnnualInspection(form.Schema):
         default='',
     )
 
-    @invariant
-    def minimumThreeGroups(data):
-        assigned_members = 0
-        team_a = 0
-        team_b = 0
-        team_c = 0
-        team_d = 0
-        team_e = 0
-        group_a_member_one = getattr(data, 'group_a_member_one', None)
-        if group_a_member_one:
-            assigned_members += 1
-            team_a += 1
-        group_a_member_two = getattr(data, 'group_a_member_two', None)
-        if group_a_member_two:
-            assigned_members += 1
-            team_a += 1
-        group_b_member_one = getattr(data, 'group_b_member_one', None)
-        if group_b_member_one:
-            assigned_members += 1
-            team_b += 1
-        group_b_member_two = getattr(data, 'group_b_member_two', None)
-        if group_b_member_two:
-            assigned_members += 1
-            team_b += 1
-        group_c_member_one = getattr(data, 'group_c_member_one', None)
-        if group_c_member_one:
-            assigned_members += 1
-            team_c += 1
-        group_c_member_two = getattr(data, 'group_c_member_two', None)
-        if group_c_member_two:
-            assigned_members += 1
-            team_c += 1
-        group_d_member_one = getattr(data, 'group_d_member_one', None)
-        if group_d_member_one:
-            assigned_members += 1
-            team_d += 1
-        group_d_member_two = getattr(data, 'group_d_member_two', None)
-        if group_d_member_two:
-            assigned_members += 1
-            team_d += 1
-        group_e_member_one = getattr(data, 'group_e_member_one', None)
-        if group_e_member_one:
-            assigned_members += 1
-            team_e += 1
-        group_e_member_two = getattr(data, 'group_e_member_two', None)
-        if group_e_member_two:
-            assigned_members += 1
-            team_e += 1
-
-        if not team_a:
-            raise Invalid(_(u"You must have at least one walker for Team A."))
-
-        if not team_b:
-            raise Invalid(_(u"You must have at least one walker for Team B."))
-
-        if not team_c:
-            raise Invalid(_(u"You must have at least one walker for Team C."))
-
-        if group_a_member_one == group_a_member_two:
-            raise Invalid(_(u"You have the same member listed twice in Team A."))
-
-        if group_b_member_one == group_b_member_two:
-            raise Invalid(_(u"You have the same member listed twice in Team B."))
-
-        if group_c_member_one == group_c_member_two:
-            raise Invalid(_(u"You have the same member listed twice in Team C."))
-
-        if team_e and not team_d:
-            raise Invalid(_(u"Please assign walkers to Team D before Team E."))
+    # @invariant
+    # def minimumThreeGroups(data):
+    #     assigned_members = 0
+    #     team_a = 0
+    #     team_b = 0
+    #     team_c = 0
+    #     team_d = 0
+    #     team_e = 0
+    #     group_a_member_one = getattr(data, 'group_a_member_one', None)
+    #     if group_a_member_one:
+    #         assigned_members += 1
+    #         team_a += 1
+    #     group_a_member_two = getattr(data, 'group_a_member_two', None)
+    #     if group_a_member_two:
+    #         assigned_members += 1
+    #         team_a += 1
+    #     group_b_member_one = getattr(data, 'group_b_member_one', None)
+    #     if group_b_member_one:
+    #         assigned_members += 1
+    #         team_b += 1
+    #     group_b_member_two = getattr(data, 'group_b_member_two', None)
+    #     if group_b_member_two:
+    #         assigned_members += 1
+    #         team_b += 1
+    #     group_c_member_one = getattr(data, 'group_c_member_one', None)
+    #     if group_c_member_one:
+    #         assigned_members += 1
+    #         team_c += 1
+    #     group_c_member_two = getattr(data, 'group_c_member_two', None)
+    #     if group_c_member_two:
+    #         assigned_members += 1
+    #         team_c += 1
+    #     group_d_member_one = getattr(data, 'group_d_member_one', None)
+    #     if group_d_member_one:
+    #         assigned_members += 1
+    #         team_d += 1
+    #     group_d_member_two = getattr(data, 'group_d_member_two', None)
+    #     if group_d_member_two:
+    #         assigned_members += 1
+    #         team_d += 1
+    #     group_e_member_one = getattr(data, 'group_e_member_one', None)
+    #     if group_e_member_one:
+    #         assigned_members += 1
+    #         team_e += 1
+    #     group_e_member_two = getattr(data, 'group_e_member_two', None)
+    #     if group_e_member_two:
+    #         assigned_members += 1
+    #         team_e += 1
+    #
+    #     if not team_a:
+    #         raise Invalid(_(u"You must have at least one walker for Team A."))
+    #
+    #     if not team_b:
+    #         raise Invalid(_(u"You must have at least one walker for Team B."))
+    #
+    #     if not team_c:
+    #         raise Invalid(_(u"You must have at least one walker for Team C."))
+    #
+    #     if group_a_member_one == group_a_member_two:
+    #         raise Invalid(_(u"You have the same member listed twice in Team A."))
+    #
+    #     if group_b_member_one == group_b_member_two:
+    #         raise Invalid(_(u"You have the same member listed twice in Team B."))
+    #
+    #     if group_c_member_one == group_c_member_two:
+    #         raise Invalid(_(u"You have the same member listed twice in Team C."))
+    #
+    #     if team_e and not team_d:
+    #         raise Invalid(_(u"Please assign walkers to Team D before Team E."))
 
     # @invariant
     # def validateGroups(data):
@@ -557,6 +555,74 @@ class HOAAnnualInspection(Container):
 
         return True
 
+    def verifyWalkersAssigned(self):
+        context = self
+        group_a_member_one = getattr(self, 'group_a_member_one', None)
+        group_a_member_two = getattr(self, 'group_a_member_two', None)
+        group_b_member_one = getattr(self, 'group_b_member_one', None)
+        group_b_member_two = getattr(self, 'group_b_member_two', None)
+        group_c_member_one = getattr(self, 'group_c_member_one', None)
+        group_c_member_two = getattr(self, 'group_c_member_two', None)
+        group_d_member_one = getattr(self, 'group_d_member_one', None)
+        group_d_member_two = getattr(self, 'group_d_member_two', None)
+        group_e_member_one = getattr(self, 'group_e_member_one', None)
+        group_e_member_two = getattr(self, 'group_e_member_two', None)
+
+        team_a = False
+        team_b = False
+        team_c = False
+        team_d = False
+
+        if group_a_member_one and group_a_member_two:
+            team_a = True
+        else:
+            api.portal.show_message(message=u"Team A must have two walkers.",
+                                    request=context.REQUEST,
+                                    type='warning')
+            return False
+
+        if group_b_member_one and group_b_member_two:
+            team_b = True
+        else:
+            api.portal.show_message(message=u"Team B must have two walkers.",
+                                    request=context.REQUEST,
+                                    type='warning')
+            return False
+
+        if group_c_member_one and group_c_member_two:
+            team_c = True
+        else:
+            api.portal.show_message(message=u"Team C must have two walkers.",
+                                    request=context.REQUEST,
+                                    type='warning')
+            return False
+
+        three_teams = False
+        if team_a and team_b and team_c:
+            three_teams = True
+
+        if group_d_member_one or group_d_member_two:
+            team_d = True
+            if not three_teams:
+                api.portal.show_message(message=u"You must configure Teams A, B, and C before Teams D or E.",
+                                    request=context.REQUEST,
+                                    type='warning')
+                return False
+
+        if group_e_member_one or group_e_member_two:
+            if not three_teams:
+                api.portal.show_message(message=u"You must configure Teams A, B, and C before Teams D or E.",
+                                    request=context.REQUEST,
+                                    type='warning')
+                return False
+            if not team_d:
+                api.portal.show_message(message=u"You must configure Team D before Team E.",
+                                    request=context.REQUEST,
+                                    type='warning')
+                return False
+
+        return True
+
     def verifySecondInspectionComplete(self):
         context = self
         parent_container = context.aq_parent
@@ -622,6 +688,12 @@ class HOAAnnualInspection(Container):
         if rewalk:
             inspection_passed_message = getattr(neighborhood_container, 'rewalk_pass_message', u'')
             inspection_failure_message = getattr(neighborhood_container, 'rewalk_fail_message', u'')
+
+        if not inspection_failure_message:
+            inspection_failure_message = u""
+
+        if not inspection_passed_message:
+            inspection_passed_message = u""
 
         house_pass_log = getattr(context, 'house_pass_log')
         if house_pass_log is None:
@@ -693,8 +765,7 @@ class HOAAnnualInspection(Container):
                 if ptn:
                     people_to_email.append(ptn)
 
-            working_house_fail_log_dict.update({fi_brain_id:people_to_email})
-
+            working_house_fail_log_dict.update({fi_home_obj_id:people_to_email})
             street_number = getattr(fi_home_obj, 'street_number', '')
             street_address = getattr(fi_home_obj, 'street_address', '')
             city = getattr(fi_home_obj, 'city', '')
@@ -749,6 +820,7 @@ class HOAAnnualInspection(Container):
                 if second_image:
                     images_to_attach.append(second_image)
 
+
             fail_message += inspection_failure_message
             fail_html += "<p>%s</p>" % inspection_failure_message
 
@@ -785,8 +857,8 @@ class HOAAnnualInspection(Container):
 
         if rewalk:
             setattr(context, 'rewalk_pass_log', working_house_pass_log_dict)
-            setattr(context, 'rewalk_fail_log', working_house_fail_log_dict)
+            setattr(context, 'rewalk_failure_log', working_house_fail_log_dict)
         else:
             setattr(context, 'house_pass_log', working_house_pass_log_dict)
-            setattr(context, 'house_fail_log', working_house_fail_log_dict)
+            setattr(context, 'house_failure_log', working_house_fail_log_dict)
 

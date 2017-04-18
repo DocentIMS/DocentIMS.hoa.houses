@@ -146,8 +146,8 @@
  </transition>
  <transition transition_id="first_walk" title="Start Inspections" new_state="initial_inspection" trigger="USER" before_script="" after_script="" >
   <action url="%(content_url)s/content_status_modify?workflow_action=first_walk" category="workflow" icon="">Start Inspections</action>
-  <guard >
-   <guard-permission>Review portal content</guard-permission>
+  <guard >verifyWalkersAssigned
+   <guard-expression>here/verifyWalkersAssigned</guard-expression>
   </guard>
 
  </transition>

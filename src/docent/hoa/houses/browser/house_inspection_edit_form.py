@@ -49,7 +49,7 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
         context = self.context
         current_state = api.content.get_state(obj=context)
         #import pdb;pdb.set_trace()
-        if current_state in ['failed_initial', 'failed_final', 'remedied']:
+        if current_state in ['failed_final', 'remedied']:
             for_show = []
             groups = self.groups
             fieldset_dict = {}
