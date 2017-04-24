@@ -374,10 +374,12 @@ class HOAAnnualInspection(Container):
             self.assign_security()
 
         if context_state == 'secondary_inspection':
-            self.sendEmailNotices()
+            #self.sendEmailNotices()
+            logger.info('Emails Sent')
 
         if context_state == 'closed':
-            self.sendEmailNotices(rewalk=True)
+            #self.sendEmailNotices(rewalk=True)
+            logger.info('Emails Sent')
 
     def add_walkers_to_groups(self):
         for g_id in WALKERS_GROUP_IDS:
