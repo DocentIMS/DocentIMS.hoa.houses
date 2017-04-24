@@ -79,15 +79,15 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
     )
 
-    form.widget(pic_req=RadioFieldWidget)
-    pic_req = schema.Choice(
-        title=_(u'Picture Rqd if Failed?'),
-        description=_(u''),
-        source=SimpleVocabulary([SimpleTerm(value=True,
-                                            title=u"Yes"),
-                                 SimpleTerm(value=False,
-                                            title=U"No")])
-    )
+    # form.widget(pic_req=RadioFieldWidget)
+    # pic_req = schema.Choice(
+    #     title=_(u'Picture Rqd if Failed?'),
+    #     description=_(u''),
+    #     source=SimpleVocabulary([SimpleTerm(value=True,
+    #                                         title=u"Yes"),
+    #                              SimpleTerm(value=False,
+    #                                         title=U"No")])
+    # )
 
     form.mode(house_failure_log='hidden')
     house_failure_log = schema.Dict(

@@ -7,8 +7,18 @@ from docent.hoa.houses.app_config import HOME_INSPECTION_STATE_TITLES
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
+from docent.hoa.houses.content.hoa_house_inspection import IHOAHOUSEINSPECTION_FIELDSETS
 
 grok.templatedir('templates')
+
+SECTION_TITLES = {'roof': 'Roof',
+                  'gutters': 'Gutters',
+                  'exterior_paint': 'Exterior Paint',
+                  'decks': 'Decks',
+                  'entry_way': 'Entry Way',
+                  'paved_surfaces': 'Paved Surfaces',
+                  'landscaping': 'Landscaping',
+                  'general_maintenance': 'General Maintenance'}
 
 def getWalkerAndEmailStructureById(member_id):
     if not member_id:
@@ -36,14 +46,9 @@ class View(grok.View):
         self.inspected_by_first = getWalkerAndEmailStructureById(inspected_by_first)
         inspected_by_second = getattr(context, 'inspected_by_second', '')
         self.inspected_by_second = getWalkerAndEmailStructureById(inspected_by_second)
-
-        self.flowerpotsErrors = getattr(context, 'flowerpots_text', '')
-        self.paintErrors = getattr(context, 'paint_text', '')
-        self.sidewalk_driveErrors = getattr(context, 'sidewalk_drive_text', '')
-        self.general_maintenanceErrors = getattr(context, 'general_maintenance_text', '')
-        self.stepsErrors = getattr(context, 'steps_text', '')
-        self.decks_patioErrors = getattr(context, 'decks_patio_text', '')
         self.passed_datetime = getattr(context, 'passed_datetime', None)
+
+        self.sections = IHOAHOUSEINSPECTION_FIELDSETS
 
         home_container = context.aq_parent
         self.home_container = home_container
@@ -55,11 +60,11 @@ class View(grok.View):
         if api.content.get_state(obj=context) != 'pending':
             self.retractable = True
 
-    def getRewalkCondition(self, rewalk_condition):
-        if rewalk_condition:
-            return 'YES'
-
-        return 'NO'
+    # def getRewalkCondition(self, rewalk_condition):
+    #     if rewalk_condition:
+    #         return 'YES'
+    #
+    #     return 'NO'
 
     def getTransitionURL(self):
         url = "%s/content_status_modify?workflow_action=retract" % self.context.absolute_url()
@@ -71,3 +76,73 @@ class View(grok.View):
 
     def getAssignmentsURL(self):
         return "%s/@@walker-assignments" % self.neighborhood_container.absolute_url()
+
+    def getSectionTitle(self, section):
+        return SECTION_TITLES[section]
+
+    def hasSectionFailures(self, section):
+        context = self.context
+        action_required = getattr(context, '%s_action_required' % section)
+        text = getattr(context, '%s_text' % section)
+        if not action_required and not text:
+            return False
+        return True
+
+    def getSectionAction(self, section):
+        context = self.context
+        action_required = getattr(context, '%s_action_required' % section)
+        if action_required:
+            return action_required.title()
+
+        return 'None'
+
+    def getSectionText(self, section):
+        context = self.context
+        text = getattr(context, '%s_text' % section)
+        if text:
+            return text
+
+        return ''
+
+    def getInitialImage(self, section):
+        context = self.context
+        image = getattr(context, '%s_image' % section)
+        if image:
+            return '%s_image' % section
+
+        return None
+
+    def getRewalkCondition(self, section):
+        context = self.context
+        cond_remains = getattr(context, '%s_cond_remains' % section)
+        if cond_remains:
+            return 'YES'
+
+        return 'NO'
+
+    def getSectionRewalkText(self, section):
+        context = self.context
+        rewalk_text = getattr(context, '%s_rewalk_text' % section)
+        if rewalk_text:
+            return rewalk_text
+
+        return ''
+
+    def getRewalkImage(self, section):
+        context = self.context
+        rewalk_image = getattr(context, '%s_rewalk_image' % section)
+        if rewalk_image:
+            return '%s_rewalk_image' % section
+
+        return None
+
+    # def getSectionFailures(self, section):
+    #     context = self.context
+    #     cond_remains = getattr(context, '%s_cond_remains' % section)
+    #     action_required = getattr(context, '%s_action_required' % section)
+    #     text = getattr(context, '%s_text' % section)
+    #     rewalk_text = getattr(context, '%s_rewalk_text' % section)
+    #     image = getattr(context, '%s_image' % section)
+    #     rewalk_image = getattr(context, '%s_rewalk_image' % section)
+
+

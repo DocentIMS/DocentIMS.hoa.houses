@@ -16,17 +16,29 @@ from zope.event import notify
 from z3c.form import interfaces
 from z3c.form import field
 from z3c.form.browser.radio import RadioFieldWidget
+from plone.formwidget.namedfile.widget import NamedImageWidget
 from plone.directives import form
 
 from docent.hoa.houses import _
 from docent.hoa.houses.browser.house_inspection_form import getAnnualInspection
 
-inspection_keys_to_fieldset_dict = {'flowerpots_text': 'flowerpots',
-                                    'paint_text': 'paint',
-                                    'sidewalk_drive_text': 'sidewalk_drive',
-                                    'steps_text': 'steps',
-                                    'decks_patio_text': 'decks_patio',
-                                    'general_maintenance_text': 'general_maintenance'}
+
+
+# inspection_keys_to_fieldset_dict = {'flowerpots_text': 'flowerpots',
+#                                     'paint_text': 'paint',
+#                                     'sidewalk_drive_text': 'sidewalk_drive',
+#                                     'steps_text': 'steps',
+#                                     'decks_patio_text': 'decks_patio',
+#                                     'general_maintenance_text': 'general_maintenance'}
+
+inspection_keys_to_fieldset_dict = {'roof_text':'roof',
+                                    'gutters_text':'gutters',
+                                    'exterior_paint_text':'exterior_paint',
+                                    'decks_text':'decks',
+                                    'entry_way_text':'entry_way',
+                                    'paved_surfaces_text':'paved_surfaces',
+                                    'landscaping_text':'landscaping',
+                                    'general_maintenance_text':'general_maintenance'}
 
 class IEmptySchema(form.Schema):
     """
@@ -48,7 +60,7 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
 
         context = self.context
         current_state = api.content.get_state(obj=context)
-        #import pdb;pdb.set_trace()
+
         if current_state in ['failed_final', 'remedied']:
             for_show = []
             groups = self.groups
@@ -63,30 +75,32 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
             new_groups = []
             active_annual_inspection = getAnnualInspection()
             aai_obj = active_annual_inspection.getObject()
-            pic_req = getattr(aai_obj, 'pic_req', False)
+            #pic_req = getattr(aai_obj, 'pic_req', False)
             for skey in for_show:
                 fieldset_key = inspection_keys_to_fieldset_dict.get(skey)
                 s_group = fieldset_dict.get(fieldset_key)
-                #import pdb;pdb.set_trace()
-
-                s_group.fields['%s_second_image' % fieldset_key].mode = None
+                s_group.fields['%s_rewalk_image' % fieldset_key].mode = None
+                #s_group.fields['%s_rewalk_image' % fieldset_key].widgetFactory = NamedImageWidget
+                s_group.fields['%s_rewalk_text' % fieldset_key].mode = None
                 s_group.fields['%s_cond_remains' % fieldset_key].mode = None
                 s_group.fields['%s_cond_remains' % fieldset_key].widgetFactory = RadioFieldWidget
+                s_group.fields['%s_text' % fieldset_key].mode = interfaces.DISPLAY_MODE
+                s_group.fields['%s_action_required' % fieldset_key].mode = interfaces.DISPLAY_MODE
                 s_group.fields['%s_image' % fieldset_key].mode = interfaces.DISPLAY_MODE
-                if pic_req:
-                    s_group.fields['%s_second_image' % fieldset_key].field.required = True
+                # if pic_req:
+                #     s_group.fields['%s_second_image' % fieldset_key].field.required = True
                 #s_group.fields['%s_second_image' % fieldset_key].mode = interfaces.HIDDEN_MODE
                 #s_group.fields['%s_second_image' % fieldset_key].mode = None
                 #new_schema += s_group.fields
                 new_groups.append(s_group)
 
             self.groups = new_groups
-        else:
-            groups = self.groups
-            for group in groups:
-                g_name = group.__name__
-                if getattr(context, '%s_second_image' % g_name, None):
-                    group.fields['%s_second_image' % g_name].mode = interfaces.DISPLAY_MODE
+        # else:
+        #     groups = self.groups
+        #     for group in groups:
+        #         g_name = group.__name__
+        #         if getattr(context, '%s_rewalk_image' % g_name, None):
+        #             group.fields['%s_rewalk_image' % g_name].mode = interfaces.DISPLAY_MODE
 
 
     @property

@@ -22,7 +22,6 @@
         <ul>
             <li>Start Date: <span tal:replace="context/start_date|Nothing" /></li>
             <li>End Date: <span tal:replace="context/end_date|Nothing" /></li>
-            <li>Picture Required: <span tal:replace="view/pic_req|Nothing" /></li>
         </ul>
 
         <h2>Teams</h2>

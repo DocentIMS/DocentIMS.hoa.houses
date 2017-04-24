@@ -77,11 +77,11 @@ class View(grok.View):
         self.group_e_member_one = getWalkerAndEmailStructureById(getattr(context, 'group_e_member_one', ''))
         self.group_e_member_two = getWalkerAndEmailStructureById(getattr(context, 'group_e_member_two', ''))
 
-        pic_req = 'No'
-        if getattr(context, 'pic_req'):
-            pic_req = "Yes"
+        # pic_req = 'No'
+        # if getattr(context, 'pic_req'):
+        #     pic_req = "Yes"
 
-        self.pic_req = pic_req
+        # self.pic_req = pic_req
 
         self.team_a = False
         if self.group_a_member_one or self.group_a_member_two:
