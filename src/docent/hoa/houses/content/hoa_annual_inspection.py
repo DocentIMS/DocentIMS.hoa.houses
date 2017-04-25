@@ -789,7 +789,7 @@ class HOAAnnualInspection(Container):
             fieldsets = IHOAHOUSEINSPECTION_FIELDSETS
             failure_dicts = []
             for fieldset in fieldsets:
-                action_required = getattr(fi_obj, '%s_action_required', '')
+                action_required = getattr(fi_obj, '%s_action_required' % fieldset, '')
                 if action_required:
                     text = getattr(fi_obj, '%s_text' % fieldset, '')
                     rewalk_text = getattr(fi_obj, '%s_rewalk_text' % fieldset, '')
@@ -923,11 +923,11 @@ class HOAAnnualInspection(Container):
                     msg.attach(msg_image)
 
                 send_message = "Dear %s,\n\n" % member_fullname
-                send_message_html = "<html><body><div style='float: right;'><img src='cid:meadows_logo'></div>" \
-                                    "<p>Dear %s,</p>" % member_fullname
+                send_message_html = "<html><body><div style='float: right; clear:left;'><img src='cid:meadows_logo'></div>" \
+                                    "<div><p>Dear %s,</p>" % member_fullname
                 send_message += fail_message
                 send_message_html += fail_html
-                send_message_html += "</body></html>"
+                send_message_html += "</div></body></html>"
 
                 msg_alt.attach(MIMEText(send_message, 'plain'))
                 msg_alt.attach(MIMEText(send_message_html, 'html'))

@@ -12,9 +12,8 @@
       />
 
   <!-- Publish static files -->
-  <plone:static
+  <browser:resourceDirectory
       name="docent.hoa.houses"
-      type="plone"
       directory="static"
       />
 
