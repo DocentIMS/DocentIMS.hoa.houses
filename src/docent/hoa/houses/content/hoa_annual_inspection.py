@@ -795,7 +795,7 @@ class HOAAnnualInspection(Container):
                     rewalk_text = getattr(fi_obj, '%s_rewalk_text' % fieldset, '')
                     cond_remains = getattr(fi_obj, '%s_cond_remains' % fieldset, '')
                     image = getattr(fi_obj, '%s_image' % fieldset, None)
-                    rewalk_image = getattr(fi_obj, '%s_rewalk_image', None)
+                    rewalk_image = getattr(fi_obj, '%s_rewalk_image' % fieldset, None)
                     f_dict = {'fieldset':fieldset,
                               'action_required':action_required,
                               'text':text,
