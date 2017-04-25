@@ -177,3 +177,39 @@ DIVISION_BY_FIVE = TEST_DIVISION_BY_FIVE
 LOT_DIVISION_DICT = {3: DIVISION_BY_THREE,
                      4: DIVISION_BY_FOUR,
                      5: DIVISION_BY_FIVE}
+
+IHOAHOUSEINSPECTION_FIELDSETS = ['roof',
+                                 'gutters',
+                                 'exterior_paint',
+                                 'decks',
+                                 'entry_way',
+                                 'paved_surfaces',
+                                 'landscaping',
+                                 'general_maintenance']
+
+
+
+REQUIRED_ACTION_DICT = {'roof': {'clean': 'August 31',
+                                 'repair': 'August 31',
+                                 'replace': 'June'},
+                        'gutters': {'clean': 'August 31',
+                                    'repair': 'August 31',
+                                    'replace': 'June'},
+                        'exterior_paint': {'clean': 'August 31',
+                                           'repair': 'August 31',
+                                           'replace': 'June'},
+                        'decks': {'clean': 'August 31',
+                                  'repair': 'August 31',
+                                  'replace': 'June'},
+                        'entry_way': {'clean': 'August 31',
+                                      'repair': 'August 31',
+                                      'replace': 'June'},
+                        'paved_surfaces': {'clean': 'August 31',
+                                           'repair': 'August 31',
+                                           'replace': 'June'},
+                        'landscaping': {'clean': 'August 31',
+                                        'repair': 'August 31',
+                                        'replace': 'June'},
+                        'general_maintenance': {'clean': 'August 31',
+                                                'repair': 'August 31',
+                                                'replace': 'June'}}

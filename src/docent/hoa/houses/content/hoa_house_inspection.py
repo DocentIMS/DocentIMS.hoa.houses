@@ -15,7 +15,7 @@ from z3c.form.browser.radio import RadioFieldWidget
 from zope.interface import provider, invariant, Invalid
 from zope.schema.interfaces import IContextAwareDefaultFactory
 
-
+from docent.hoa.houses.app_config import IHOAHOUSEINSPECTION_FIELDSETS
 
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
 from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT
@@ -53,14 +53,6 @@ REQUIRED_ACTION_VOCABULARY = SimpleVocabulary(
      SimpleTerm(value='replace', title=_(u'Replace'))]
     )
 
-IHOAHOUSEINSPECTION_FIELDSETS = ['roof',
-                                 'gutters',
-                                 'exterior_paint',
-                                 'decks',
-                                 'entry_way',
-                                 'paved_surfaces',
-                                 'landscaping',
-                                 'general_maintenance' ]
 
 class IHOAHouseInspection(form.Schema):
     """

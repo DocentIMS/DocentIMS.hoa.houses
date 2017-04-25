@@ -24,7 +24,11 @@ from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
-from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT, LOT_DIVISION_DICT, WALKERS_GROUP_IDS
+from docent.hoa.houses.app_config import (HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT,
+                                          LOT_DIVISION_DICT,
+                                          WALKERS_GROUP_IDS,
+                                          IHOAHOUSEINSPECTION_FIELDSETS,
+                                          REQUIRED_ACTION_DICT)
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,
                                         removeHomeFromLookupRegistry,
                                         clearAllHomesForMember,
@@ -374,11 +378,11 @@ class HOAAnnualInspection(Container):
             self.assign_security()
 
         if context_state == 'secondary_inspection':
-            #self.sendEmailNotices()
+            self.sendEmailNotices()
             logger.info('Emails Sent')
 
         if context_state == 'closed':
-            #self.sendEmailNotices(rewalk=True)
+            self.sendEmailNotices(rewalk=True)
             logger.info('Emails Sent')
 
     def add_walkers_to_groups(self):
@@ -436,7 +440,7 @@ class HOAAnnualInspection(Container):
         number_of_groups = 0
         if group_a_member_one or group_a_member_two:
             number_of_groups += 1
-        if group_b_member_one or group_b_member_one:
+        if group_b_member_one or group_b_member_two:
             number_of_groups += 1
         if group_c_member_one or group_c_member_two:
             number_of_groups += 1
@@ -773,25 +777,32 @@ class HOAAnnualInspection(Container):
             city = getattr(fi_home_obj, 'city', '')
             state = getattr(fi_home_obj, 'state', '')
             zipcode = getattr(fi_home_obj, 'zipcode', '')
-            address_string = "%s %s, %s %s, %s" % (street_number,
-                                                   street_address,
-                                                   city,
-                                                   state,
-                                                   zipcode)
+            div = getattr(fi_home_obj, 'div', '')
+            lot = getattr(fi_home_obj, 'lot', '')
+            inspection_type = 'Initial Inspection'
+            if rewalk:
+                inspection_type = 'Final Inspection'
 
-            fieldsets = [ 'flowerpots', 'paint', 'sidewalk_drive', 'steps', 'decks_patio', 'general_maintenance' ]
+            address_string = "%s %s" % (street_number,
+                                        street_address)
+
+            fieldsets = IHOAHOUSEINSPECTION_FIELDSETS
             failure_dicts = []
             for fieldset in fieldsets:
-                text = getattr(fi_obj, '%s_text' % fieldset, '')
-                if text:
+                action_required = getattr(fi_obj, '%s_action_required', '')
+                if action_required:
+                    text = getattr(fi_obj, '%s_text' % fieldset, '')
+                    rewalk_text = getattr(fi_obj, '%s_rewalk_text' % fieldset, '')
                     cond_remains = getattr(fi_obj, '%s_cond_remains' % fieldset, '')
                     image = getattr(fi_obj, '%s_image' % fieldset, None)
-                    second_image = getattr(fi_obj, '%s_second_image', None)
+                    rewalk_image = getattr(fi_obj, '%s_rewalk_image', None)
                     f_dict = {'fieldset':fieldset,
+                              'action_required':action_required,
                               'text':text,
+                              'rewalk_text':rewalk_text,
                               'cond_remains':cond_remains,
                               'image':image,
-                              'second_image':second_image
+                              'rewalk_image':rewalk_image
                               }
                     failure_dicts.append(f_dict)
 
@@ -799,32 +810,91 @@ class HOAAnnualInspection(Container):
 
             fail_message = ""
             fail_html = ""
-            fail_message += "Your home at: %s failed it's inspection for the following reasons:\n\n" % address_string
-            fail_html += "<p>Your home at: %s failed it's inspection for the following reasons:</p>" % address_string
+            fail_message += "Your home at: %s, (Division %s Lot %s) Failed The Meadows Annual Property Inspection " \
+                            "completed this week:\n\n" % (address_string, div, lot)
+            fail_html += "<p>Your home at: %s (Division %s Lot %s) <span style='color:red;'>Failed</span> The Meadows " \
+                         "Annual Property Inspection completed this week.</p><hr width='80%'>" % address_string
             for failure_dict in failure_dicts:
                 fail_message += '%s\n' % failure_dict.get('fieldset').title()
-                fail_html += "<h4>%s</h4><ul>" % failure_dict.get('fieldset').title()
+                fail_html += "<h4>%s</h4><ul style='list-style-type: none;'>" % failure_dict.get('fieldset').title()
+
+                fieldset_key = failure_dict.get('fieldset')
+                action_required_key = failure_dict.get('action_required')
+                action_required_dict = REQUIRED_ACTION_DICT.get(fieldset_key)
+                action_required = action_required_dict.get(action_required_key)
+
+                year_str = date.today().strftime('%Y')
+                action_required_str = '%s, %s' % (action_required, year_str)
+                if action_required == 'replace':
+                    year_str = str(int(year_str)+1)
+                    action_required_str = '%s %s' % (action_required, year_str)
+
                 if rewalk:
-                    cond_remains = failure_dict.get('cond_remains')
-                    if cond_remains:
-                        fail_message += 'Condition Remains: YES\n'
-                        fail_html += "<li>Condition Remains: YES</li>"
-                    else:
-                        fail_message += 'Condition Remains: NO\n'
-                        fail_html += "<li>Condition Remains: NO</li>"
-                fail_message += 'Failed for: %s\n\n' % failure_dict.get('text')
-                fail_html += "<li>Failed for: %s</li></ul>" % failure_dict.get('text')
+                    fail_message += "Failed for: %s\n" % failure_dict.get('rewalk_text')
+                    fail_html += "<li>Failed for: %s</li>" % failure_dict.get('rewalk_text')
 
-                first_image = failure_dict.get('image')
-                if first_image:
-                    images_to_attach.append(first_image)
-                second_image = failure_dict.get('second_image')
-                if second_image:
-                    images_to_attach.append(second_image)
+                    fail_message += "Remediation Date: %s\n\n" % action_required_str
+                    fail_html += "<li>Remediation Date: %s</li>" % action_required_str
+                    rewalk_image = failure_dict.get('rewalk_image')
+                    rewalk_image_id = '%s_rewalk_image' % fieldset_key
+                    msg_image = MIMEImage(rewalk_image.data)
+                    msg_image.add_header('Content-ID', '<%s>' % rewalk_image_id)
+                    images_to_attach.append(msg_image)
+                    fail_html += "<li><img src='cid:%s'></li>" % rewalk_image_id
+                else:
+                    fail_message += "Failed for: %s\n" % failure_dict.get('text')
+                    fail_html += "<li>Failed for: %s</li>" % failure_dict.get('text')
+
+                    fail_message += "Remediation Date: %s\n\n" % action_required_str
+                    fail_html += "<li>Remediation Date: %s</li>" % action_required_str
+                    image = failure_dict.get('image')
+                    image_id = '%s_image' % fieldset_key
+                    msg_image = MIMEImage(rewalk_image.data)
+                    msg_image.add_header('Content-ID', '<%s>' % image_id)
+                    images_to_attach.append(msg_image)
+                    fail_html += "<li><img src='cid:%s'></li>" % image_id
+
+                fail_html += '</ul>'
 
 
-            fail_message += inspection_failure_message
-            fail_html += "<p>%s</p>" % inspection_failure_message
+            fail_html += "<hr width='80%'>"
+
+            #fail_message += inspection_failure_message
+            #fail_html += "<p>%s</p>" % inspection_failure_message
+
+            if rewalk:
+                fail_message += "Please note this was the %s.\n\n" % inspection_type
+                fail_html += "<p>Please note this was the <em>%s</em></p>" % inspection_type
+            else:
+                fail_message += "Please note this was the %s. The Association will re-inspect your property on or " \
+                                "after remediation date shown above, and will levy a fine against your unit unless " \
+                                "you remediate the above findings.\n\n" % inspection_type
+                fail_html += "<p>Please note this was the <em>%s</em>. The Association will re-inspect your property on or " \
+                                "after remediation date shown above, and will levy a fine against your unit unless " \
+                                "you remediate the above findings.</p>" % inspection_type
+
+            if not rewalk:
+                fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
+                                "remediation date above.\n    2. Contact the board at " \
+                                "property-inspection@themeadowsofredmond.org with questions or to request more time. " \
+                                "The board believes existing rules provided adequate time; therefore, there needs to " \
+                                "be a specific reason and schedule for any extension.\n    3. Contest these finding " \
+                                "within 15 days by emailing the board at property-inspection@themeadowsofredmond.org " \
+                                "and/or attending the next board meeting (provided it is within 15 days of this " \
+                                "letter). Please be specific with your disagreement.\n\n"
+                fail_html += "<p><u>Actions You May Take Before compliance date:</u></p>" \
+                             "<ul style='list-style-type: decimal;'>"
+                fail_html += "<li>Fix the items before the remediation date above.</li>"
+                fail_html += "<li>Contact the board at <a href='mailto:property-inspection@themeadowsofredmond.org'>pro" \
+                             "perty-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
+                             "The board believes existing rules provided adequate time; therefore, there needs to be " \
+                             "a specific reason and schedule for any extension.</li>"
+                fail_html += "<li>Contest these finding within 15 days by emailing the board at " \
+                             "<a href='mailto:property-inspection@themeadowsofredmond.org'>property-inspection@theme" \
+                             "adowsofredmond.org</a> and/or attending the next board meeting " \
+                             "(provided it is within 15 days of this letter). Please be specific with your " \
+                             "disagreement.</li>"
+                fail_html += "</ul>"
 
             fail_message += "\n\nThanks,\n\nThe Meadows Board"
             fail_html += "<p>Thanks,<br /><br />The Meadows Board</p>"
@@ -843,13 +913,20 @@ class HOAAnnualInspection(Container):
                 msg.attach(msg_alt)
 
                 for i_t_a in images_to_attach:
-                    img = MIMEImage(i_t_a.data)
-                    msg.attach(img)
+                    msg.attach(i_t_a)
+
+                meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.jpeg")
+                if meadows_logo:
+                    msg_image = MIMEImage(meadows_logo.GET())
+                    msg_image.add_header('Content-ID', '<meadows_logo>')
+                    msg.attach(msg_image)
 
                 send_message = "Dear %s,\n\n" % member_fullname
-                send_message_html = "<p>Dear %s," % member_fullname
+                send_message_html = "<html><body><div style='float: right;'><img src='cid:meadows_logo'></div>" \
+                                    "<p>Dear %s,</p>" % member_fullname
                 send_message += fail_message
                 send_message_html += fail_html
+                send_message_html += "</body></html>"
 
                 msg_alt.attach(MIMEText(send_message, 'plain'))
                 msg_alt.attach(MIMEText(send_message_html, 'html'))
