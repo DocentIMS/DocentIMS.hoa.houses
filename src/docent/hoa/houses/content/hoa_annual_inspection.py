@@ -812,7 +812,7 @@ class HOAAnnualInspection(Container):
             fail_html = ""
             fail_message += "Your home at: %s, (Division %s Lot %s) Failed The Meadows Annual Property Inspection " \
                             "completed this week:\n\n" % (address_string, div, lot)
-            fail_html += "<p>Your home at: %s (Division %s Lot %s)" % (address_string, div, lot)
+            fail_html += "<p>Your home at: %s (Division %s Lot %s) " % (address_string, div, lot)
             fail_html += "<span style='color:red;'>Failed</span> The Meadows Annual Property Inspection completed " \
                          "this week.</p><hr width='80%'>"
             for failure_dict in failure_dicts:
@@ -923,11 +923,11 @@ class HOAAnnualInspection(Container):
                     msg.attach(msg_image)
 
                 send_message = "Dear %s,\n\n" % member_fullname
-                send_message_html = "<html><body><div style='float: right; clear:left;'><img src='cid:meadows_logo'></div>" \
+                send_message_html = "<html><body><div style='position: relative; padding: 0 0 75px 0;'><div style='right: 0; position: absolute; top: 0;'><img src='cid:meadows_logo'></div>" \
                                     "<div><p>Dear %s,</p>" % member_fullname
                 send_message += fail_message
                 send_message_html += fail_html
-                send_message_html += "</div></body></html>"
+                send_message_html += "</div></div></body></html>"
 
                 msg_alt.attach(MIMEText(send_message, 'plain'))
                 msg_alt.attach(MIMEText(send_message_html, 'html'))
