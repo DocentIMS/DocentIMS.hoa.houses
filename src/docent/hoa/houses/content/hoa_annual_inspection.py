@@ -812,8 +812,9 @@ class HOAAnnualInspection(Container):
             fail_html = ""
             fail_message += "Your home at: %s, (Division %s Lot %s) Failed The Meadows Annual Property Inspection " \
                             "completed this week:\n\n" % (address_string, div, lot)
-            fail_html += "<p>Your home at: %s (Division %s Lot %s) <span style='color:red;'>Failed</span> The Meadows " \
-                         "Annual Property Inspection completed this week.</p><hr width='80%'>" % address_string
+            fail_html += "<p>Your home at: %s (Division %s Lot %s)" % (address_string, div, lot)
+            fail_html += "<span style='color:red;'>Failed</span> The Meadows Annual Property Inspection completed " \
+                         "this week.</p><hr width='80%'>"
             for failure_dict in failure_dicts:
                 fail_message += '%s\n' % failure_dict.get('fieldset').title()
                 fail_html += "<h4>%s</h4><ul style='list-style-type: none;'>" % failure_dict.get('fieldset').title()
@@ -849,7 +850,7 @@ class HOAAnnualInspection(Container):
                     fail_html += "<li>Remediation Date: %s</li>" % action_required_str
                     image = failure_dict.get('image')
                     image_id = '%s_image' % fieldset_key
-                    msg_image = MIMEImage(rewalk_image.data)
+                    msg_image = MIMEImage(image.data)
                     msg_image.add_header('Content-ID', '<%s>' % image_id)
                     images_to_attach.append(msg_image)
                     fail_html += "<li><img src='cid:%s'></li>" % image_id
