@@ -816,6 +816,10 @@ class HOAAnnualInspection(Container):
             fail_html += "<span style='color:red;'>Failed</span> The Meadows Annual Property Inspection completed " \
                          "this week.</p><hr width='80%'>"
             for failure_dict in failure_dicts:
+                if rewalk:
+                    condition_remains = failure_dict.get('cond_remains')
+                    if not condition_remains:
+                        continue
                 fail_message += '%s\n' % failure_dict.get('fieldset').title()
                 fail_html += "<h4>%s</h4><ul style='list-style-type: none;'>" % failure_dict.get('fieldset').title()
 
@@ -837,11 +841,12 @@ class HOAAnnualInspection(Container):
                     fail_message += "Remediation Date: %s\n\n" % action_required_str
                     fail_html += "<li>Remediation Date: %s</li>" % action_required_str
                     rewalk_image = failure_dict.get('rewalk_image')
-                    rewalk_image_id = '%s_rewalk_image' % fieldset_key
-                    msg_image = MIMEImage(rewalk_image.data)
-                    msg_image.add_header('Content-ID', '<%s>' % rewalk_image_id)
-                    images_to_attach.append(msg_image)
-                    fail_html += "<li><img src='cid:%s'></li>" % rewalk_image_id
+                    if rewalk_image:
+                        rewalk_image_id = '%s_rewalk_image' % fieldset_key
+                        msg_image = MIMEImage(rewalk_image.data)
+                        msg_image.add_header('Content-ID', '<%s>' % rewalk_image_id)
+                        images_to_attach.append(msg_image)
+                        fail_html += "<li><img src='cid:%s'></li>" % rewalk_image_id
                 else:
                     fail_message += "Failed for: %s\n" % failure_dict.get('text')
                     fail_html += "<li>Failed for: %s</li>" % failure_dict.get('text')
@@ -849,11 +854,12 @@ class HOAAnnualInspection(Container):
                     fail_message += "Remediation Date: %s\n\n" % action_required_str
                     fail_html += "<li>Remediation Date: %s</li>" % action_required_str
                     image = failure_dict.get('image')
-                    image_id = '%s_image' % fieldset_key
-                    msg_image = MIMEImage(image.data)
-                    msg_image.add_header('Content-ID', '<%s>' % image_id)
-                    images_to_attach.append(msg_image)
-                    fail_html += "<li><img src='cid:%s'></li>" % image_id
+                    if image:
+                        image_id = '%s_image' % fieldset_key
+                        msg_image = MIMEImage(image.data)
+                        msg_image.add_header('Content-ID', '<%s>' % image_id)
+                        images_to_attach.append(msg_image)
+                        fail_html += "<li><img src='cid:%s'></li>" % image_id
 
                 fail_html += '</ul>'
 
