@@ -46,7 +46,17 @@ class View(grok.View):
         self.inspected_by_first = getWalkerAndEmailStructureById(inspected_by_first)
         inspected_by_second = getattr(context, 'inspected_by_second', '')
         self.inspected_by_second = getWalkerAndEmailStructureById(inspected_by_second)
-        self.passed_datetime = getattr(context, 'passed_datetime', None)
+        passed_datetime = getattr(context, 'passed_datetime', None)
+        if passed_datetime:
+            self.passed_datetime = passed_datetime.strftime('%B %-d, %Y %H:%M')
+        else:
+            self.passed_datetime = ''
+
+        inspection_datetime = getattr(context, 'inspection_datetime', None)
+        if inspection_datetime:
+            self.inspection_datetime = inspection_datetime.strftime('%B %-d, %Y %H:%M')
+        else:
+            self.inspection_datetime = ''
 
         self.sections = IHOAHOUSEINSPECTION_FIELDSETS
 

@@ -830,7 +830,7 @@ class HOAAnnualInspection(Container):
 
                 year_str = date.today().strftime('%Y')
                 action_required_str = '%s, %s' % (action_required, year_str)
-                if action_required == 'replace':
+                if action_required_key == 'replace':
                     year_str = str(int(year_str)+1)
                     action_required_str = '%s %s' % (action_required, year_str)
 
@@ -883,22 +883,22 @@ class HOAAnnualInspection(Container):
             if not rewalk:
                 fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
                                 "remediation date above.\n    2. Contact the board at " \
-                                "property-inspection@themeadowsofredmond.org with questions or to request more time. " \
+                                "annual-inspection@themeadowsofredmond.org with questions or to request more time. " \
                                 "The board believes existing rules provided adequate time; therefore, there needs to " \
                                 "be a specific reason and schedule for any extension.\n    3. Contest these finding " \
-                                "within 15 days by emailing the board at property-inspection@themeadowsofredmond.org " \
+                                "within 15 days by emailing the board at annual-inspection@themeadowsofredmond.org " \
                                 "and/or attending the next board meeting (provided it is within 15 days of this " \
                                 "letter). Please be specific with your disagreement.\n\n"
-                fail_html += "<p><u>Actions You May Take Before compliance date:</u></p>" \
+                fail_html += "<p>Actions You May Take Before compliance date:</p>" \
                              "<ul style='list-style-type: decimal;'>"
                 fail_html += "<li>Fix the items before the remediation date above.</li>"
-                fail_html += "<li>Contact the board at <a href='mailto:property-inspection@themeadowsofredmond.org'>pro" \
-                             "perty-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
+                fail_html += "<li>Contact the board at <a href='mailto:annual-inspection@themeadowsofredmond.org'>" \
+                             "annual-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
                              "The board believes existing rules provided adequate time; therefore, there needs to be " \
                              "a specific reason and schedule for any extension.</li>"
                 fail_html += "<li>Contest these finding within 15 days by emailing the board at " \
-                             "<a href='mailto:property-inspection@themeadowsofredmond.org'>property-inspection@theme" \
-                             "adowsofredmond.org</a> and/or attending the next board meeting " \
+                             "<a href='mailto:annual-inspection@themeadowsofredmond.org'>annual-inspection@" \
+                             "themeadowsofredmond.org</a> and/or attending the next board meeting " \
                              "(provided it is within 15 days of this letter). Please be specific with your " \
                              "disagreement.</li>"
                 fail_html += "</ul>"
@@ -929,7 +929,7 @@ class HOAAnnualInspection(Container):
                     msg.attach(msg_image)
 
                 send_message = "Dear %s,\n\n" % member_fullname
-                send_message_html = "<html><body><div style='position: relative; padding: 0 0 75px 0;'><div style='right: 0; position: absolute; top: 0;'><img src='cid:meadows_logo'></div>" \
+                send_message_html = "<html><body><div><div style='width: 100%%;'><div style='float:right'><img src='cid:meadows_logo'></div></div>" \
                                     "<div><p>Dear %s,</p>" % member_fullname
                 send_message += fail_message
                 send_message_html += fail_html
