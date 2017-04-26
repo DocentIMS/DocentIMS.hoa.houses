@@ -929,7 +929,7 @@ class HOAAnnualInspection(Container):
                     msg.attach(msg_image)
 
                 send_message = "Dear %s,\n\n" % member_fullname
-                send_message_html = "<html><body><div><div style='width: 100%%;'><div style='float:right'><img src='cid:meadows_logo'></div></div>" \
+                send_message_html = "<html><body><div><div style='width: 100%%; height: 88px;'><div style='float:right'><img src='cid:meadows_logo'></div></div>" \
                                     "<div><p>Dear %s,</p>" % member_fullname
                 send_message += fail_message
                 send_message_html += fail_html
