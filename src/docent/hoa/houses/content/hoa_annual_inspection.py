@@ -846,7 +846,7 @@ class HOAAnnualInspection(Container):
                         msg_image = MIMEImage(rewalk_image.data)
                         msg_image.add_header('Content-ID', '<%s>' % rewalk_image_id)
                         images_to_attach.append(msg_image)
-                        fail_html += "<li><img src='cid:%s'></li>" % rewalk_image_id
+                        fail_html += "<li><img src='cid:%s' height='150' width='200'></li>" % rewalk_image_id
                 else:
                     fail_message += "Failed for: %s\n" % failure_dict.get('text')
                     fail_html += "<li>Failed for: %s</li>" % failure_dict.get('text')
@@ -859,7 +859,7 @@ class HOAAnnualInspection(Container):
                         msg_image = MIMEImage(image.data)
                         msg_image.add_header('Content-ID', '<%s>' % image_id)
                         images_to_attach.append(msg_image)
-                        fail_html += "<li><img src='cid:%s'></li>" % image_id
+                        fail_html += "<li><img src='cid:%s' height='150' width='200'></li>" % image_id
 
                 fail_html += '</ul>'
 
