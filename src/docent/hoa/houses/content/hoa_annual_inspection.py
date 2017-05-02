@@ -451,13 +451,13 @@ class HOAAnnualInspection(Container):
                 ci_brain_zero_obj = ci_brain_zero.getObject()
                 ci_brain_zero_parent = ci_brain_zero_obj.aq_parent
                 #portal_msg += '%s' % current_inspection_brains[0].Title
-                portal_msg += '%s' % ci_brain_zero_parent.Title
+                portal_msg += '%s' % ci_brain_zero_parent.title
 
                 for ci_brain in current_inspection_brains[1:]:
                     #portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
                     ci_brain_obj = ci_brain.getObject()
                     ci_brain_parent = ci_brain_obj.aq_parent
-                    portal_msg += ', %s' % ci_brain_parent.Title
+                    portal_msg += ', %s' % ci_brain_parent.title
                     #portal_msg += ', %s' % ci_brain.Title
 
             api.portal.show_message(message=portal_msg,
@@ -567,13 +567,13 @@ class HOAAnnualInspection(Container):
                 ci_brain_zero_obj = ci_brain_zero.getObject()
                 ci_brain_zero_parent = ci_brain_zero_obj.aq_parent
                 #portal_msg += '%s' % current_inspection_brains[0].Title
-                portal_msg += '%s' % ci_brain_zero_parent.Title
+                portal_msg += '%s' % ci_brain_zero_parent.title
 
                 for ci_brain in active_inspection_brains[1:]:
                     #portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
                     ci_brain_obj = ci_brain.getObject()
                     ci_brain_parent = ci_brain_obj.aq_parent
-                    portal_msg += ', %s' % ci_brain_parent.Title
+                    portal_msg += ', %s' % ci_brain_parent.title
 
             api.portal.show_message(message=portal_msg,
                                     request=context.REQUEST,
