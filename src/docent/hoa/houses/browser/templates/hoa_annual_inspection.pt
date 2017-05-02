@@ -66,13 +66,13 @@
                                 house_pass_log_structure view/house_pass_log_structure;
                                 rewalk_failure_log_structure view/rewalk_failure_log_structure;
                                 rewalk_pass_log_structure view/rewalk_pass_log_structure">
-        <h2>Emails Sent</h2>
+        <h2>Inspection Results</h2>
         <div class="pat-autotoc autotabs" data-pat-autotoc="section:section;levels:h4;">    
 	<section tal:condition="house_pass_log_structure">
                 <h4>Initial Pass</h4>
                 <table>
                     <tr>
-                        <th>House</th><th>People Emailed</th>
+                        <th>House</th><th>Div/Lot</th><th>People Emailed</th>
                     </tr>
                     <tr tal:repeat="row_cells house_pass_log_structure"><span tal:replace="structure row_cells" /></tr>
                 </table>
@@ -81,7 +81,7 @@
                 <h4>Initial Failure</h4>
                 <table>
                     <tr>
-                        <th>House</th><th>People Emailed</th>
+                        <th>House</th><th>Div/Lot</th><th>People Emailed</th>
                     </tr>
                     <tr tal:repeat="row_cells house_failure_log_structure"><span tal:replace="structure row_cells" /></tr>
                 </table>
@@ -90,7 +90,7 @@
                 <h4>Rewalk Pass</h4>
                 <table>
                     <tr>
-                        <th>House</th><th>People Emailed</th>
+                        <th>House</th><th>Div/Lot</th><th>People Emailed</th>
                     </tr>
                     <tr tal:repeat="row_cells rewalk_pass_log_structure"><span tal:replace="structure row_cells" /></tr>
                 </table>
@@ -99,7 +99,7 @@
                 <h4>Rewalk Failure</h4>
                 <table>
                     <tr>
-                        <th>House</th><th>People Emailed</th>
+                        <th>House</th><th>Div/Lot</th><th>People Emailed</th>
                     </tr>
                     <tr tal:repeat="row_cells rewalk_failure_log_structure"><span tal:replace="structure row_cells" /></tr>
                 </table>

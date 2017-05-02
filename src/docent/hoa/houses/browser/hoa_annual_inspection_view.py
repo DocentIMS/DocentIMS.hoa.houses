@@ -29,7 +29,7 @@ def getWalkerAndEmailStructureById(member_id):
 
 def getRowStructureForEmailReports(context, report_dict):
     if not report_dict:
-        return ['<td></td><td></td>']
+        return ['<td></td><td></td><td></td>']
 
     parent_container = context.aq_parent
     #get_address()
@@ -38,10 +38,11 @@ def getRowStructureForEmailReports(context, report_dict):
         structure = ''
         house_obj = getattr(parent_container, house_id, None)
         if house_obj:
+            house_address = house_obj.get_address()
             house_url = house_obj.absolute_url()
-            structure += "<td><a href='%s'>%s</a></td>" % (house_url, house_id)
+            structure += "<td>%s</td><td><a href='%s'>%s</a></td>" % (house_address, house_url, house_id)
         else:
-            structure += "<td>%s</td>" % house_id
+            structure += "<td></td><td>%s</td>" % house_id
 
         member_ids = report_dict.get(house_id)
         if member_ids:

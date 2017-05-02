@@ -19,12 +19,13 @@
     <tal:main-macro metal:define-macro="main">
 
     <div tal:replace="structure provider:plone.abovecontenttitle" />
-    <h1 tal:content="context/Title"></h1>
+    <!--<h1 tal:content="context/Title"></h1>-->
+    <h1><span tal:replace="context/street_number|Nothing" /> <span tal:replace="context/street_address|Nothing" /></h1>
     <div tal:replace="structure provider:plone.belowcontenttitle" />
-    <div class="address_block">
-        <p><span tal:replace="context/street_number|Nothing" /> <span tal:replace="context/street_address|Nothing" /></p>
-        <p><span tal:replace="context/city|Nothing" />, <span tal:replace="context/state|Nothing" /> <span tal:replace="context/zipcode|Nothing" /></p>
-    </div>
+    <!--<div class="address_block">-->
+        <!--<p><span tal:replace="context/street_number|Nothing" /> <span tal:replace="context/street_address|Nothing" /></p>-->
+        <!--<p><span tal:replace="context/city|Nothing" />, <span tal:replace="context/state|Nothing" /> <span tal:replace="context/zipcode|Nothing" /></p>-->
+    <!--</div>-->
     <div tal:replace="structure provider:plone.abovecontentbody" />
     <div class="home_details">
         <div class="details_block">
