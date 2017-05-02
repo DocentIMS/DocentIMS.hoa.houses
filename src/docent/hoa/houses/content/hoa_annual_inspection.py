@@ -667,7 +667,7 @@ class HOAAnnualInspection(Container):
                 member_fullname = member_data.getProperty('fullname')
                 member_email = member_data.getProperty('email')
                 pass_message = "Dear %s,\n\n" % member_fullname
-                html_pass_msg = "<p>Dear $s,</p>" %member_fullname
+                html_pass_msg = "<p>Dear %s,</p>" % member_fullname
 
                 if rewalk:
                     pass_message += "Your home at: %s Passed the Second Inspection of The Meadows Annual Property " \
