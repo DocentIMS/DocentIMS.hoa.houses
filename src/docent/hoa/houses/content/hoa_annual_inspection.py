@@ -251,108 +251,6 @@ class IHOAAnnualInspection(form.Schema):
         default='',
     )
 
-    # @invariant
-    # def minimumThreeGroups(data):
-    #     assigned_members = 0
-    #     team_a = 0
-    #     team_b = 0
-    #     team_c = 0
-    #     team_d = 0
-    #     team_e = 0
-    #     group_a_member_one = getattr(data, 'group_a_member_one', None)
-    #     if group_a_member_one:
-    #         assigned_members += 1
-    #         team_a += 1
-    #     group_a_member_two = getattr(data, 'group_a_member_two', None)
-    #     if group_a_member_two:
-    #         assigned_members += 1
-    #         team_a += 1
-    #     group_b_member_one = getattr(data, 'group_b_member_one', None)
-    #     if group_b_member_one:
-    #         assigned_members += 1
-    #         team_b += 1
-    #     group_b_member_two = getattr(data, 'group_b_member_two', None)
-    #     if group_b_member_two:
-    #         assigned_members += 1
-    #         team_b += 1
-    #     group_c_member_one = getattr(data, 'group_c_member_one', None)
-    #     if group_c_member_one:
-    #         assigned_members += 1
-    #         team_c += 1
-    #     group_c_member_two = getattr(data, 'group_c_member_two', None)
-    #     if group_c_member_two:
-    #         assigned_members += 1
-    #         team_c += 1
-    #     group_d_member_one = getattr(data, 'group_d_member_one', None)
-    #     if group_d_member_one:
-    #         assigned_members += 1
-    #         team_d += 1
-    #     group_d_member_two = getattr(data, 'group_d_member_two', None)
-    #     if group_d_member_two:
-    #         assigned_members += 1
-    #         team_d += 1
-    #     group_e_member_one = getattr(data, 'group_e_member_one', None)
-    #     if group_e_member_one:
-    #         assigned_members += 1
-    #         team_e += 1
-    #     group_e_member_two = getattr(data, 'group_e_member_two', None)
-    #     if group_e_member_two:
-    #         assigned_members += 1
-    #         team_e += 1
-    #
-    #     if not team_a:
-    #         raise Invalid(_(u"You must have at least one walker for Team A."))
-    #
-    #     if not team_b:
-    #         raise Invalid(_(u"You must have at least one walker for Team B."))
-    #
-    #     if not team_c:
-    #         raise Invalid(_(u"You must have at least one walker for Team C."))
-    #
-    #     if group_a_member_one == group_a_member_two:
-    #         raise Invalid(_(u"You have the same member listed twice in Team A."))
-    #
-    #     if group_b_member_one == group_b_member_two:
-    #         raise Invalid(_(u"You have the same member listed twice in Team B."))
-    #
-    #     if group_c_member_one == group_c_member_two:
-    #         raise Invalid(_(u"You have the same member listed twice in Team C."))
-    #
-    #     if team_e and not team_d:
-    #         raise Invalid(_(u"Please assign walkers to Team D before Team E."))
-
-    # @invariant
-    # def validateGroups(data):
-    #     assigned_members = []
-    #     for m_id in ['group_a_member_one'
-    #                  'group_a_member_two',
-    #                  'group_b_member_one',
-    #                  'group_b_member_two',
-    #                  'group_c_member_one',
-    #                  'group_c_member_two',
-    #                  'group_d_member_one',
-    #                  'group_d_member_two',
-    #                  'group_e_member_one',
-    #                  'group_e_member_two']:
-    #         a_value = getattr(data, m_id, None)
-    #         if a_value:
-    #             assigned_members.append(a_value)
-    #
-    #     sorted_dict = Counter(assigned_members)
-    #     import pdb;pdb.set_trace()
-    #     for k, v in sorted_dict.iteritems():
-    #         if v >= 2:
-    #             member_data = api.user.get(userid=k)
-    #             fullname = member_data.getProperty('fullname')
-    #             portal = api.portal.get()
-    #             api.portal.show_message(message="%s has been assigned to multiple groups." % fullname,
-    #                                     request=portal.REQUEST,
-    #                                     type='warning')
-
-
-
-
-
 
 class HOAAnnualInspection(Container):
     """
@@ -522,7 +420,7 @@ class HOAAnnualInspection(Container):
                                    id=house_inspection_title,
                                    title=house_inspection_title,
                                    safe_id=True)
-                setattr(new_insp, 'title', house_obj_title)
+                setattr(new_insp, 'title', house_inspection_title)
                 added_inspections += 1
 
         api.portal.show_message(message=u"%s houses prepared for annual inspection." % added_inspections,
@@ -633,23 +531,30 @@ class HOAAnnualInspection(Container):
         context = self
         parent_container = context.aq_parent
         parent_container_path = '/'.join(parent_container.getPhysicalPath())
+        pending_inspection_brains = context.portal_catalog.searchResults(
+                   path={'query': parent_container_path, 'depth': 3},
+                   object_provides=IHOAHouseInspection.__identifier__,
+                   review_state='pending')
         current_inspection_brains = context.portal_catalog.searchResults(
                    path={'query': parent_container_path, 'depth': 3},
                    object_provides=IHOAHouseInspection.__identifier__,
                    review_state='failed_initial')
-        if current_inspection_brains:
+
+        active_inspection_brains = pending_inspection_brains + current_inspection_brains
+
+        if active_inspection_brains:
             house_inspection_title = getattr(context, 'house_inspection_title', '')
             current_inspections = []
-            [current_inspections.append(i) for i in current_inspection_brains if i.getId == house_inspection_title]
+            [current_inspections.append(i) for i in active_inspection_brains if i.getId == house_inspection_title]
             pending_inspections = len(current_inspections)
-            pending_inspections = len(current_inspection_brains)
+            pending_inspections = len(active_inspection_brains)
             portal_msg = ""
             if pending_inspections > 20:
                 portal_msg += "There are %s homes remaining to inspect." % pending_inspections
             else:
                 portal_msg += "The following homes have not been inspected: "
                 #portal_msg += '<a href="%s">%s</a>' %(current_inspection_brains[0].getURL(), current_inspection_brains[0].Title)
-                portal_msg += '%s' % current_inspection_brains[0].Title
+                portal_msg += '%s' % active_inspection_brains[0].Title
                 for ci_brain in current_inspection_brains[1:]:
                     #portal_msg += ', <a href="%s">%s</a>' % (ci_brain.getURL(), ci_brain.Title)
                     portal_msg += ', %s' % ci_brain.Title
@@ -711,8 +616,10 @@ class HOAAnnualInspection(Container):
         working_house_fail_log_dict = {}
 
         secretary_email = getattr(neighborhood_container, 'secretary_email', None)
-        pass_message_subject = "%s - Passed" % getattr(context, 'title', u'Annual Inspection')
-        fail_message_subject = "%s - Failed" % getattr(context, 'title', u'Annual Inspection')
+        pass_message_subject = "Your property has passed The Meadows Annual Inspection"
+        fail_message_subject = "Meadows Property Inspection - Your property has failed the inspection"
+        if rewalk:
+            fail_message_subject = "Meadows Property Inspection - Your property has failed The Meadows re-inspection."
 
         for pi_brain in passed_inspection_brains:
             pi_brain_id = pi_brain.getId
@@ -734,28 +641,63 @@ class HOAAnnualInspection(Container):
 
             street_number = getattr(pi_home_obj, 'street_number', '')
             street_address = getattr(pi_home_obj, 'street_address', '')
-            city = getattr(pi_home_obj, 'city', '')
-            state = getattr(pi_home_obj, 'state', '')
-            zipcode = getattr(pi_home_obj, 'zipcode', '')
-            address_string = "%s %s, %s %s, %s" % (street_number,
-                                                   street_address,
-                                                   city,
-                                                   state,
-                                                   zipcode)
+            # city = getattr(pi_home_obj, 'city', '')
+            # state = getattr(pi_home_obj, 'state', '')
+            # zipcode = getattr(pi_home_obj, 'zipcode', '')
+            address_string = "%s %s" % (street_number,
+                                        street_address,)
             for ptn in people_to_email:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
                 member_email = member_data.getProperty('email')
                 pass_message = "Dear %s,\n\n" % member_fullname
-                pass_message += "Your home at: %s passed it's inspection.\n\n" % address_string
-                pass_message += inspection_passed_message
-                pass_message += "\n\nRegards,\n\nThe Meadows Board"
+                html_pass_msg = "<p>Dear $s,</p>" %member_fullname
 
-                api.portal.send_email(sender=secretary_email,
-                                      recipient=member_email,
-                                      subject=pass_message_subject,
-                                      body=pass_message,
-                                      immediate=True)
+                if rewalk:
+                    pass_message += "Your home at: %s Passed the Second Inspection of The Meadows Annual Property " \
+                                    "Inspection.\n\n" % address_string
+                    html_pass_msg += "<p>Your home at: %s Passed the Second Inspection of The Meadows Annual Property " \
+                                     "Inspection.</p>" % address_string
+                else:
+                    pass_message += "Your home at: %s Passed The Meadows Annual Property Inspection.\n\n" % address_string
+                    html_pass_msg += "<p>Your home at: %s Passed The Meadows Annual Property Inspection.</p>" % address_string
+
+                pass_message += "You have no further action.\n\n"
+                html_pass_msg += "<p>You have no further action.</p>"
+
+                pass_message += "The Meadows community prides itself in maintaining our community appearance to " \
+                                "benefit all residents. We appreciate your help.\n\n"
+                html_pass_msg += "<p>The Meadows community prides itself in maintaining our community appearance to " \
+                                 "benefit all residents. We appreciate your help.</p>"
+
+                pass_message += "\n\nRegards,\n\nThe Meadows Board"
+                html_pass_msg += "<p>Regards,<br /><br />The Meadows Board</p>"
+
+                pass_msg = MIMEMultipart('related')
+                pass_msg_alt = MIMEMultipart('alternative')
+
+                pass_msg['Subject'] = "Your property has passed The Meadows Annual Inspection"
+                pass_msg['From'] = secretary_email
+                pass_msg['To'] = member_email
+                pass_msg.preamble = 'This is a multi-part message in MIME format.'
+                pass_msg.attach(pass_msg_alt)
+
+                meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.jpeg")
+                if meadows_logo:
+                    msg_image = MIMEImage(meadows_logo.GET())
+                    msg_image.add_header('Content-ID', '<meadows_logo>')
+                    pass_msg.attach(msg_image)
+
+                send_message_html = "<html><body><div><div style='width: 100%%; height: 88px;'><div style='float:right'><img src='cid:meadows_logo'></div></div><div>"
+                send_message = pass_message
+                send_message_html += html_pass_msg
+                send_message_html += "</div></div></body></html>"
+
+                pass_msg_alt.attach(MIMEText(send_message, 'plain'))
+                pass_msg_alt.attach(MIMEText(send_message_html, 'html'))
+
+                host = portal.MailHost
+                host.send(pass_msg, immediate=True)
 
         for fi_brain in failed_inspection_brains:
             fi_brain_id = fi_brain.getId
@@ -810,11 +752,23 @@ class HOAAnnualInspection(Container):
 
             fail_message = ""
             fail_html = ""
-            fail_message += "Your home at: %s, (Division %s Lot %s) Failed The Meadows Annual Property Inspection " \
-                            "completed this week:\n\n" % (address_string, div, lot)
-            fail_html += "<p>Your home at: %s (Division %s Lot %s) " % (address_string, div, lot)
-            fail_html += "<span style='color:red;'>Failed</span> The Meadows Annual Property Inspection completed " \
-                         "this week.</p><hr width='80%'>"
+            if rewalk:
+                fail_message += "Your home at: %s, (Division %s Lot %s) Failed Second Inspection ofThe Meadows Annual " \
+                                "Property Inspection. " % (address_string, div, lot)
+                fail_message += "Because this is the second failure for the same violation(s), in accordance with our " \
+                                "rules, you are being fined $100. You will receive a fine notification from our " \
+                                "property manager."
+                fail_html += "<p>Your home at: %s (Division %s Lot %s) " % (address_string, div, lot)
+                fail_html += "<span style='color:red;'>Failed</span> the <em>Second Inspection</em> ofThe Meadows " \
+                             "Annual Property Inspection. <em>Because this is the second failure for the same violation(s), " \
+                             "in accordance with our rules, you are being fined $100. You will receive a fine " \
+                             "notification from our property manager.</em></p><hr width='80%'>"
+            else:
+                fail_message += "Your home at: %s, (Division %s Lot %s) Failed The Meadows Annual Property Inspection " \
+                                "completed this week:\n\n" % (address_string, div, lot)
+                fail_html += "<p>Your home at: %s (Division %s Lot %s) " % (address_string, div, lot)
+                fail_html += "<span style='color:red;'>Failed</span> The Meadows Annual Property Inspection completed " \
+                             "this week.</p><hr width='80%'>"
             for failure_dict in failure_dicts:
                 if rewalk:
                     condition_remains = failure_dict.get('cond_remains')
@@ -838,8 +792,8 @@ class HOAAnnualInspection(Container):
                     fail_message += "Failed for: %s\n" % failure_dict.get('rewalk_text')
                     fail_html += "<li>Failed for: %s</li>" % failure_dict.get('rewalk_text')
 
-                    fail_message += "Remediation Date: %s\n\n" % action_required_str
-                    fail_html += "<li>Remediation Date: %s</li>" % action_required_str
+                    # fail_message += "Remediation Date: %s\n\n" % action_required_str
+                    # fail_html += "<li>Remediation Date: %s</li>" % action_required_str
                     rewalk_image = failure_dict.get('rewalk_image')
                     if rewalk_image:
                         rewalk_image_id = '%s_rewalk_image' % fieldset_key
@@ -869,10 +823,7 @@ class HOAAnnualInspection(Container):
             #fail_message += inspection_failure_message
             #fail_html += "<p>%s</p>" % inspection_failure_message
 
-            if rewalk:
-                fail_message += "Please note this was the %s.\n\n" % inspection_type
-                fail_html += "<p>Please note this was the <em>%s</em></p>" % inspection_type
-            else:
+            if not rewalk:
                 fail_message += "Please note this was the %s. The Association will re-inspect your property on or " \
                                 "after remediation date shown above, and will levy a fine against your unit unless " \
                                 "you remediate the above findings.\n\n" % inspection_type
@@ -880,28 +831,35 @@ class HOAAnnualInspection(Container):
                                 "after remediation date shown above, and will levy a fine against your unit unless " \
                                 "you remediate the above findings.</p>" % inspection_type
 
-            if not rewalk:
-                fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
-                                "remediation date above.\n    2. Contact the board at " \
-                                "annual-inspection@themeadowsofredmond.org with questions or to request more time. " \
-                                "The board believes existing rules provided adequate time; therefore, there needs to " \
-                                "be a specific reason and schedule for any extension.\n    3. Contest these finding " \
-                                "within 15 days by emailing the board at annual-inspection@themeadowsofredmond.org " \
-                                "and/or attending the next board meeting (provided it is within 15 days of this " \
-                                "letter). Please be specific with your disagreement.\n\n"
-                fail_html += "<p>Actions You May Take Before compliance date:</p>" \
-                             "<ul style='list-style-type: decimal;'>"
-                fail_html += "<li>Fix the items before the remediation date above.</li>"
-                fail_html += "<li>Contact the board at <a href='mailto:annual-inspection@themeadowsofredmond.org'>" \
-                             "annual-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
-                             "The board believes existing rules provided adequate time; therefore, there needs to be " \
-                             "a specific reason and schedule for any extension.</li>"
-                fail_html += "<li>Contest these finding within 15 days by emailing the board at " \
-                             "<a href='mailto:annual-inspection@themeadowsofredmond.org'>annual-inspection@" \
-                             "themeadowsofredmond.org</a> and/or attending the next board meeting " \
-                             "(provided it is within 15 days of this letter). Please be specific with your " \
-                             "disagreement.</li>"
-                fail_html += "</ul>"
+            fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
+                            "remediation date above.\n    2. Contact the board at " \
+                            "annual-inspection@themeadowsofredmond.org with questions or to request more time. " \
+                            "The board believes existing rules provided adequate time; therefore, there needs to " \
+                            "be a specific reason and schedule for any extension.\n    3. Contest these finding " \
+                            "within 15 days by emailing the board at annual-inspection@themeadowsofredmond.org " \
+                            "and/or attending the next board meeting (provided it is within 15 days of this " \
+                            "letter). Please be specific with your disagreement.\n\n"
+            fail_html += "<p>Actions You May Take Before compliance date:</p>" \
+                         "<ul style='list-style-type: decimal;'>"
+            fail_html += "<li>Fix the items before the remediation date above.</li>"
+            fail_html += "<li>Contact the board at <a href='mailto:annual-inspection@themeadowsofredmond.org'>" \
+                         "annual-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
+                         "The board believes existing rules provided adequate time; therefore, there needs to be " \
+                         "a specific reason and schedule for any extension.</li>"
+            fail_html += "<li>Contest these finding within 15 days by emailing the board at " \
+                         "<a href='mailto:annual-inspection@themeadowsofredmond.org'>annual-inspection@" \
+                         "themeadowsofredmond.org</a> and/or attending the next board meeting " \
+                         "(provided it is within 15 days of this letter). Please be specific with your " \
+                         "disagreement.</li>"
+            fail_html += "</ul>"
+
+            if rewalk:
+                fail_message += "Fines accrued for weedwalk violations are treated as any debt to the Association and " \
+                                "all debt collection actions provided by our debt collection policy will be enforced. " \
+                                "Thank you very much for your cooperation.\n\n"
+                fail_html += "<p>Fines accrued for weedwalk violations are treated as any debt to the Association and " \
+                             "all debt collection actions provided by our debt collection policy will be enforced. " \
+                             "Thank you very much for your cooperation.</p>"
 
             fail_message += "\n\nThanks,\n\nThe Meadows Board"
             fail_html += "<p>Thanks,<br /><br />The Meadows Board</p>"

@@ -21,6 +21,20 @@
             </div>
         </div>
 
+        <tal:rewalk tal:define="rewalk context/getRewalkStatus;">
+            <div tal:condition="rewalk" tal:define="failures context/getFailures">
+                <section tal:repeat="failure failures">
+                    <h4 tal:content="failure/section_title"></h4>
+                    <p><strong>Required Action:</strong> <span tal:replace="failure/action_required" /></p>
+                    <p tal:content="failure/text"></p>
+                    <div tal:define="initial_image failure/initial_image_url" tal:condition="nocall:initial_image">
+                        <img src="#" tal:attributes="src string: ${initial_image}" />
+                    </div>
+                </section>
+            </div>
+
+        </tal:rewalk>
+
         <div id="content-core">
             <p><strong><em>Passing</em></strong> the home will add it to your "Completed" list. You will be returned to the "Assigned" tab to choose the next home to inspect.</p>
             <p><strong><em>Failing</em></strong> the home will load the Home Inspection Form.</p>

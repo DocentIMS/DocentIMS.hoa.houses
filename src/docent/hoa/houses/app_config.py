@@ -188,7 +188,6 @@ IHOAHOUSEINSPECTION_FIELDSETS = ['roof',
                                  'general_maintenance']
 
 
-
 REQUIRED_ACTION_DICT = {'roof': {'clean': 'August 31',
                                  'repair': 'August 31',
                                  'replace': 'June'},

@@ -8,9 +8,11 @@ from plone.supermodel.directives import fieldset
 from zope import schema
 from zope.interface import provider, invariant, Invalid
 from zope.schema.interfaces import IContextAwareDefaultFactory
+from AccessControl.SecurityInfo import ClassSecurityInfo
 
 from docent.hoa.houses.registry import IHOAHomeLookupRegistry
-from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT
+from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
+from docent.hoa.houses.app_config import HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT, IHOAHOUSEINSPECTION_FIELDSETS
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,
                                         removeHomeFromLookupRegistry,
                                         clearAllHomesForMember,
@@ -319,6 +321,7 @@ class HOAHouse(Container):
     """
     """
     __ac_local_roles_block__ = True
+    security = ClassSecurityInfo()
 
     def after_object_added_processor(self, context, event):
         self.update_role_members()
@@ -384,3 +387,39 @@ class HOAHouse(Container):
         street_number = getattr(self, 'street_number', '')
         street_address = getattr(self, 'street_address', '')
         return '%s %s' % (street_number, street_address)
+
+    def getLatestInspection(self):
+        inspection_brains = self.getFolderContents(object_provides=IHOAHouseInspection.__identifier__,
+                                               sort_on="created",
+                                               sort_order="ascending")
+
+        latest_inspection_brain = inspection_brains[0]
+
+        return latest_inspection_brain
+
+    security.declarePublic('getRewalkStatus')
+    def getRewalkStatus(self):
+        latest_inspection_brain = self.getLatestInspection()
+        if latest_inspection_brain.review_state in ['failed_initial', 'failed_final', 'remedied']:
+            return True
+
+        return False
+
+    security.declarePublic('getFailures')
+    def getFailures(self):
+        latest_inspection_brain = self.getLatestInspection()
+        latest_inspection_obj = latest_inspection_brain.getObject()
+        failures = []
+        for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
+            action_required = getattr(latest_inspection_obj, '%s_action_required' % fieldset_id)
+            if action_required:
+                section_title = ' '.join(fieldset_id.split('_')).title()
+                initial_image_url = '%s//@@images/%s_image/mini' % (latest_inspection_obj.absolute_url(), fieldset_id)
+                text = getattr(latest_inspection_obj, '%s_text' % fieldset_id)
+                failures.append({'section_title':section_title,
+                                 'initial_image_url':initial_image_url,
+                                 'text':text,
+                                 'action_required':action_required})
+
+        return failures
+
