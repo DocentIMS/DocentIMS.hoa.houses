@@ -1161,3 +1161,7 @@ class HOAHouseInspection(Container):
             setattr(self, 'passed_datetime', now)
 
         setattr(self, 'inspection_datetime', now)
+
+        annual_inspection_brain = getAnnualInspection()
+        ai_obj = annual_inspection_brain.getObject()
+        ai_obj.checkLastInspection()

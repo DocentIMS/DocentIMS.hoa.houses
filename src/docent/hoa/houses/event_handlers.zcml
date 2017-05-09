@@ -19,6 +19,12 @@
       handler=".event_handlers.after_transition_processor"
       />
 
+    <subscriber
+      for="docent.hoa.houses.content.hoa_house_inspection.IHOAHouseInspection
+      Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+      handler=".event_handlers.after_transition_processor"
+      />
+
   <subscriber
       for="docent.hoa.houses.content.hoa_annual_inspection.IHOAAnnualInspection
       Products.DCWorkflow.interfaces.IAfterTransitionEvent"

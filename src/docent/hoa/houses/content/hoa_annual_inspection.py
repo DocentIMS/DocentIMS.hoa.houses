@@ -1,6 +1,11 @@
 import logging
 from datetime import date
 
+from AccessControl import ClassSecurityInfo, getSecurityManager
+from AccessControl.SecurityManagement import newSecurityManager, setSecurityManager
+from AccessControl.User import UnrestrictedUser as BaseUnrestrictedUser
+import transaction
+
 import smtplib
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -274,6 +279,7 @@ class HOAAnnualInspection(Container):
         if context_state == 'initial_inspection':
             self.propagate_house_inspections()
             self.assign_security()
+            self.emailInspectors()
 
         if context_state == 'secondary_inspection':
             self.sendEmailNotices()
@@ -282,6 +288,35 @@ class HOAAnnualInspection(Container):
         if context_state == 'closed':
             self.sendEmailNotices(rewalk=True)
             logger.info('Emails Sent')
+
+    def checkLastInspection(self):
+        context_state = api.content.get_state(obj=self)
+        sm = getSecurityManager()
+        role = 'Manager'
+        tmp_user = BaseUnrestrictedUser(sm.getUser().getId(), '', [role], '')
+        portal= api.portal.get()
+        tmp_user = tmp_user.__of__(portal.acl_users)
+        newSecurityManager(None, tmp_user)
+        try:
+            if context_state == 'initial_inspection':
+                if self.verifyFirstInspectionComplete(guard=False):
+                    #send email
+                    logger.info('Initial Inspection Ready to Close, email sent to board')
+                    api.portal.send_email(recipient='board@themeadowsofredmond.org',
+                                          subject='The Meadows Annual Property Initial Inspection is complete.',
+                                          body='All homes have been inspected - HAL :)')
+
+            elif context_state == 'secondary_inspection':
+                if self.verifySecondInspectionComplete(guard=False):
+                    #send_email
+                    logger.info('Rewalk Inspection Ready to Close, email sent to board')
+                    api.portal.send_email(recipient='board@themeadowsofredmond.org',
+                                          subject='The Meadows Annual Property Rewalk Inspection is complete.',
+                                          body='All homes have been inspected - HAL :)')
+            setSecurityManager(sm)
+        except Exception as e:
+            setSecurityManager(sm)
+            logger.warn('HOA Annual Inspection Check Last Inspection failed.')
 
     def add_walkers_to_groups(self):
         for g_id in WALKERS_GROUP_IDS:
@@ -427,7 +462,7 @@ class HOAAnnualInspection(Container):
                                 request=context.REQUEST,
                                 type='info')
 
-    def verifyFirstInspectionComplete(self):
+    def verifyFirstInspectionComplete(self, guard=True):
         context = self
         parent_container = context.aq_parent
         parent_container_path = '/'.join(parent_container.getPhysicalPath())
@@ -460,9 +495,18 @@ class HOAAnnualInspection(Container):
                     portal_msg += ', %s' % ci_brain_parent.title
                     #portal_msg += ', %s' % ci_brain.Title
 
-            api.portal.show_message(message=portal_msg,
-                                    request=context.REQUEST,
-                                    type='info')
+            if guard:
+                api.portal.show_message(message=portal_msg,
+                                        request=context.REQUEST,
+                                        type='info')
+            else:
+                if len(current_inspection_brains) == 1:
+                    last_brain = current_inspection_brains[0]
+                    last_brain_obj = last_brain.getObject()
+                    lbo_state = api.content.get_state(obj=last_brain_obj)
+                    if lbo_state in ['passed', 'failed_initial']:
+                        return True
+
             return False
 
         return True
@@ -535,7 +579,7 @@ class HOAAnnualInspection(Container):
 
         return True
 
-    def verifySecondInspectionComplete(self):
+    def verifySecondInspectionComplete(self, guard=True):
         context = self
         parent_container = context.aq_parent
         parent_container_path = '/'.join(parent_container.getPhysicalPath())
@@ -575,12 +619,95 @@ class HOAAnnualInspection(Container):
                     ci_brain_parent = ci_brain_obj.aq_parent
                     portal_msg += ', %s' % ci_brain_parent.title
 
-            api.portal.show_message(message=portal_msg,
-                                    request=context.REQUEST,
-                                    type='info')
+            if guard:
+                api.portal.show_message(message=portal_msg,
+                                        request=context.REQUEST,
+                                        type='info')
+            else:
+                if len(current_inspection_brains) == 1:
+                    last_brain = current_inspection_brains[0]
+                    last_brain_obj = last_brain.getObject()
+                    lbo_state = api.content.get_state(obj=last_brain_obj)
+                    if lbo_state in ['passed', 'failed_final']:
+                        return True
             return False
 
         return True
+
+    def emailInspectors(self):
+        """
+        There are a minimum of three teams.
+        :return:
+        """
+        context = self
+        start_date = getattr(context, 'start_date')
+        end_date = getattr(context, 'end_date')
+
+        team_members_dict = {'group_a_member_one' : getattr(self, 'group_a_member_one', None),
+                             'group_a_member_two' : getattr(self, 'group_a_member_two', None),
+                             'group_b_member_one' : getattr(self, 'group_b_member_one', None),
+                             'group_b_member_two' : getattr(self, 'group_b_member_two', None),
+                             'group_c_member_one' : getattr(self, 'group_c_member_one', None),
+                             'group_c_member_two' : getattr(self, 'group_c_member_two', None),
+                             'group_d_member_one' : getattr(self, 'group_d_member_one', None),
+                             'group_e_member_one' : getattr(self, 'group_e_member_one', None),
+                             'group_e_member_two' : getattr(self, 'group_e_member_two', None)}
+
+        for team_id in ['group_a', 'group_b', 'group_c', 'group_d', 'group_e']:
+            member_one = team_members_dict.get('%s_member_one' % team_id)
+            member_one_fullname = ''
+            member_one_email = ''
+            if member_one:
+                member_obj_one = api.user.get(userid=member_one)
+                member_one_fullname = member_obj_one.getProperty('fullname')
+                member_one_email = member_obj_one.getProperty('email')
+            member_two_fullname = ''
+            member_two_email = ''
+
+            member_two = team_members_dict.get('%s_member_two' % team_id)
+            if member_two:
+                member_obj_two = api.user.get(userid=member_two)
+                member_two_fullname = member_obj_two.getProperty('fullname')
+                member_two_email = member_obj_two.getProperty('email')
+
+            if member_one and member_two:
+                for message_params in [(member_one_fullname, member_one_email, member_two_fullname, member_two_email),
+                                (member_two_fullname, member_two_email, member_one_fullname, member_one_email)]:
+                    msg = "Dear %s,\n\n" % message_params[2]
+                    msg += "Thanks for volunteering to help with The Meadows Annual Property Inspection. You've been paired"
+                    msg += " with %s <%s>." % (message_params[0],
+                                               message_params[1])
+                    msg += " The Inspection begins %s and needs to be completed by %s." % (start_date.strftime('%B %d, %Y'),
+                                                                                           end_date.strftime('%B %d, %Y'))
+                    msg += "You'll receive more information shortly from the Inspection manager.\n\nThanks - " \
+                           "The Meadows Inspection Team."
+
+                    api.portal.send_email(recipient=message_params[3],
+                                          subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
+                                          body=msg)
+            elif member_one:
+                msg = "Dear %s,\n\n" % member_one_fullname
+                msg += "Thanks for volunteering to help with The Meadows Annual Property Inspection."
+                msg += " The Inspection begins %s and needs to be completed by %s." % (start_date.strftime('%B %d, %Y'),
+                                                                                       end_date.strftime('%B %d, %Y'))
+                msg += "You'll receive more information shortly from the Inspection manager.\n\nThanks - " \
+                       "The Meadows Inspection Team."
+
+                api.portal.send_email(recipient=member_one_email,
+                                      subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
+                                      body=msg)
+            elif member_two:
+                msg = "Dear %s,\n\n" % member_two_fullname
+                msg += "Thanks for volunteering to help with The Meadows Annual Property Inspection."
+                msg += " The Inspection begins %s and needs to be completed by %s." % (start_date.strftime('%B %d, %Y'),
+                                                                                       end_date.strftime('%B %d, %Y'))
+                msg += "You'll receive more information shortly from the Inspection manager.\n\nThanks - " \
+                       "The Meadows Inspection Team."
+
+                api.portal.send_email(recipient=member_two_email,
+                                      subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
+                                      body=msg)
+
 
     def sendEmailNotices(self, rewalk=False):
         portal = api.portal.get()
