@@ -6,6 +6,10 @@ from AccessControl.SecurityManagement import newSecurityManager, setSecurityMana
 from AccessControl.User import UnrestrictedUser as BaseUnrestrictedUser
 import transaction
 
+from plone.namedfile.file import NamedBlobFile
+import csv
+from cStringIO import StringIO
+
 import smtplib
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -33,6 +37,7 @@ from docent.hoa.houses.app_config import (HOME_ROLE_TO_ATTRIBUTE_LOOKUP_DICT,
                                           LOT_DIVISION_DICT,
                                           WALKERS_GROUP_IDS,
                                           IHOAHOUSEINSPECTION_FIELDSETS,
+                                          IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT,
                                           REQUIRED_ACTION_DICT)
 from docent.hoa.houses.registry import (addHomeToLookupRegistry,
                                         removeHomeFromLookupRegistry,
@@ -109,6 +114,15 @@ class IHOAAnnualInspection(form.Schema):
 
     form.mode(house_pass_log='hidden')
     house_pass_log = schema.Dict(
+        title=_(u'Homes Sent Initial Pass Notices'),
+        description=_(u"Emails sent to the following home owners."),
+        key_type=schema.ASCIILine(),
+        value_type=schema.List(value_type=schema.ASCIILine()),
+        required=False,
+    )
+
+    form.mode(house_pass_log='hidden')
+    csv_pass_log = schema.Dict(
         title=_(u'Homes Sent Initial Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
         key_type=schema.ASCIILine(),
@@ -284,10 +298,13 @@ class HOAAnnualInspection(Container):
         if context_state == 'secondary_inspection':
             self.sendEmailNotices()
             logger.info('Emails Sent')
-
+            self.createCSVFiles()
+            logger.info('CSV Files Created')
         if context_state == 'closed':
             self.sendEmailNotices(rewalk=True)
             logger.info('Emails Sent')
+            self.createCSVFiles(rewalk=True)
+            logger.info('CSV Files Created')
 
     def checkLastInspection(self):
         context_state = api.content.get_state(obj=self)
@@ -707,6 +724,299 @@ class HOAAnnualInspection(Container):
                 api.portal.send_email(recipient=member_two_email,
                                       subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
                                       body=msg)
+
+    def createCSVFiles(self, rewalk=False):
+        portal = api.portal.get()
+        context = self
+        house_inspection_title = getattr(self, 'house_inspection_title', None)
+        if not house_inspection_title:
+            api.portal.show_message(message="We cannot locate the appropriate home inspections. Please verify this "
+                                            "inspection was properly configured.",
+                                    request=context.REQUEST,
+                                    type='warning')
+            return
+
+        current_state = 'failed_initial'
+        if rewalk:
+            current_state = 'failed_final'
+
+        neighborhood_container = context.aq_parent
+        neighborhood_path = '/'.join(neighborhood_container.getPhysicalPath())
+        #get all house passed inspections
+        passed_inspection_brains = context.portal_catalog.searchResults(
+            path={'query': neighborhood_path, 'depth': 3},
+            object_provides=IHOAHouseInspection.__identifier__,
+            review_state='passed')
+
+        failed_inspection_brains = context.portal_catalog.searchResults(
+            path={'query': neighborhood_path, 'depth': 3},
+            object_provides=IHOAHouseInspection.__identifier__,
+            review_state=current_state)
+
+        failure_csv_headers = ['Full_Name',
+                             'Address1',
+                             'divlot',
+                             'City',
+                             'State',
+                             'Zip',
+                             'toda_date',
+                             'finding_1',
+                             'remediation_date_1',
+                             'finding_2',
+                             'remediation_date_2']
+        passing_csv_headers = ['Full_Name',
+                             'Address1',
+                             'divlot',
+                             'City',
+                             'State',
+                             'Zip',
+                             'toda_date']
+
+        passing_csv_dicts = []
+        failure_csv_dicts = []
+
+        today = date.today()
+        todays_date = today.strftime('%B %d, %Y')
+        today_timestamp = today.strftime('%Y_%b_%d')
+
+        house_pass_log = getattr(context, 'csv_pass_log')
+        if house_pass_log is None:
+            house_pass_log = {}
+
+        previously_passed_houses = house_pass_log.keys()
+
+        working_house_pass_log_dict = {}
+        working_house_fail_log_dict = {}
+
+        for pi_brain in passed_inspection_brains:
+            pi_brain_id = pi_brain.getId
+            if pi_brain_id != house_inspection_title:
+                continue
+            pi_obj = pi_brain.getObject()
+            pi_home_obj = pi_obj.aq_parent
+            pi_home_obj_id = pi_home_obj.id
+            if pi_home_obj_id in previously_passed_houses:
+                continue
+
+            people_to_mail = []
+            for to_notify in ['owner_one', 'owner_two', 'property_manager']:
+                ptn = getattr(pi_home_obj, to_notify, None)
+                if ptn:
+                    people_to_mail.append(ptn)
+
+            working_house_pass_log_dict.update({pi_home_obj_id:people_to_mail})
+
+            street_number = getattr(pi_home_obj, 'street_number', '')
+            street_address = getattr(pi_home_obj, 'street_address', '')
+            city = getattr(pi_home_obj, 'city', '')
+            state = getattr(pi_home_obj, 'state', '')
+            zipcode = getattr(pi_home_obj, 'zipcode', '')
+            div = getattr(pi_home_obj, 'div', '')
+            lot = getattr(pi_home_obj, 'lot', '')
+            div_lot = "%s_%s" % (div, lot)
+            address_string = "%s %s" % (street_number,
+                                        street_address,)
+            for ptn in people_to_mail:
+                member_data = api.user.get(userid=ptn)
+                member_fullname = member_data.getProperty('fullname')
+                passing_csv_dicts.append({'Full_Name':member_fullname,
+                                          'Address1':address_string,
+                                          'divlot':div_lot,
+                                          'City':city,
+                                          'State':state,
+                                          'Zip':zipcode,
+                                          'toda_date':todays_date})
+
+        setattr(context, 'csv_pass_log', working_house_pass_log_dict)
+
+        for fi_brain in failed_inspection_brains:
+            fi_brain_id = fi_brain.getId
+            if fi_brain_id != house_inspection_title:
+                continue
+            fi_obj = fi_brain.getObject()
+            fi_home_obj = fi_obj.aq_parent
+            fi_home_obj_id = fi_home_obj.id
+
+            street_number = getattr(fi_home_obj, 'street_number', '')
+            street_address = getattr(fi_home_obj, 'street_address', '')
+            city = getattr(fi_home_obj, 'city', '')
+            state = getattr(fi_home_obj, 'state', '')
+            zipcode = getattr(fi_home_obj, 'zipcode', '')
+            div = getattr(fi_home_obj, 'div', '')
+            lot = getattr(fi_home_obj, 'lot', '')
+            div_lot = "%s_%s" % (div, lot)
+            address_string = "%s %s" % (street_number,
+                                        street_address,)
+
+            fpeople_to_mail = []
+            for to_notify in ['owner_one', 'owner_two', 'property_manager']:
+                ptn = getattr(fi_home_obj, to_notify, None)
+                if ptn:
+                    fpeople_to_mail.append(ptn)
+
+
+            fieldsets = IHOAHOUSEINSPECTION_FIELDSETS
+            failure_dicts = []
+            for fieldset in fieldsets:
+                action_required = getattr(fi_obj, '%s_action_required' % fieldset, '')
+                cond_remains = getattr(fi_obj, '%s_cond_remains' % fieldset, '')
+                if rewalk:
+                    if action_required and cond_remains:
+                        text = getattr(fi_obj, '%s_text' % fieldset, '')
+                        rewalk_text = getattr(fi_obj, '%s_rewalk_text' % fieldset, '')
+                        #cond_remains = getattr(fi_obj, '%s_cond_remains' % fieldset, '')
+                        f_dict = {'fieldset':fieldset,
+                                  'action_required':action_required,
+                                  'text':text,
+                                  'rewalk_text':rewalk_text,
+                                  'cond_remains':cond_remains
+                                  }
+                        failure_dicts.append(f_dict)
+                else:
+                    if action_required:
+                        text = getattr(fi_obj, '%s_text' % fieldset, '')
+                        rewalk_text = getattr(fi_obj, '%s_rewalk_text' % fieldset, '')
+                        #cond_remains = getattr(fi_obj, '%s_cond_remains' % fieldset, '')
+                        f_dict = {'fieldset':fieldset,
+                                  'action_required':action_required,
+                                  'text':text,
+                                  'rewalk_text':rewalk_text,
+                                  'cond_remains':cond_remains
+                                  }
+                        failure_dicts.append(f_dict)
+            #failure_dict_keys = failure_dicts.keys()
+
+            finding_two_text = ''
+            finding_two_date = ''
+
+            if len(failure_dicts) >= 2:
+                failure_one_dict = failure_dicts[0]
+                failure_two_dict = failure_dicts[1]
+                if rewalk:
+                    fieldset_one_id = failure_one_dict.get('fieldset')
+                    fieldset_one_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_one_id)
+                    finding_one_text = '%s: %s' % (fieldset_one_title, failure_one_dict.get('rewalk_text'))
+                    finding_one_date = 'Immediate.'
+                    fieldset_two_id = failure_two_dict.get('fieldset')
+                    fieldset_two_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_two_id)
+                    finding_two_text = '%s: %s' % (fieldset_two_title, failure_two_dict.get('rewalk_text'))
+                    finding_two_date = 'Immediate.'
+                else:
+                    fieldset_one_id = failure_one_dict.get('fieldset')
+                    fieldset_one_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_one_id)
+                    finding_one_text = '%s: %s' % (fieldset_one_title, failure_one_dict.get('text'))
+                    fieldset_key = failure_one_dict.get('fieldset')
+                    action_required_key = failure_one_dict.get('action_required')
+                    action_required_dict = REQUIRED_ACTION_DICT.get(fieldset_key)
+                    finding_one_date = action_required_dict.get(action_required_key)
+
+                    fieldset_two_id = failure_two_dict.get('fieldset')
+                    fieldset_two_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_two_id)
+                    finding_two_text = '%s: %s' % (fieldset_two_title, failure_two_dict.get('text'))
+                    f2_fieldset_key = failure_two_dict.get('fieldset')
+                    f2_action_required_key = failure_two_dict.get('action_required')
+                    f2_action_required_dict = REQUIRED_ACTION_DICT.get(f2_fieldset_key)
+                    finding_two_date = f2_action_required_dict.get(f2_action_required_key)
+
+            elif len(failure_dicts) == 1:
+                failure_one_dict = failure_dicts[0]
+
+                fieldset_id = failure_one_dict.get('fieldset')
+                fieldset_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_id)
+                finding_one_text = '%s: %s' % (fieldset_title, failure_one_dict.get('text'))
+                fieldset_key = failure_one_dict.get('fieldset')
+                action_required_key = failure_one_dict.get('action_required')
+                action_required_dict = REQUIRED_ACTION_DICT.get(fieldset_key)
+                finding_one_date = action_required_dict.get(action_required_key)
+
+            else:
+                finding_one_text = ''
+                finding_one_date = ''
+
+
+            for ptn in fpeople_to_mail:
+                member_data = api.user.get(userid=ptn)
+                member_fullname = member_data.getProperty('fullname')
+                failure_csv_dicts.append({'Full_Name': member_fullname,
+                                       'Address1': address_string,
+                                       'divlot': div_lot,
+                                       'City': city,
+                                       'State': state,
+                                       'Zip': zipcode,
+                                       'toda_date': todays_date,
+                                       'finding_1': finding_one_text,
+                                       'remediation_date_1': finding_one_date,
+                                       'finding_2': finding_two_text,
+                                       'remediation_date_2': finding_two_date})
+
+        inspection_state = 'initial'
+        if rewalk:
+            inspection_state = 'rewalk'
+
+        passing_file_id = '%s_%s_inspection_passing.csv' % (today_timestamp, inspection_state)
+        passing_file_title = '%s %s Inspection Passing CSV' % (todays_date, inspection_state)
+        failing_file_id = '%s_%s_inspection_failures.csv' % (today_timestamp, inspection_state)
+        failing_file_title = '%s %s Inspection Failures CSV' % (todays_date, inspection_state)
+
+
+
+        passing_file = ''
+        p_buffer = StringIO()
+        p_writer = csv.DictWriter(p_buffer, fieldnames=passing_csv_headers, delimiter=',', quoting=csv.QUOTE_ALL)
+        p_writer.writeheader()
+        for p_dict in passing_csv_dicts:
+            p_writer.writerow(p_dict)
+
+        p_value = p_buffer.getvalue()
+        p_value = unicode(p_value, 'utf-8').encode("iso-8859-1", "replace")
+
+        failing_file = ''
+        f_buffer = StringIO()
+        f_writer = csv.DictWriter(f_buffer, fieldnames=failure_csv_headers, delimiter=',', quoting=csv.QUOTE_ALL)
+        f_writer.writeheader()
+        for f_dict in failure_csv_dicts:
+            f_writer.writerow(f_dict)
+
+        f_value = f_buffer.getvalue()
+        f_value = unicode(f_value, 'utf-8').encode("iso-8859-1", "replace")
+
+        logger.info('creating files in %s' % context.id)
+        #import pdb;pdb.set_trace()
+
+        pass_csv = api.content.create(type='File',
+                                      id=passing_file_id,
+                                      title=passing_file_title.title(),
+                                      container=context
+                                      )
+
+        fail_csv = api.content.create(type='File',
+                                      id=failing_file_id,
+                                      title=failing_file_title.title(),
+                                      container=context
+                                      )
+
+        setattr(pass_csv, 'file', NamedBlobFile(data=p_value,
+                                              filename=unicode(passing_file_id)))
+
+        setattr(fail_csv, 'file', NamedBlobFile(data=f_value,
+                                                filename=unicode(failing_file_id)))
+        #import pdb;pdb.set_trace()
+        # context.invokeFactory('File',
+        #                       id=passing_file_id,
+        #                       title=passing_file_title.title(),
+        #                       content_type='text/csv',
+        #                       file=p_value)
+        #
+        # context.invokeFactory('File',
+        #                       id=failing_file_id,
+        #                       title=failing_file_title.title(),
+        #                       content_type='text/csv',
+        #                       file=f_value)
+        # pass_csv = context[passing_file_id]
+        # fail_csv = context[failing_file_id]
+        #
+        pass_csv.setFormat('text/csv')
+        fail_csv.setFormat('text/csv')
 
 
     def sendEmailNotices(self, rewalk=False):

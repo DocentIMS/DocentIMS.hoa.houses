@@ -187,6 +187,14 @@ IHOAHOUSEINSPECTION_FIELDSETS = ['roof',
                                  'landscaping',
                                  'general_maintenance']
 
+IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT = {'roof':'Roof',
+                                            'gutters':'Gutters',
+                                            'exterior_paint':'Exterior Paint',
+                                            'decks':'Decks',
+                                            'entry_way':'Entry Way',
+                                            'paved_surfaces':'Paved Surfaces',
+                                            'landscaping':'Landscaping',
+                                            'general_maintenance':'General Maintenance'}
 
 REQUIRED_ACTION_DICT = {'roof': {'clean': 'August 31',
                                  'repair': 'August 31',
