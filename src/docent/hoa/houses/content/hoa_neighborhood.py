@@ -7,6 +7,9 @@ from plone.supermodel.directives import fieldset
 from zope import schema
 from plone.schema import Email
 
+import StringIO
+import csv
+
 from docent.hoa.houses import _
 
 from docent.hoa.houses.app_config import DIVISION_ONE, DIVISION_TWO, WALKERS_GROUP_IDS
@@ -89,8 +92,8 @@ class HOANeighborhood(Container):
 
     def after_object_added_processor(self, context, event):
         context = self
-        #all_house_ids = DIVISION_ONE + DIVISION_TWO
-        all_house_ids = ['1_001', '1_002', '1_003', '1_004', '1_005']
+        all_house_ids = DIVISION_ONE + DIVISION_TWO
+        #all_house_ids = ['1_001', '1_002', '1_003', '1_004', '1_005']
         for house_id in all_house_ids:
             div, lot = house_id.split('_')
             house_obj = api.content.create(container=context,
@@ -105,3 +108,43 @@ class HOANeighborhood(Container):
                                   roles=['Reader'],
                                   obj=context)
         context.reindexObjectSecurity()
+
+    def assignStreetNumbers(self):
+        context = self
+        if hasattr(context, 'house_block.csv'):
+            house_block_csv = getattr(context, 'house_block.csv')
+            data = house_block_csv.file.data
+            io = StringIO.StringIO(data)
+
+            reader = csv.reader(io, delimiter=',')
+            header = reader.next()
+
+            if header != ['LOT', 'NUMBER', 'STREET']:
+                api.portal.show_message(message="Improper Headers for CSV input.",
+                                        type='warning',
+                                        request=self.REQUEST)
+                return
+            streets = []
+            for line in reader:
+                lot_div, number, street = line
+                streets.append(street)
+                home = getattr(context, lot_div)
+                if home:
+                    setattr(home, 'street_number', number)
+                    setattr(home, 'street_address', street)
+                    home.reindexObject()
+
+            street_addresses = getattr(context, 'street_addresses')
+            if street_addresses:
+                all_addresses = streets + street_addresses
+                setattr(context, 'street_addresses', list(set(all_addresses)))
+            else:
+                setattr(context, 'street_addresses', set(streets))
+
+            api.portal.show_message(message="All Homes Listed in CSV successfully updated.",
+                                    type='info',
+                                    request=self.REQUEST)
+        else:
+            api.portal.show_message(message="No CSV File Provided",
+                                    type='warning',
+                                    request=self.REQUEST)

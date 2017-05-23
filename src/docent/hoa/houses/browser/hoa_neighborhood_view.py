@@ -15,6 +15,8 @@ from docent.hoa.houses.content.hoa_neighborhood import IHOANeighborhood
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
 
+from plone.protect.utils import addTokenToUrl
+
 grok.templatedir('templates')
 
 class View(grok.View):
@@ -89,3 +91,19 @@ class View(grok.View):
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('map')
 
         return table_row_structure
+
+    def hasAdminAccess(self):
+        current_user = api.user.get_current()
+        if api.user.has_permission('cmf.ManagePortal', user=current_user):
+            return True
+
+        return False
+
+    def addressUpdateURL(self):
+        request = self.request
+        context = self.context
+        context_url = context.absolute_url()
+
+        address_update_url = "%s/@@update-home-addresses" % context_url
+
+        return addTokenToUrl(address_update_url)
