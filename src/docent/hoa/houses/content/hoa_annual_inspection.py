@@ -819,6 +819,13 @@ class HOAAnnualInspection(Container):
             for ptn in people_to_mail:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
+                use_meadows_address = member_data.getProperty('use_local_address')
+                if use_meadows_address:
+                    address_string = member_data.getProperty('mailing_address_1')
+                    city = member_data.getProperty('mailing_city')
+                    state = member_data.getProperty('mailing_state')
+                    zipcode = member_data.getProperty('mailing_zipcode')
+
                 passing_csv_dicts.append({'Full_Name':member_fullname,
                                           'Address1':address_string,
                                           'divlot':div_lot,
@@ -886,8 +893,10 @@ class HOAAnnualInspection(Container):
                         failure_dicts.append(f_dict)
             #failure_dict_keys = failure_dicts.keys()
 
-            finding_two_text = ''
-            finding_two_date = ''
+            finding_one_text = 'None'
+            finding_one_date = 'None'
+            finding_two_text = 'None'
+            finding_two_date = 'None'
 
             if len(failure_dicts) >= 2:
                 failure_one_dict = failure_dicts[0]
@@ -929,14 +938,17 @@ class HOAAnnualInspection(Container):
                 action_required_dict = REQUIRED_ACTION_DICT.get(fieldset_key)
                 finding_one_date = action_required_dict.get(action_required_key)
 
-            else:
-                finding_one_text = ''
-                finding_one_date = ''
-
 
             for ptn in fpeople_to_mail:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
+                use_meadows_address = member_data.getProperty('use_local_address')
+                if use_meadows_address:
+                    address_string = member_data.getProperty('mailing_address_1')
+                    city = member_data.getProperty('mailing_city')
+                    state = member_data.getProperty('mailing_state')
+                    zipcode = member_data.getProperty('mailing_zipcode')
+
                 failure_csv_dicts.append({'Full_Name': member_fullname,
                                        'Address1': address_string,
                                        'divlot': div_lot,
