@@ -107,3 +107,12 @@ class View(grok.View):
         address_update_url = "%s/@@update-home-addresses" % context_url
 
         return addTokenToUrl(address_update_url)
+
+    def createOwnersURL(self):
+        request = self.request
+        context = self.context
+        context_url = context.absolute_url()
+
+        address_update_url = "%s/@@create-home-owners" % context_url
+
+        return addTokenToUrl(address_update_url)

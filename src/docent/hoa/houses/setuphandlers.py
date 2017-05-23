@@ -44,6 +44,13 @@ def post_install(context):
     for g_id in [HOME_OWNERS_GID, RENTERS_GID]:
         portal_groups.addPrincipalToGroup(g_id, WALKERS_MEMBERS_GID)
 
+    #set site to use email as login
+    api.portal.set_registry_record(name='plone.use_email_as_login', value=True)
+
+    #allow users to set their own password
+    api.portal.set_registry_record(name='plone.enable_user_pwd_choice', value=True)
+
+
 
 
 
