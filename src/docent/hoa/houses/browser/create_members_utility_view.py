@@ -1,6 +1,7 @@
 import logging
 from AccessControl import Unauthorized
-
+from datetime import datetime
+import time
 from five import grok
 import StringIO
 import csv
@@ -82,6 +83,12 @@ class View(grok.View):
                         group_exceptions.append(email)
                     except ValueError:
                         group_exceptions.append(email)
+
+            #rename file
+            timestamp = int(time.mktime(datetime.now().timetuple()) * 1000)
+            new_file_id = '%s_home_owners.csv' % timestamp
+
+            api.content.rename(obj=home_owners_csv, new_id=new_file_id)
 
             api.portal.show_message(message="All Members Listed in CSV successfully created. If any member not "
                                             "created a separate notice will display.",

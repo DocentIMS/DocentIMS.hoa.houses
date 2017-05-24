@@ -1,4 +1,7 @@
 import logging
+from datetime import datetime
+import time
+
 from Acquisition import aq_base
 from plone import api
 from plone.dexterity.content import Container
@@ -140,6 +143,12 @@ class HOANeighborhood(Container):
                 setattr(context, 'street_addresses', list(set(all_addresses)))
             else:
                 setattr(context, 'street_addresses', set(streets))
+
+            #rename file
+            timestamp = int(time.mktime(datetime.now().timetuple()) * 1000)
+            new_file_id = '%s_house_block.csv' % timestamp
+
+            api.content.rename(obj=house_block_csv, new_id=new_file_id)
 
             api.portal.show_message(message="All Homes Listed in CSV successfully updated.",
                                     type='info',

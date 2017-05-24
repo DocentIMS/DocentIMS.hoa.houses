@@ -23,8 +23,8 @@
 
     <div tal:replace="structure provider:plone.belowcontenttitle" />
     <div tal:condition="view/hasAdminAccess">
-       <p><a href="#" tal:attributes="href view/addressUpdateURL">Update Home Address Via CSV</a> - Note: This will update all homes in the csv and overwrite any manually made changes.</p>
-       <p><a href="#" tal:attributes="href view/createOwnersURL">Create Members Via CSV</a> - Note: This will create home owners as Plone users and set a random password. If a member pre-exists they will not be recreated.</p>
+       <p tal:condition="view/showAddressUpdateLink"><a href="#" tal:attributes="href view/addressUpdateURL">Update Home Address Via CSV</a> - Note: This will update all homes in the csv and overwrite any manually made changes.</p>
+       <p tal:condition="view/showCreateOwnersLink"><a href="#" tal:attributes="href view/createOwnersURL">Create Members Via CSV</a> - Note: This will create home owners as Plone users and set a random password. If a member pre-exists they will not be recreated.</p>
     </div>
     <div tal:replace="structure provider:plone.abovecontentbody" />
         <div tal:condition="view/active_inspection">

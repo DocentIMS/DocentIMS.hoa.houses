@@ -99,6 +99,20 @@ class View(grok.View):
 
         return False
 
+    def showAddressUpdateLink(self):
+        context = self.context
+        if hasattr(context, 'house_block.csv'):
+            return True
+
+        return False
+
+    def showCreateOwnersLink(self):
+        context = self.context
+        if hasattr(context, 'home_owners.csv'):
+            return True
+
+        return False
+
     def addressUpdateURL(self):
         request = self.request
         context = self.context
