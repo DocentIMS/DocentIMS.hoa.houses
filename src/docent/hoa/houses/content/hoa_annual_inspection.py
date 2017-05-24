@@ -755,6 +755,7 @@ class HOAAnnualInspection(Container):
 
         failure_csv_headers = ['Full_Name',
                              'Address1',
+                             'Address2',
                              'divlot',
                              'City',
                              'State',
@@ -766,6 +767,7 @@ class HOAAnnualInspection(Container):
                              'remediation_date_2']
         passing_csv_headers = ['Full_Name',
                              'Address1',
+                             'Address2',
                              'divlot',
                              'City',
                              'State',
@@ -814,20 +816,24 @@ class HOAAnnualInspection(Container):
             div = getattr(pi_home_obj, 'div', '')
             lot = getattr(pi_home_obj, 'lot', '')
             div_lot = "%s_%s" % (div, lot)
-            address_string = "%s %s" % (street_number,
-                                        street_address,)
+            address_string1 = "%s %s" % (street_number,
+                                         street_address,)
+            address_string2 = ""
+
             for ptn in people_to_mail:
                 member_data = api.user.get(userid=ptn)
                 member_fullname = member_data.getProperty('fullname')
                 use_meadows_address = member_data.getProperty('use_local_address')
                 if use_meadows_address:
-                    address_string = member_data.getProperty('mailing_address_1')
+                    address_string1 = member_data.getProperty('mailing_address_1')
+                    address_string2 = member_data.getProperty('mailing_address_2')
                     city = member_data.getProperty('mailing_city')
                     state = member_data.getProperty('mailing_state')
                     zipcode = member_data.getProperty('mailing_zipcode')
 
                 passing_csv_dicts.append({'Full_Name':member_fullname,
-                                          'Address1':address_string,
+                                          'Address1':address_string1,
+                                          'Address2':address_string2,
                                           'divlot':div_lot,
                                           'City':city,
                                           'State':state,
@@ -852,8 +858,9 @@ class HOAAnnualInspection(Container):
             div = getattr(fi_home_obj, 'div', '')
             lot = getattr(fi_home_obj, 'lot', '')
             div_lot = "%s_%s" % (div, lot)
-            address_string = "%s %s" % (street_number,
+            address_string1 = "%s %s" % (street_number,
                                         street_address,)
+            address_string2 = ""
 
             fpeople_to_mail = []
             for to_notify in ['owner_one', 'owner_two', 'property_manager']:
@@ -944,13 +951,15 @@ class HOAAnnualInspection(Container):
                 member_fullname = member_data.getProperty('fullname')
                 use_meadows_address = member_data.getProperty('use_local_address')
                 if use_meadows_address:
-                    address_string = member_data.getProperty('mailing_address_1')
+                    address_string1 = member_data.getProperty('mailing_address_1')
+                    address_string2 = member_data.getProperty('mailing_address_2')
                     city = member_data.getProperty('mailing_city')
                     state = member_data.getProperty('mailing_state')
                     zipcode = member_data.getProperty('mailing_zipcode')
 
                 failure_csv_dicts.append({'Full_Name': member_fullname,
-                                       'Address1': address_string,
+                                       'Address1': address_string1,
+                                       'Address2': address_string2,
                                        'divlot': div_lot,
                                        'City': city,
                                        'State': state,
