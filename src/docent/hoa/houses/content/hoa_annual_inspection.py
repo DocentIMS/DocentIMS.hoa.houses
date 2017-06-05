@@ -132,7 +132,7 @@ class IHOAAnnualInspection(form.Schema):
 
     form.mode(rewalk_failure_log='hidden')
     rewalk_failure_log = schema.Dict(
-        title=_(u'Homes Sent Rewalk Pass Notices'),
+        title=_(u'Homes Sent Re-Inspection Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
         key_type=schema.ASCIILine(),
         value_type=schema.List(value_type=schema.ASCIILine()),
@@ -141,7 +141,7 @@ class IHOAAnnualInspection(form.Schema):
 
     form.mode(rewalk_pass_log='hidden')
     rewalk_pass_log = schema.Dict(
-        title=_(u'Homes Sent Rewalk Pass Notices'),
+        title=_(u'Homes Sent Re-Inspection Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
         key_type=schema.ASCIILine(),
         value_type=schema.List(value_type=schema.ASCIILine()),
@@ -326,9 +326,9 @@ class HOAAnnualInspection(Container):
             elif context_state == 'secondary_inspection':
                 if self.verifySecondInspectionComplete(guard=False):
                     #send_email
-                    logger.info('Rewalk Inspection Ready to Close, email sent to board')
+                    logger.info('Re-Inspection Ready to Close, email sent to board')
                     api.portal.send_email(recipient='board@themeadowsofredmond.org',
-                                          subject='The Meadows Annual Property Rewalk Inspection is complete.',
+                                          subject='The Meadows Annual Property Re-Inspection is complete.',
                                           body='All homes have been inspected - HAL :)')
             setSecurityManager(sm)
         except Exception as e:
@@ -764,7 +764,9 @@ class HOAAnnualInspection(Container):
                              'finding_1',
                              'remediation_date_1',
                              'finding_2',
-                             'remediation_date_2']
+                             'remediation_date_2',
+                             'finding_3',
+                             'remediation_date_3']
         passing_csv_headers = ['Full_Name',
                              'Address1',
                              'Address2',
@@ -904,8 +906,54 @@ class HOAAnnualInspection(Container):
             finding_one_date = 'None'
             finding_two_text = 'None'
             finding_two_date = 'None'
+            finding_three_text = 'None'
+            finding_three_date = 'None'
 
-            if len(failure_dicts) >= 2:
+            if len(failure_dicts) >= 3:
+                failure_one_dict = failure_dicts[0]
+                failure_two_dict = failure_dicts[1]
+                failure_three_dict = failure_dicts[2]
+                if rewalk:
+                    fieldset_one_id = failure_one_dict.get('fieldset')
+                    fieldset_one_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_one_id)
+                    finding_one_text = '%s: %s' % (fieldset_one_title, failure_one_dict.get('rewalk_text'))
+                    finding_one_date = 'Immediate.'
+
+                    fieldset_two_id = failure_two_dict.get('fieldset')
+                    fieldset_two_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_two_id)
+                    finding_two_text = '%s: %s' % (fieldset_two_title, failure_two_dict.get('rewalk_text'))
+                    finding_two_date = 'Immediate.'
+
+                    fieldset_three_id = failure_two_dict.get('fieldset')
+                    fieldset_three_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_three_id)
+                    finding_three_text = '%s: %s' % (fieldset_three_title, failure_three_dict.get('rewalk_text'))
+                    finding_three_date = 'Immediate.'
+                else:
+                    fieldset_one_id = failure_one_dict.get('fieldset')
+                    fieldset_one_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_one_id)
+                    finding_one_text = '%s: %s' % (fieldset_one_title, failure_one_dict.get('text'))
+                    fieldset_key = failure_one_dict.get('fieldset')
+                    action_required_key = failure_one_dict.get('action_required')
+                    action_required_dict = REQUIRED_ACTION_DICT.get(fieldset_key)
+                    finding_one_date = action_required_dict.get(action_required_key)
+
+                    fieldset_two_id = failure_two_dict.get('fieldset')
+                    fieldset_two_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_two_id)
+                    finding_two_text = '%s: %s' % (fieldset_two_title, failure_two_dict.get('text'))
+                    f2_fieldset_key = failure_two_dict.get('fieldset')
+                    f2_action_required_key = failure_two_dict.get('action_required')
+                    f2_action_required_dict = REQUIRED_ACTION_DICT.get(f2_fieldset_key)
+                    finding_two_date = f2_action_required_dict.get(f2_action_required_key)
+
+                    fieldset_three_id = failure_three_dict.get('fieldset')
+                    fieldset_three_title = IHOAHOUSEINSPECTION_FIELDSET_TITLES_DICT.get(fieldset_three_id)
+                    finding_three_text = '%s: %s' % (fieldset_three_title, failure_three_dict.get('text'))
+                    f3_fieldset_key = failure_three_dict.get('fieldset')
+                    f3_action_required_key = failure_three_dict.get('action_required')
+                    f3_action_required_dict = REQUIRED_ACTION_DICT.get(f3_fieldset_key)
+                    finding_three_date = f3_action_required_dict.get(f3_action_required_key)
+
+            elif len(failure_dicts) == 2:
                 failure_one_dict = failure_dicts[0]
                 failure_two_dict = failure_dicts[1]
                 if rewalk:
@@ -968,7 +1016,9 @@ class HOAAnnualInspection(Container):
                                        'finding_1': finding_one_text,
                                        'remediation_date_1': finding_one_date,
                                        'finding_2': finding_two_text,
-                                       'remediation_date_2': finding_two_date})
+                                       'remediation_date_2': finding_two_date,
+                                       'finding_3': finding_three_text,
+                                       'remediation_date_3': finding_three_date})
 
         inspection_state = 'initial'
         if rewalk:
