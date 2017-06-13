@@ -829,11 +829,15 @@ class HOAAnnualInspection(Container):
                 if not use_meadows_address:
                     remote_address1 = member_data.getProperty('mailing_address_1')
                     if remote_address1:
-                        address_string1 = remote_address1
-                        address_string2 = member_data.getProperty('mailing_address_2')
-                        city = member_data.getProperty('mailing_city')
-                        state = member_data.getProperty('mailing_state')
-                        zipcode = member_data.getProperty('mailing_zipcode')
+                        passing_csv_dicts.append({'Full_Name':member_fullname,
+                                              'Address1':remote_address1,
+                                              'Address2':member_data.getProperty('mailing_address_2'),
+                                              'divlot':div_lot,
+                                              'City':member_data.getProperty('mailing_city'),
+                                              'State':member_data.getProperty('mailing_state'),
+                                              'Zip':member_data.getProperty('mailing_zipcode'),
+                                              'toda_date':todays_date})
+                        continue
 
                 passing_csv_dicts.append({'Full_Name':member_fullname,
                                           'Address1':address_string1,
@@ -1003,11 +1007,15 @@ class HOAAnnualInspection(Container):
                 if not use_meadows_address:
                     remote_address1 = member_data.getProperty('mailing_address_1')
                     if remote_address1:
-                        address_string1 = remote_address1
-                        address_string2 = member_data.getProperty('mailing_address_2')
-                        city = member_data.getProperty('mailing_city')
-                        state = member_data.getProperty('mailing_state')
-                        zipcode = member_data.getProperty('mailing_zipcode')
+                        passing_csv_dicts.append({'Full_Name':member_fullname,
+                                                  'Address1':remote_address1,
+                                                  'Address2':member_data.getProperty('mailing_address_2'),
+                                                  'divlot':div_lot,
+                                                  'City':member_data.getProperty('mailing_city'),
+                                                  'State':member_data.getProperty('mailing_state'),
+                                                  'Zip':member_data.getProperty('mailing_zipcode'),
+                                                  'toda_date':todays_date})
+                        continue
 
                 failure_csv_dicts.append({'Full_Name': member_fullname,
                                        'Address1': address_string1,
