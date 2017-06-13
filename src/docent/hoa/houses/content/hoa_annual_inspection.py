@@ -1007,14 +1007,20 @@ class HOAAnnualInspection(Container):
                 if not use_meadows_address:
                     remote_address1 = member_data.getProperty('mailing_address_1')
                     if remote_address1:
-                        passing_csv_dicts.append({'Full_Name':member_fullname,
+                        failure_csv_dicts.append({'Full_Name':member_fullname,
                                                   'Address1':remote_address1,
                                                   'Address2':member_data.getProperty('mailing_address_2'),
                                                   'divlot':div_lot,
                                                   'City':member_data.getProperty('mailing_city'),
                                                   'State':member_data.getProperty('mailing_state'),
                                                   'Zip':member_data.getProperty('mailing_zipcode'),
-                                                  'toda_date':todays_date})
+                                                  'toda_date':todays_date,
+                                                  'finding_1': finding_one_text,
+                                                  'remediation_date_1': finding_one_date,
+                                                  'finding_2': finding_two_text,
+                                                  'remediation_date_2': finding_two_date,
+                                                  'finding_3': finding_three_text,
+                                                  'remediation_date_3': finding_three_date})
                         continue
 
                 failure_csv_dicts.append({'Full_Name': member_fullname,
