@@ -1295,7 +1295,7 @@ class HOAAnnualInspection(Container):
             fail_message = ""
             fail_html = ""
             if rewalk:
-                fail_message += "Your home at: %s, (Division %s Lot %s) Failed Second Inspection ofThe Meadows Annual " \
+                fail_message += "Your home at: %s, (Division %s Lot %s) Failed Second Inspection of The Meadows Annual " \
                                 "Property Inspection. " % (address_string, div, lot)
                 fail_message += "Because this is the second failure for the same violation(s), in accordance with our " \
                                 "rules, you are being fined $100. You will receive a fine notification from our " \
@@ -1375,21 +1375,21 @@ class HOAAnnualInspection(Container):
 
             fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
                             "remediation date above.\n    2. Contact the board at " \
-                            "annual-inspection@themeadowsofredmond.org with questions or to request more time. " \
+                            "property-inspection@themeadowsofredmond.org with questions or to request more time. " \
                             "The board believes existing rules provided adequate time; therefore, there needs to " \
                             "be a specific reason and schedule for any extension.\n    3. Contest these finding " \
-                            "within 15 days by emailing the board at annual-inspection@themeadowsofredmond.org " \
+                            "within 15 days by emailing the board at property-inspection@themeadowsofredmond.org " \
                             "and/or attending the next board meeting (provided it is within 15 days of this " \
                             "letter). Please be specific with your disagreement.\n\n"
             fail_html += "<p>Actions You May Take Before compliance date:</p>" \
                          "<ul style='list-style-type: decimal;'>"
             fail_html += "<li>Fix the items before the remediation date above.</li>"
-            fail_html += "<li>Contact the board at <a href='mailto:annual-inspection@themeadowsofredmond.org'>" \
-                         "annual-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
+            fail_html += "<li>Contact the board at <a href='mailto:property-inspection@themeadowsofredmond.org'>" \
+                         "property-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
                          "The board believes existing rules provided adequate time; therefore, there needs to be " \
                          "a specific reason and schedule for any extension.</li>"
             fail_html += "<li>Contest these finding within 15 days by emailing the board at " \
-                         "<a href='mailto:annual-inspection@themeadowsofredmond.org'>annual-inspection@" \
+                         "<a href='mailto:property-inspection@themeadowsofredmond.org'>property-inspection@" \
                          "themeadowsofredmond.org</a> and/or attending the next board meeting " \
                          "(provided it is within 15 days of this letter). Please be specific with your " \
                          "disagreement.</li>"
