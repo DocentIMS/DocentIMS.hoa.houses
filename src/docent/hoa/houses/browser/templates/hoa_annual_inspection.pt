@@ -87,7 +87,7 @@
                 </table>
             </section>
             <section tal:condition="rewalk_pass_log_structure">
-                <h4>Rewalk Pass</h4>
+                <h4>Reinspect Pass</h4>
                 <table>
                     <tr>
                         <th>House</th><th>Div/Lot</th><th>People Emailed</th>
@@ -96,7 +96,7 @@
                 </table>
             </section>
             <section tal:condition="rewalk_failure_log_structure">
-                <h4>Rewalk Failure</h4>
+                <h4>Reinspect Failure</h4>
                 <table>
                     <tr>
                         <th>House</th><th>Div/Lot</th><th>People Emailed</th>

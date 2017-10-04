@@ -63,7 +63,7 @@
                     <div tal:define="initial_image python:view.getInitialImage(section)" tal:condition="nocall:initial_image">
                         <img src="#" tal:attributes="src string: ${context/absolute_url}/@@images/${initial_image}/mini" />
                     </div>
-                    <h4>Rewalk</h4>
+                    <h4>Reinspect</h4>
                     <p>Does condition persist? <span tal:replace="python:view.getRewalkCondition(section)" /></p>
                     <p tal:content="python: view.getSectionRewalkText(section)"></p>
                     <div tal:define="rewalk_image python:view.getRewalkImage(section)" tal:condition="nocall:rewalk_image">

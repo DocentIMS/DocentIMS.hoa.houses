@@ -52,9 +52,9 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
 
     #schema = IEmptySchema
     description = _(u'For each inspection criteria, if the home fails, select the tab and enter a brief explanation. '
-                    u'If a picture is required, take a picture and upload. <i>Do Not click "Save" until you have '
-                    u'completed the inspection of the house</i> as this immediately saves and closes the inspection. '
-                    u'Once your inspection is completed, click "Save". You will be brought to a page that summarizes '
+                    u'If a picture is required, take a picture and upload. <i><u>Do Not click "Save" until you have '
+                    u'completed the inspection of the house</u></i> as this immediately saves and closes the inspection. '
+                    u'<b>Once your inspection is completed, click "Save".</b> You will be brought to a page that summarizes '
                     u'your findings with an opportunity to make changes before the inspection is saved.')
 
     def updateWidgets(self):

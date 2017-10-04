@@ -113,7 +113,7 @@ class IHOAHouseInspection(form.Schema):
 
     roof_text = schema.Text(
         title=_(u"Roof Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -133,7 +133,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(roof_rewalk_text='hidden')
     roof_rewalk_text = schema.Text(
         title=_(u"Roof Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -171,7 +171,7 @@ class IHOAHouseInspection(form.Schema):
 
     gutters_text = schema.Text(
         title=_(u"Gutters Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -191,7 +191,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(gutters_rewalk_text='hidden')
     gutters_rewalk_text = schema.Text(
         title=_(u"Gutters Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -229,7 +229,7 @@ class IHOAHouseInspection(form.Schema):
 
     exterior_paint_text = schema.Text(
         title=_(u"Exterior Paint Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -249,7 +249,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(exterior_paint_rewalk_text='hidden')
     exterior_paint_rewalk_text = schema.Text(
         title=_(u"Exterior Paint Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -287,7 +287,7 @@ class IHOAHouseInspection(form.Schema):
 
     decks_text = schema.Text(
         title=_(u"Decks Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -307,7 +307,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(decks_rewalk_text='hidden')
     decks_rewalk_text = schema.Text(
         title=_(u"Decks Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -345,7 +345,7 @@ class IHOAHouseInspection(form.Schema):
 
     entry_way_text = schema.Text(
         title=_(u"Entry Way Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -365,7 +365,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(entry_way_rewalk_text='hidden')
     entry_way_rewalk_text = schema.Text(
         title=_(u"Entry Way Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -403,7 +403,7 @@ class IHOAHouseInspection(form.Schema):
 
     paved_surfaces_text = schema.Text(
         title=_(u"Paved Surfaces Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -423,7 +423,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(paved_surfaces_rewalk_text='hidden')
     paved_surfaces_rewalk_text = schema.Text(
         title=_(u"Paved Surfaces Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -461,7 +461,7 @@ class IHOAHouseInspection(form.Schema):
 
     landscaping_text = schema.Text(
         title=_(u"Landscaping Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -481,7 +481,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(landscaping_rewalk_text='hidden')
     landscaping_rewalk_text = schema.Text(
         title=_(u"Landscaping Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -519,7 +519,7 @@ class IHOAHouseInspection(form.Schema):
 
     general_maintenance_text = schema.Text(
         title=_(u"General Maintenance Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -539,7 +539,7 @@ class IHOAHouseInspection(form.Schema):
     form.mode(general_maintenance_rewalk_text='hidden')
     general_maintenance_rewalk_text = schema.Text(
         title=_(u"General Maintenance Issue"),
-        description=_(u"Comments included in letter and email."),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
         max_length=50,
     )
@@ -690,14 +690,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(roof_text='display')
     roof_text = schema.Text(
         title=_(u"Roof Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     roof_rewalk_text = schema.Text(
-        title=_(u"Roof Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Roof Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(roof_image='display')
@@ -746,14 +748,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(gutters_text='display')
     gutters_text = schema.Text(
         title=_(u"Gutters Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     gutters_rewalk_text = schema.Text(
-        title=_(u"Gutters Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Gutters Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(gutters_image='display')
@@ -802,14 +806,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(exterior_paint_text='display')
     exterior_paint_text = schema.Text(
         title=_(u"Exterior Paint Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     exterior_paint_rewalk_text = schema.Text(
-        title=_(u"Exterior Paint Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Exterior Paint Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(exterior_paint_image='display')
@@ -858,14 +864,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(decks_text='display')
     decks_text = schema.Text(
         title=_(u"Decks Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     decks_rewalk_text = schema.Text(
-        title=_(u"Decks Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Decks Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(decks_image='display')
@@ -914,14 +922,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(entry_way_text='display')
     entry_way_text = schema.Text(
         title=_(u"Entry Way Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     entry_way_rewalk_text = schema.Text(
-        title=_(u"Entry Way Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Entry Way Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(entry_way_image='display')
@@ -929,6 +939,7 @@ class IHOAHouseReWalkInspection(form.Schema):
         title=_(u"Entry Way Photo"),
         description=_(u""),
         required=False,
+        max_length=50,
     )
 
     entry_way_rewalk_image = NamedBlobImage(
@@ -970,14 +981,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(paved_surfaces_text='display')
     paved_surfaces_text = schema.Text(
         title=_(u"Paved Surfaces Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     paved_surfaces_rewalk_text = schema.Text(
-        title=_(u"Paved Surfaces Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Paved Surfaces Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(paved_surfaces_image='display')
@@ -1026,14 +1039,16 @@ class IHOAHouseReWalkInspection(form.Schema):
     form.mode(landscaping_text='display')
     landscaping_text = schema.Text(
         title=_(u"Landscaping Issue"),
-        description=_(u""),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     landscaping_rewalk_text = schema.Text(
-        title=_(u"Landscaping Rewalk Issue"),
-        description=_(u""),
+        title=_(u"Landscaping Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(landscaping_image='display')
@@ -1084,12 +1099,14 @@ class IHOAHouseReWalkInspection(form.Schema):
         title=_(u"General Maintenance Issue"),
         description=_(u""),
         required=False,
+        max_length=50,
     )
 
     general_maintenance_rewalk_text = schema.Text(
-        title=_(u"General Maintenance Rewalk Issue"),
-        description=_(u""),
+        title=_(u"General Maintenance Reinspect Issue"),
+        description=_(u"Comments included in letter and email. 50 character limit"),
         required=False,
+        max_length=50,
     )
 
     form.mode(general_maintenance_image='display')

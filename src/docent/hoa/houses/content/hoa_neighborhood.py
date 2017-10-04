@@ -77,13 +77,13 @@ class IHOANeighborhood(form.Schema):
     )
 
     rewalk_pass_message = schema.Text(
-        title=_(u"Rewalk Passed Inspection Message"),
+        title=_(u"Reinspect Passed Inspection Message"),
         description=_(u"This message is used for both email and postal messages to be sent."),
         required=False,
     )
 
     rewalk_fail_message = schema.Text(
-        title=_(u"Rewalk Fail Message"),
+        title=_(u"Reinspect Fail Message"),
         description=_(u"This message is used for both email and postal messages to be sent."),
         required=False,
     )
