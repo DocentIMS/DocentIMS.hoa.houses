@@ -603,11 +603,12 @@ class IHOAHouseInspection(form.Schema):
         if context_state in ['failed_final', 'remedied']:
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
                 if hasattr(data, '%s_cond_remains' % fieldset_id):
-                    if not getattr(data, '%s_cond_remains' % fieldset_id):
-                        fieldset_split = fieldset_id.split('_')
-                        fieldset_name = ' '.join(fieldset_split).title()
-                        api.portal.show_message(message="Did you verify the prior condition of: %s" % fieldset_name,
-                                         request=context.REQUEST)
+                    initial_text = getattr(data, '%s_text' % fieldset_id)
+                    if initial_text and not getattr(data, '%s_cond_remains' % fieldset_id):
+                        error_keys = fieldset_id.split('_')
+                        error_str = ' '.join(error_keys)
+                        raise Invalid(_(u"You must provide an image for %s." % error_str))
+
 
 
     @invariant
@@ -1181,11 +1182,12 @@ class IHOAHouseReWalkInspection(form.Schema):
         if context_state in ['failed_final', 'remedied']:
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
                 if hasattr(data, '%s_cond_remains' % fieldset_id):
-                    if not getattr(data, '%s_cond_remains' % fieldset_id):
-                        fieldset_split = fieldset_id.split('_')
-                        fieldset_name = ' '.join(fieldset_split).title()
-                        api.portal.show_message(message="Did you verify the prior condition of: %s" % fieldset_name,
-                                         request=context.REQUEST)
+                    initial_text = getattr(data, '%s_text' % fieldset_id)
+                    if initial_text and not getattr(data, '%s_cond_remains' % fieldset_id):
+                        error_keys = fieldset_id.split('_')
+                        error_str = ' '.join(error_keys)
+                        raise Invalid(_(u"You must provide an image for %s." % error_str))
+
     @invariant
     def imagesRequired(data):
         context = data.__context__
