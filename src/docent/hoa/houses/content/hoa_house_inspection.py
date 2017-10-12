@@ -606,7 +606,7 @@ class IHOAHouseInspection(form.Schema):
                     if not getattr(data, '%s_cond_remains' % fieldset_id):
                         fieldset_split = fieldset_id.split('_')
                         fieldset_name = ' '.join(fieldset_split).title()
-                        api.show_message(message="Did you verify the prior condition of: %s" % fieldset_name,
+                        api.portal.show_message(message="Did you verify the prior condition of: %s" % fieldset_name,
                                          request=context.REQUEST)
 
 
@@ -1184,7 +1184,7 @@ class IHOAHouseReWalkInspection(form.Schema):
                     if not getattr(data, '%s_cond_remains' % fieldset_id):
                         fieldset_split = fieldset_id.split('_')
                         fieldset_name = ' '.join(fieldset_split).title()
-                        api.show_message(message="Did you verify the prior condition of: %s" % fieldset_name,
+                        api.portal.show_message(message="Did you verify the prior condition of: %s" % fieldset_name,
                                          request=context.REQUEST)
     @invariant
     def imagesRequired(data):
