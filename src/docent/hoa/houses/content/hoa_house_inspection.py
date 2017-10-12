@@ -584,7 +584,7 @@ class IHOAHouseInspection(form.Schema):
         if context_state in ['failed_final', 'remedied']:
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
                 if hasattr(data, '%s_cond_remains' % fieldset_id):
-                    if getattr(data, '%s_cond_remains' % fieldset_id) == 'True':
+                    if getattr(data, '%s_cond_remains' % fieldset_id):
                         rewalk_txt = getattr(data, '%s_rewalk_text' % fieldset_id)
                         rewalk_image = getattr(data, '%s_rewalk_image' % fieldset_id)
                         if not rewalk_txt:
@@ -603,8 +603,9 @@ class IHOAHouseInspection(form.Schema):
         if context_state in ['failed_final', 'remedied']:
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
                 if hasattr(data, '%s_cond_remains' % fieldset_id):
-                    initial_text = getattr(data, '%s_text' % fieldset_id)
-                    if initial_text and not getattr(data, '%s_cond_remains' % fieldset_id):
+                    initial_text = getattr(data, '%s_text' % fieldset_id) or None
+                    cond_remains = getattr(data, '%s_cond_remains' % fieldset_id) or None
+                    if initial_text is not None and cond_remains is not None:
                         error_keys = fieldset_id.split('_')
                         error_str = ' '.join(error_keys)
                         raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
