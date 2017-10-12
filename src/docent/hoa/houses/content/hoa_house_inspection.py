@@ -952,7 +952,6 @@ class IHOAHouseReWalkInspection(form.Schema):
         title=_(u"Entry Way Photo"),
         description=_(u""),
         required=False,
-        max_length=50,
     )
 
     entry_way_rewalk_image = NamedBlobImage(
