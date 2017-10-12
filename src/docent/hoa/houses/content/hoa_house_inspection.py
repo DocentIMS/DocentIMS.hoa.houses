@@ -604,8 +604,10 @@ class IHOAHouseInspection(form.Schema):
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
                 if hasattr(data, '%s_cond_remains' % fieldset_id):
                     initial_text = getattr(data, '%s_text' % fieldset_id) or None
-                    cond_remains = getattr(data, '%s_cond_remains' % fieldset_id) or None
-                    if initial_text is not None and cond_remains is not None:
+                    cond_remains = getattr(data, '%s_cond_remains' % fieldset_id)
+                    if cond_remains is True:
+                        continue
+                    if initial_text is not None and cond_remains is None:
                         error_keys = fieldset_id.split('_')
                         error_str = ' '.join(error_keys)
                         raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
