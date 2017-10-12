@@ -1,0 +1,9 @@
+#form-widgets-roof_image img,
+#form-widgets-gutters_image img,
+#form-widgets-exterior_paint_image img,
+#form-widgets-decks_image img,
+#form-widgets-entry_way_image img,
+#form-widgets-paved_surfaces_image img,
+#form-widgets-landscaping_image img,
+#form-widgets-general_maintenance_image img {height:192px;
+                                             width:256px;}
