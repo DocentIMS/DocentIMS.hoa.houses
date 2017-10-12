@@ -597,6 +597,19 @@ class IHOAHouseInspection(form.Schema):
                             raise Invalid(_(u"You must provide an a photo of the condition for %s." % error_str))
 
     @invariant
+    def verifyCondition(data):
+        context = data.__context__
+        context_state = api.content.get_state(obj=context)
+        if context_state in ['failed_final', 'remedied']:
+            for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
+                if hasattr(data, '%s_cond_remains' % fieldset_id):
+                    if not getattr(data, '%s_cond_remains' % fieldset_id):
+                        error_keys = fieldset_id.split('_')
+                        error_str = ' '.join(error_keys)
+                        raise Invalid(_(u"You must verify that the condition persists for %s." % error_str))
+
+
+    @invariant
     def imagesRequired(data):
         context = data.__context__
         context_state = api.content.get_state(obj=context)
@@ -1160,6 +1173,18 @@ class IHOAHouseReWalkInspection(form.Schema):
                             error_keys = fieldset_id.split('_')
                             error_str = ' '.join(error_keys)
                             raise Invalid(_(u"You must provide an a photo of the condition for %s." % error_str))
+
+    @invariant
+    def verifyCondition(data):
+        context = data.__context__
+        context_state = api.content.get_state(obj=context)
+        if context_state in ['failed_final', 'remedied']:
+            for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
+                if hasattr(data, '%s_cond_remains' % fieldset_id):
+                    if not getattr(data, '%s_cond_remains' % fieldset_id):
+                        error_keys = fieldset_id.split('_')
+                        error_str = ' '.join(error_keys)
+                        raise Invalid(_(u"You must verify that the condition persists for %s." % error_str))
 
     @invariant
     def imagesRequired(data):

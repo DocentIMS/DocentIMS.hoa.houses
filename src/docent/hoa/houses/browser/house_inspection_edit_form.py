@@ -71,6 +71,8 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
                 group.fields['%s_text' % fieldset_key].mode = interfaces.DISPLAY_MODE
                 group.fields['%s_action_required' % fieldset_key].mode = interfaces.DISPLAY_MODE
                 group.fields['%s_image' % fieldset_key].mode = interfaces.DISPLAY_MODE
+                group.fields['%s_image' % fieldset_key].width = 128
+                group.fields['%s_image' % fieldset_key].height = 96
 
             for_show = []
             fieldset_dict = {}

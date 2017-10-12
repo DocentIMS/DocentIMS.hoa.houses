@@ -1373,17 +1373,31 @@ class HOAAnnualInspection(Container):
                                 "after remediation date shown above, and will levy a fine against your unit unless " \
                                 "you remediate the above findings.</p>" % inspection_type
 
-            fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
-                            "remediation date above.\n    2. Contact the board at " \
+            if not rewalk:
+                fail_message += "Actions You May Take Before compliance date:\n\n    1. Fix the items before the " \
+                                "remediation date above.\n"
+                fail_html += "<p>Actions You May Take Before compliance date:</p>" \
+                             "<ul style='list-style-type: decimal;'>"
+                fail_html += "<li>Fix the items before the remediation date above.</li>"
+            else:
+                fail_message += "Actions You May Take:\n\n    1. Fix the discrepancies as soon as possible and notify " \
+                                "the board. Note: Monthly fines will accrue until you complete the work, notify " \
+                                "the board, and the board re-inspects and is satisfied with the work."
+
+                fail_html += "<p>Actions You May Take</p>" \
+                             "<ul style='list-style-type: decimal;'>"
+                fail_html += "<li>Fix the discrepancies as soon as possible and notify the board. Note: Monthly " \
+                             "fines will accrue until you complete the work, notify the board, and the board " \
+                             "re-inspects and is satisfied with the work.</li>"
+
+            fail_message += "    2. Contact the board at " \
                             "property-inspection@themeadowsofredmond.org with questions or to request more time. " \
                             "The board believes existing rules provided adequate time; therefore, there needs to " \
                             "be a specific reason and schedule for any extension.\n    3. Contest these finding " \
                             "within 15 days by emailing the board at property-inspection@themeadowsofredmond.org " \
                             "and/or attending the next board meeting (provided it is within 15 days of this " \
                             "letter). Please be specific with your disagreement.\n\n"
-            fail_html += "<p>Actions You May Take Before compliance date:</p>" \
-                         "<ul style='list-style-type: decimal;'>"
-            fail_html += "<li>Fix the items before the remediation date above.</li>"
+
             fail_html += "<li>Contact the board at <a href='mailto:property-inspection@themeadowsofredmond.org'>" \
                          "property-inspection@themeadowsofredmond.org</a> with questions or to request more time. " \
                          "The board believes existing rules provided adequate time; therefore, there needs to be " \
