@@ -610,8 +610,8 @@ class IHOAHouseInspection(form.Schema):
                     if initial_text is not None and cond_remains is None:
                         error_keys = fieldset_id.split('_')
                         error_str = ' '.join(error_keys)
-                        raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
-
+                        #raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
+                        api.portal.show_message(message="Did you verify the condition for %s?" % error_str.title())
 
 
     @invariant
