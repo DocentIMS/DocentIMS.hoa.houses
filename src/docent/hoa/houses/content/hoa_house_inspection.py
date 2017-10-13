@@ -11,7 +11,6 @@ from zope import schema
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from z3c.form.browser.radio import RadioFieldWidget
 
-
 from zope.interface import provider, invariant, Invalid
 from zope.schema.interfaces import IContextAwareDefaultFactory
 
@@ -596,22 +595,22 @@ class IHOAHouseInspection(form.Schema):
                             error_str = ' '.join(error_keys)
                             raise Invalid(_(u"You must provide an a photo of the condition for %s." % error_str))
 
-    @invariant
-    def verifyCondition(data):
-        context = data.__context__
-        context_state = api.content.get_state(obj=context)
-        if context_state in ['failed_final', 'remedied']:
-            for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
-                if hasattr(data, '%s_cond_remains' % fieldset_id):
-                    initial_text = getattr(data, '%s_text' % fieldset_id) or None
-                    cond_remains = getattr(data, '%s_cond_remains' % fieldset_id)
-                    if cond_remains is True:
-                        continue
-                    if initial_text is not None and cond_remains is None:
-                        error_keys = fieldset_id.split('_')
-                        error_str = ' '.join(error_keys)
-                        #raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
-                        api.portal.show_message(message="Did you verify the condition for %s?" % error_str.title())
+    # @invariant
+    # def verifyCondition(data):
+    #     context = data.__context__
+    #     context_state = api.content.get_state(obj=context)
+    #     if context_state in ['failed_final', 'remedied']:
+    #         for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
+    #             if hasattr(data, '%s_cond_remains' % fieldset_id):
+    #                 initial_text = getattr(data, '%s_text' % fieldset_id) or None
+    #                 cond_remains = getattr(data, '%s_cond_remains' % fieldset_id)
+    #                 if cond_remains is True:
+    #                     continue
+    #                 if initial_text is not None and cond_remains is None:
+    #                     error_keys = fieldset_id.split('_')
+    #                     error_str = ' '.join(error_keys)
+    #                     #raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
+    #                     api.portal.show_message(message="Did you verify the condition for %s?" % error_str.title())
 
 
     @invariant
