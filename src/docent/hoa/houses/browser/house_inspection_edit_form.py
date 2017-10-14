@@ -18,6 +18,7 @@ from z3c.form import interfaces
 from z3c.form import field
 from z3c.form.browser.radio import RadioFieldWidget
 from z3c.form.interfaces import ActionExecutionError, WidgetActionExecutionError
+import z3c.form
 from plone.formwidget.namedfile.widget import NamedImageWidget
 from plone.formwidget.namedfile.widget import NamedImageFieldWidget
 from plone.directives import form
@@ -94,29 +95,29 @@ class HouseInspectionEditForm(edit.DefaultEditForm):
 
         super(HouseInspectionEditForm, self).updateWidgets()
 
-    @z3c.form.button.buttonAndHandler(_(u'Save'))
-    def handleApply(self, action):
-        data, errors = self.extractData()
-        context = data.__context__
-        context_state = api.content.get_state(obj=context)
-        if context_state in ['failed_final', 'remedied']:
-            for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
-                if hasattr(data, '%s_cond_remains' % fieldset_id):
-                    initial_text = getattr(data, '%s_text' % fieldset_id) or None
-                    cond_remains = getattr(data, '%s_cond_remains' % fieldset_id)
-                    if cond_remains is True:
-                        continue
-                    if initial_text is not None and cond_remains is None:
-                        error_keys = fieldset_id.split('_')
-                        error_str = ' '.join(error_keys)
-                        #raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
-                        #api.portal.show_message(message="Did you verify the condition for %s?" % error_str.title())
-                        raise  ActionExecutionError(Invalid(_(u"You must verify the condition remains "
-                                                              u"for %s." % error_str.title())))
-
-        if errors:
-            self.status = self.formErrorsMessage
-            return
+    # @z3c.form.button.buttonAndHandler(_(u'Save'))
+    # def handleApply(self, action):
+    #     data, errors = self.extractData()
+    #     context = self.context
+    #     context_state = api.content.get_state(obj=context)
+    #     if context_state in ['failed_final', 'remedied']:
+    #         for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
+    #             if hasattr(data, '%s_cond_remains' % fieldset_id):
+    #                 initial_text = getattr(data, '%s_text' % fieldset_id) or None
+    #                 cond_remains = getattr(data, '%s_cond_remains' % fieldset_id)
+    #                 if cond_remains is True:
+    #                     continue
+    #                 if initial_text is not None and cond_remains is None:
+    #                     error_keys = fieldset_id.split('_')
+    #                     error_str = ' '.join(error_keys)
+    #                     #raise Invalid(_(u"You must verify the condition remains for %s." % error_str))
+    #                     #api.portal.show_message(message="Did you verify the condition for %s?" % error_str.title())
+    #                     raise  ActionExecutionError(Invalid(_(u"You must verify the condition remains "
+    #                                                           u"for %s." % error_str.title())))
+    #
+    #     if errors:
+    #         self.status = self.formErrorsMessage
+    #         return
 
     @property
     def fti(self):
