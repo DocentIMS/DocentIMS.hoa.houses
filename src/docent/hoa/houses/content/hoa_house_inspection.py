@@ -600,11 +600,12 @@ class IHOAHouseInspection(form.Schema):
         context = data.__context__
         data_dict = data._Data_data___
         context_state = api.content.get_state(obj=context)
+        #import pdb;pdb.set_trace()
         if context_state in ['failed_final', 'remedied']:
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
-                if hasattr(data_dict, '%s_cond_remains' % fieldset_id):
-                    initial_text = getattr(data, '%s_text' % fieldset_id) or None
-                    cond_remains = getattr(data, '%s_cond_remains' % fieldset_id)
+                if '%s_cond_remains' % fieldset_id in data_dict:
+                    initial_text = data_dict.get('%s_text' % fieldset_id) or None
+                    cond_remains = data_dict.get('%s_cond_remains' % fieldset_id)
                     if cond_remains is True:
                         continue
                     if cond_remains is False:
