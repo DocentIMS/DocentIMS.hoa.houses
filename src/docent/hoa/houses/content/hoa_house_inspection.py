@@ -559,6 +559,7 @@ class IHOAHouseInspection(form.Schema):
     @invariant
     def confirmAction(data):
         context = data.__context__
+
         context_state = api.content.get_state(obj=context)
         for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
             if hasattr(data, '%s_text' % fieldset_id):
@@ -600,7 +601,6 @@ class IHOAHouseInspection(form.Schema):
         context = data.__context__
         data_dict = data._Data_data___
         context_state = api.content.get_state(obj=context)
-        #import pdb;pdb.set_trace()
         if context_state in ['failed_final', 'remedied']:
             for fieldset_id in IHOAHOUSEINSPECTION_FIELDSETS:
                 if '%s_cond_remains' % fieldset_id in data_dict:
@@ -1146,6 +1146,10 @@ class IHOAHouseReWalkInspection(form.Schema):
         required=False,
     )
 
+    form.mode(redirect_assignments='hidden')
+    redirect_assignments = schema.TextLine(title=_(u"Redirect Assignments"),
+                                           required=False)
+
     @invariant
     def confirmAction(data):
         context = data.__context__
@@ -1224,14 +1228,31 @@ class HOAHouseInspection(Container):
     """
     """
 
-    def after_transition_processor(self):
+    def after_transition_processor(self, event):
         context_state = api.content.get_state(obj=self)
         now = datetime.now()
+        if hasattr(event, 'transition'):
+            transition = event.transition
+            if transition.title == 'Retract':
+                portal = api.portal.get()
+                hoa_neighborhoods = api.content.find(context=portal, portal_type='hoa_neighborhood')
+                if not hoa_neighborhoods:
+                    api.portal.show_message(message="Could not locate your neighborhood. Please contact an administrator.",
+                                            request=self.REQUEST,
+                                            type='warn')
+                elif len(hoa_neighborhoods) > 1:
+                    api.portal.show_message(message="Found too many neighborhoods! Please contact an administrator.",
+                                            request=self.REQUEST,
+                                            type='warn')
+                else:
+                    hoa_neighborhood_brain = hoa_neighborhoods[0]
+                    setattr(self, 'redirect_assignments', hoa_neighborhood_brain.UID)
+                    return
         if context_state == 'passed':
             setattr(self, 'passed_datetime', now)
 
         setattr(self, 'inspection_datetime', now)
-
+        setattr(self, 'redirect_assignments', '')
         annual_inspection_brain = getAnnualInspection()
         ai_obj = annual_inspection_brain.getObject()
         ai_obj.checkLastInspection()

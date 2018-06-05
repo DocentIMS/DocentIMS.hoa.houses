@@ -9,6 +9,11 @@ from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHOUSEINSPECTION_FIELDSETS
 
+from plone.protect.interfaces import IDisableCSRFProtection
+from zope.interface import alsoProvides
+
+from plone.protect.utils import addTokenToUrl
+
 grok.templatedir('templates')
 
 SECTION_TITLES = {'roof': 'Roof',
@@ -42,6 +47,14 @@ class View(grok.View):
         get email html structure for all home owners and set them as view attribute
         """
         context = self.context
+        redirect_assignments = getattr(context, 'redirect_assignments', '') or ''
+        if redirect_assignments:
+            alsoProvides(self.request, IDisableCSRFProtection)
+            setattr(context, 'redirect_assignments', '')
+            hoa_neighborhood = api.content.get(UID=redirect_assignments)
+            return self.request.response.redirect('%s/@@walker-assignments' % hoa_neighborhood.absolute_url())
+
+
         inspected_by_first = getattr(context, 'inspected_by_first', '')
         self.inspected_by_first = getWalkerAndEmailStructureById(inspected_by_first)
         inspected_by_second = getattr(context, 'inspected_by_second', '')
@@ -78,7 +91,7 @@ class View(grok.View):
 
     def getTransitionURL(self):
         url = "%s/content_status_modify?workflow_action=retract" % self.context.absolute_url()
-        return url
+        return addTokenToUrl(url)
         #return addTokenToUrl(url)
 
     def getAddress(self):
@@ -145,6 +158,7 @@ class View(grok.View):
             return '%s_rewalk_image' % section
 
         return None
+
 
     # def getSectionFailures(self, section):
     #     context = self.context

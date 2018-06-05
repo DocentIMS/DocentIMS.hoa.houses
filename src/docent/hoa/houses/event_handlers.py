@@ -19,7 +19,7 @@ def after_edit_processor(context, event):
 def after_transition_processor(context, event):
     logger.info('after_transition_processor')
     if hasattr(context, 'after_transition_processor'):
-        context.after_transition_processor()
+        context.after_transition_processor(event)
 
 def after_creation_processor(context, event):
     logger.info('after_creation_processor')
@@ -73,7 +73,7 @@ def onPrincipalCreation(context, event):
     """
     #event.principal, event.principal.getUserId()
     logger.info('onPrincipalCreation')
-    
+
 
 #@adapter(IPrincipalDeletedEvent)
 def onPrincipalDeletion(event):

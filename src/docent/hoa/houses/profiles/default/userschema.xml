@@ -1,6 +1,7 @@
 <model xmlns="http://namespaces.plone.org/supermodel/schema"
        xmlns:form="http://namespaces.plone.org/supermodel/form"
        xmlns:users="http://namespaces.plone.org/supermodel/users"
+       xmlns:security="http://namespaces.plone.org/supermodel/security"
        xmlns:i18n="http://xml.zope.org/namespaces/i18n"
        i18n:domain="plone">
   <schema name="member-fields">
@@ -50,5 +51,11 @@
       <title i18n:translate="label_mailing_zipcode">Mailing Address Zipcode</title>
     </field>
         </fieldset>
+    <field name="management_trust_account" type="zope.schema.TextLine" users:forms="In User Profile" security:write-permission="cmf.ModifyPortalContent">
+      <description/>
+      <required>False</required>
+      <title>Management Trust Account</title>
+    </field>
+
   </schema>
 </model>

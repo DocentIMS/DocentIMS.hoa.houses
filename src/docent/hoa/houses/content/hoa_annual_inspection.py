@@ -288,7 +288,7 @@ class HOAAnnualInspection(Container):
         if context_state not in ['draft', 'closed']:
             self.assign_security()
 
-    def after_transition_processor(self):
+    def after_transition_processor(self, event):
         context_state = api.content.get_state(obj=self)
         if context_state == 'initial_inspection':
             self.propagate_house_inspections()

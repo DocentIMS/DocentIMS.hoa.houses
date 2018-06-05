@@ -53,17 +53,24 @@ class IEmptySchema(form.Schema):
 
 class HouseInspectionEditForm(edit.DefaultEditForm):
 
-    #schema = IEmptySchema
     description = _(u'For each inspection criteria, if the home fails, select the tab and enter a brief explanation. '
-                    u'If a picture is required, take a picture and upload. <i><u>Do Not click "Save" until you have '
+                    u'If a picture is required, take a picture and upload. <i><u>Do Not click "Done" until you have '
                     u'completed the inspection of the house</u></i> as this immediately saves and closes the inspection. '
-                    u'<b>Once your inspection is completed, click "Save".</b> You will be brought to a page that summarizes '
+                    u'<b>Once your inspection is completed, click "Done".</b> You will be brought to a page that summarizes '
                     u'your findings with an opportunity to make changes before the inspection is saved.')
+
+    def updateActions(self):
+        super(HouseInspectionEditForm, self).updateActions()
+        save_action = self.actions.get('save') or None
+        if save_action:
+            save_action.title = u'Done'
+
 
     def updateWidgets(self):
         context = self.context
         current_state = api.content.get_state(obj=context)
         groups = self.groups
+
         if current_state in ['failed_final', 'remedied']:
             for group in groups:
                 fieldset_key = group.__name__
