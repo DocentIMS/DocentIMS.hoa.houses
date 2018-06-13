@@ -17,10 +17,20 @@ def getWalkerAndEmailStructureById(member_id):
     email = ''
     try:
         member_data = api.user.get(userid=member_id)
+        if not member_data:
+            current_member = api.user.get_current()
+            if 'Manager' in api.user.get_roles(user=current_member):
+                return '<em>Unknown Member</em> - %s' % member_id
+            else:
+                return '<em>Unknown Member</em>'
         fullname = member_data.getProperty('fullname')
         email = member_data.getProperty('email')
     except MissingParameterError:
-        return '<em>Unknown Member</em>'
+        current_member = api.user.get_current()
+        if 'Manager' in api.user.get_roles(user=current_member):
+            return '<em>Unknown Member</em> - %s' % member_id
+        else:
+            return '<em>Unknown Member</em>'
 
     if not fullname and not email:
         return member_id
