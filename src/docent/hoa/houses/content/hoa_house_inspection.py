@@ -1233,21 +1233,23 @@ class HOAHouseInspection(Container):
         now = datetime.now()
         if hasattr(event, 'transition'):
             transition = event.transition
-            if transition.title == 'Retract':
-                portal = api.portal.get()
-                hoa_neighborhoods = api.content.find(context=portal, portal_type='hoa_neighborhood')
-                if not hoa_neighborhoods:
-                    api.portal.show_message(message="Could not locate your neighborhood. Please contact an administrator.",
-                                            request=self.REQUEST,
-                                            type='warn')
-                elif len(hoa_neighborhoods) > 1:
-                    api.portal.show_message(message="Found too many neighborhoods! Please contact an administrator.",
-                                            request=self.REQUEST,
-                                            type='warn')
-                else:
-                    hoa_neighborhood_brain = hoa_neighborhoods[0]
-                    setattr(self, 'redirect_assignments', hoa_neighborhood_brain.UID)
-                    return
+            if transition:
+                if transition.title == 'Retract':
+                    portal = api.portal.get()
+                    hoa_neighborhoods = api.content.find(context=portal, portal_type='hoa_neighborhood')
+                    if not hoa_neighborhoods:
+                        api.portal.show_message(message="Could not locate your neighborhood. Please contact an administrator.",
+                                                request=self.REQUEST,
+                                                type='warn')
+                    elif len(hoa_neighborhoods) > 1:
+                        api.portal.show_message(message="Found too many neighborhoods! Please contact an administrator.",
+                                                request=self.REQUEST,
+                                                type='warn')
+                    else:
+                        hoa_neighborhood_brain = hoa_neighborhoods[0]
+                        setattr(self, 'redirect_assignments', hoa_neighborhood_brain.UID)
+                        return
+        
         if context_state == 'passed':
             setattr(self, 'passed_datetime', now)
 
