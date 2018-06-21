@@ -1248,8 +1248,67 @@ class HOAHouseInspection(Container):
                     else:
                         hoa_neighborhood_brain = hoa_neighborhoods[0]
                         setattr(self, 'redirect_assignments', hoa_neighborhood_brain.UID)
+                        #needs logic to determine what to delete (ie first vs second)
+                        annual_inspection_brain = getAnnualInspection()
+                        inspection_state = annual_inspection_brain.review_state
+                        if inspection_state == 'initial_inspection' or inspection_state == 'Initial Inspection':
+                            #remove values of this initial inspection
+                            setattr(self, 'inspection_datetime', None)
+                            setattr(self, 'passed_datetime', None)
+                            setattr(self, 'inspected_by_first', u'')
+                            setattr(self, 'roof_action_required', '')
+                            setattr(self, 'roof_text', u'')
+                            setattr(self, 'roof_image', None)
+                            setattr(self, 'gutters_action_required', '')
+                            setattr(self, 'gutters_text', u'')
+                            setattr(self, 'gutters_image', None)
+                            setattr(self, 'exterior_paint_action_required', '')
+                            setattr(self, 'exterior_paint_text', u'')
+                            setattr(self, 'exterior_paint_image', None)
+                            setattr(self, 'decks_action_required', '')
+                            setattr(self, 'decks_text', u'')
+                            setattr(self, 'decks_image', None)
+                            setattr(self, 'entry_way_action_required', '')
+                            setattr(self, 'entry_way_text', u'')
+                            setattr(self, 'entry_way_image', None)
+                            setattr(self, 'paved_surfaces_action_required', '')
+                            setattr(self, 'paved_surfaces_text', u'')
+                            setattr(self, 'paved_surfaces_image', None)
+                            setattr(self, 'landscaping_action_required', '')
+                            setattr(self, 'landscaping_text', u'')
+                            setattr(self, 'landscaping_image', None)
+                            setattr(self, 'general_maintenance_action_required', '')
+                            setattr(self, 'general_maintenance_text', u'')
+                            setattr(self, 'general_maintenance_image', None)
+                        elif inspection_state == 'secondary_inspection' or inspection_state == 'Secondary Inspection':
+                            setattr(self, 'landscaping_cond_remains', '')
+                            setattr(self, 'landscaping_rewalk_text', u'')
+                            setattr(self, 'landscaping_rewalk_image', None)
+                            setattr(self, 'general_maintenance_cond_remains', '')
+                            setattr(self, 'general_maintenance_rewalk_text', u'')
+                            setattr(self, 'general_maintenance_rewalk_image', None)
+                            setattr(self, 'paved_surfaces_cond_remains', '')
+                            setattr(self, 'paved_surfaces_rewalk_text', u'')
+                            setattr(self, 'paved_surfaces_rewalk_image', None)
+                            setattr(self, 'entry_way_cond_remains', '')
+                            setattr(self, 'entry_way_rewalk_text', u'')
+                            setattr(self, 'entry_way_rewalk_image', None)
+                            setattr(self, 'decks_cond_remains', '')
+                            setattr(self, 'decks_rewalk_text', u'')
+                            setattr(self, 'decks_rewalk_image', None)
+                            setattr(self, 'exterior_paint_cond_remains', '')
+                            setattr(self, 'exterior_paint_rewalk_text', u'')
+                            setattr(self, 'exterior_paint_rewalk_image', None)
+                            setattr(self, 'gutters_cond_remains', '')
+                            setattr(self, 'gutters_rewalk_text', u'')
+                            setattr(self, 'gutters_rewalk_image', None)
+                            setattr(self, 'roof_cond_remains', '')
+                            setattr(self, 'roof_rewalk_text', u'')
+                            setattr(self, 'roof_rewalk_image', None)
+                            setattr(self, 'inspected_by_second', u'')
+
                         return
-        
+
         if context_state == 'passed':
             setattr(self, 'passed_datetime', now)
 
