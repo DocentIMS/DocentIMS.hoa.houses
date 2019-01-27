@@ -391,7 +391,7 @@ class HOAHouse(Container):
     def getLatestInspection(self):
         inspection_brains = self.getFolderContents(contentFilter={"portal_type" : "hoa_house_inspection",
                                                                   "sort_on":"created",
-                                                                  "sort_order":"ascending"})
+                                                                  "sort_order":"descending"})
 
         latest_inspection_brain = inspection_brains[0]
 
