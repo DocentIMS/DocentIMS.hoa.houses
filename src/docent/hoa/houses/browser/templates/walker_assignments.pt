@@ -17,7 +17,11 @@
 
 <metal:main fill-slot="main">
     <tal:main-macro metal:define-macro="main">
-
+    <ul class="walking_maps" tal:define="map_one_url view/getMapOneURL;
+                                         map_two_url view/getMapTwoURL">
+      <li tal:condition="map_one_url"><a href="" rel="noopener noreferrer" target="_blank" tal:attributes="href map_one_url">Meadows Division One Map</a></li>
+      <li tal:condition="map_two_url"><a href="" rel="noopener noreferrer" target="_blank" tal:attributes="href map_two_url">Meadows Division Two Map</a></li>
+    </ul>
     <div tal:replace="structure provider:plone.abovecontenttitle" />
     <h1>Assigned Homes - <span tal:replace="view/current_inspection" /></h1>
     <p>These are the homes assigned to your team. Select "Inspect" and perform the inspection.

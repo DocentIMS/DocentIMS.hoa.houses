@@ -11,7 +11,7 @@ from Products.CMFCore.utils import getToolByName
 from docent.hoa.houses.content.hoa_neighborhood import IHOANeighborhood
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
-from docent.hoa.houses.app_config import HOME_INSPECTION_STATE_TITLES
+from docent.hoa.houses.app_config import HOME_INSPECTION_STATE_TITLES, MAP_GROUP_ONE_GID, MAP_GROUP_TWO_GID
 
 grok.templatedir('templates')
 
@@ -87,6 +87,9 @@ class WalkerAssignments(grok.View):
         for street in streets:
             street_dict[street] = sorted(street_dict[street], key=itemgetter('div_lot'))
 
+        current_user = api.user.get_current()
+        cu_groups = api.group.get_groups(user=current_user)
+        self.cu_group_ids = [i.getId for i in cu_groups]
         self.current_inspection = current_inspection
         self.streets = streets
         self.street_dict = street_dict
@@ -111,3 +114,12 @@ class WalkerAssignments(grok.View):
         table_row_structure += '<td>%s</td>' % home_listing_dict.get('map')
 
         return table_row_structure
+
+    def getMapOneURL(self):
+        if MAP_GROUP_ONE_GID in self.cu_group_ids:
+            return 'map_one_Url'
+
+    def getMapTwoURL(self):
+        if MAP_GROUP_TWO_GID in self.cu_group_ids:
+            return 'map_two_url'
+

@@ -121,7 +121,7 @@ class IHOAAnnualInspection(form.Schema):
         required=False,
     )
 
-    form.mode(house_pass_log='hidden')
+    form.mode(csv_pass_log='hidden')
     csv_pass_log = schema.Dict(
         title=_(u'Homes Sent Initial Pass Notices'),
         description=_(u"Emails sent to the following home owners."),
@@ -354,20 +354,28 @@ class HOAAnnualInspection(Container):
 
         if group_a_member_one:
             api.group.add_user(groupname='walkers_a', username=group_a_member_one)
+            api.group.add_user(groupname='division_map_one', username=group_a_member_one)
         if group_a_member_two:
             api.group.add_user(groupname='walkers_a', username=group_a_member_two)
+            api.group.add_user(groupname='division_map_one', username=group_a_member_two)
         if group_b_member_one:
             api.group.add_user(groupname='walkers_b', username=group_b_member_one)
+            api.group.add_user(groupname='division_map_one', username=group_b_member_one)
         if group_b_member_two:
             api.group.add_user(groupname='walkers_b', username=group_b_member_two)
+            api.group.add_user(groupname='division_map_one', username=group_b_member_two)
         if group_c_member_one:
             api.group.add_user(groupname='walkers_c', username=group_c_member_one)
+            api.group.add_user(groupname='division_map_two', username=group_c_member_one)
         if group_c_member_two:
             api.group.add_user(groupname='walkers_c', username=group_c_member_two)
+            api.group.add_user(groupname='division_map_two', username=group_c_member_two)
         if group_d_member_one:
             api.group.add_user(groupname='walkers_d', username=group_d_member_one)
+            api.group.add_user(groupname='division_map_two', username=group_d_member_one)
         if group_d_member_two:
             api.group.add_user(groupname='walkers_d', username=group_d_member_two)
+            api.group.add_user(groupname='division_map_two', username=group_d_member_two)
         # if group_e_member_one:
         #     api.group.add_user(groupname='walkers_e', username=group_e_member_one)
         # if group_e_member_two:
