@@ -64,10 +64,14 @@ class WalkerAssignments(grok.View):
                 street = getattr(hi_home_obj, 'street_number', '')
                 address = getattr(hi_home_obj, 'street_address', '')
                 street_address = '%s %s' % (street, address)
+                div = getattr(hi_home_obj, 'div', '')
+                lot = getattr(hi_home_obj, 'lot', '')
+                div_lot = '%s_%s' % (div, lot)
                 home_listing_dict = {'url':'%s/@@home-inspection' % hi_home_obj.absolute_url(),
                                      'address':street_address,
-                                     'div':getattr(hi_home_obj, 'div', ''),
-                                     'lot':getattr(hi_home_obj, 'lot', ''),
+                                     'div':div,
+                                     'lot':lot,
+                                     'div_lot':div_lot,
                                      'map':''}
 
                 if hi_brain.review_state == home_inspection_state:
@@ -81,12 +85,12 @@ class WalkerAssignments(grok.View):
 
         streets = sorted(street_dict.keys())
         for street in streets:
-            street_dict[street] = sorted(street_dict[street], key=itemgetter('address'))
+            street_dict[street] = sorted(street_dict[street], key=itemgetter('div_lot'))
 
         self.current_inspection = current_inspection
         self.streets = streets
         self.street_dict = street_dict
-        self.completed_listings = sorted(completed_listings, key=itemgetter('address'))
+        self.completed_listings = sorted(completed_listings, key=itemgetter('div_lot'))
 
     def getTableRowStructure(self, home_listing_dict):
         table_row_structure = ''
