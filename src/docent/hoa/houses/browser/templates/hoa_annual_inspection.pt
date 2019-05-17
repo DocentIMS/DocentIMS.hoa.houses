@@ -54,13 +54,6 @@
                 <li>Member Two: <span tal:replace="structure view/group_d_member_two" /></li>
             </ul>
         </section>
-        <section tal:condition="view/team_e">
-            <h4>Team E</h4>
-            <ul>
-                <li>Member One: <span tal:replace="structure view/group_e_member_one" /></li>
-                <li>Member Two: <span tal:replace="structure view/group_e_member_two" /></li>
-            </ul>
-        </section>
         </div>
 	<tal:block tal:define="house_failure_log_structure view/house_failure_log_structure;
                                 house_pass_log_structure view/house_pass_log_structure;

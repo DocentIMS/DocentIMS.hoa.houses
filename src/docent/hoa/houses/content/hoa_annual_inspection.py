@@ -247,28 +247,28 @@ class IHOAAnnualInspection(form.Schema):
         default='',
     )
 
-    fieldset('team_e',
-        label=u'Team E',
-        description=u'',
-        fields=['group_e_member_one',
-                'group_e_member_two', ]
-    )
-
-    group_e_member_one = schema.Choice(
-        title=_(u"Group E Member One"),
-        description=_(u""),
-        vocabulary=u'docent.hoa.walkers',
-        required=False,
-        default='',
-    )
-
-    group_e_member_two = schema.Choice(
-        title=_(u"Group E Member Two"),
-        description=_(u""),
-        vocabulary=u'docent.hoa.walkers',
-        required=False,
-        default='',
-    )
+    # fieldset('team_e',
+    #     label=u'Team E',
+    #     description=u'',
+    #     fields=['group_e_member_one',
+    #             'group_e_member_two', ]
+    # )
+    #
+    # group_e_member_one = schema.Choice(
+    #     title=_(u"Group E Member One"),
+    #     description=_(u""),
+    #     vocabulary=u'docent.hoa.walkers',
+    #     required=False,
+    #     default='',
+    # )
+    #
+    # group_e_member_two = schema.Choice(
+    #     title=_(u"Group E Member Two"),
+    #     description=_(u""),
+    #     vocabulary=u'docent.hoa.walkers',
+    #     required=False,
+    #     default='',
+    # )
 
 
 class HOAAnnualInspection(Container):
@@ -349,8 +349,8 @@ class HOAAnnualInspection(Container):
         group_c_member_two = getattr(self, 'group_c_member_two', None)
         group_d_member_one = getattr(self, 'group_d_member_one', None)
         group_d_member_two = getattr(self, 'group_d_member_two', None)
-        group_e_member_one = getattr(self, 'group_e_member_one', None)
-        group_e_member_two = getattr(self, 'group_e_member_two', None)
+        # group_e_member_one = getattr(self, 'group_e_member_one', None)
+        # group_e_member_two = getattr(self, 'group_e_member_two', None)
 
         if group_a_member_one:
             api.group.add_user(groupname='walkers_a', username=group_a_member_one)
@@ -368,10 +368,10 @@ class HOAAnnualInspection(Container):
             api.group.add_user(groupname='walkers_d', username=group_d_member_one)
         if group_d_member_two:
             api.group.add_user(groupname='walkers_d', username=group_d_member_two)
-        if group_e_member_one:
-            api.group.add_user(groupname='walkers_e', username=group_e_member_one)
-        if group_e_member_two:
-            api.group.add_user(groupname='walkers_e', username=group_e_member_two)
+        # if group_e_member_one:
+        #     api.group.add_user(groupname='walkers_e', username=group_e_member_one)
+        # if group_e_member_two:
+        #     api.group.add_user(groupname='walkers_e', username=group_e_member_two)
 
 
     def getNumberOfGroups(self):
@@ -384,8 +384,8 @@ class HOAAnnualInspection(Container):
         group_c_member_two = getattr(self, 'group_c_member_two', None)
         group_d_member_one = getattr(self, 'group_d_member_one', None)
         group_d_member_two = getattr(self, 'group_d_member_two', None)
-        group_e_member_one = getattr(self, 'group_e_member_one', None)
-        group_e_member_two = getattr(self, 'group_e_member_two', None)
+        # group_e_member_one = getattr(self, 'group_e_member_one', None)
+        # group_e_member_two = getattr(self, 'group_e_member_two', None)
 
         number_of_groups = 0
         if group_a_member_one or group_a_member_two:
@@ -396,8 +396,8 @@ class HOAAnnualInspection(Container):
             number_of_groups += 1
         if group_d_member_one or group_d_member_two:
             number_of_groups += 1
-        if group_e_member_one or group_e_member_two:
-            number_of_groups += 1
+        # if group_e_member_one or group_e_member_two:
+        #     number_of_groups += 1
 
         return number_of_groups
 
@@ -538,8 +538,8 @@ class HOAAnnualInspection(Container):
         group_c_member_two = getattr(self, 'group_c_member_two', None)
         group_d_member_one = getattr(self, 'group_d_member_one', None)
         group_d_member_two = getattr(self, 'group_d_member_two', None)
-        group_e_member_one = getattr(self, 'group_e_member_one', None)
-        group_e_member_two = getattr(self, 'group_e_member_two', None)
+        # group_e_member_one = getattr(self, 'group_e_member_one', None)
+        # group_e_member_two = getattr(self, 'group_e_member_two', None)
 
         team_a = False
         team_b = False
@@ -582,17 +582,17 @@ class HOAAnnualInspection(Container):
                                     type='warning')
                 return False
 
-        if group_e_member_one or group_e_member_two:
-            if not three_teams:
-                api.portal.show_message(message=u"You must configure Teams A, B, and C before Teams D or E.",
-                                    request=context.REQUEST,
-                                    type='warning')
-                return False
-            if not team_d:
-                api.portal.show_message(message=u"You must configure Team D before Team E.",
-                                    request=context.REQUEST,
-                                    type='warning')
-                return False
+        # if group_e_member_one or group_e_member_two:
+        #     if not three_teams:
+        #         api.portal.show_message(message=u"You must configure Teams A, B, and C before Teams D or E.",
+        #                             request=context.REQUEST,
+        #                             type='warning')
+        #         return False
+        #     if not team_d:
+        #         api.portal.show_message(message=u"You must configure Team D before Team E.",
+        #                             request=context.REQUEST,
+        #                             type='warning')
+        #         return False
 
         return True
 
@@ -666,11 +666,9 @@ class HOAAnnualInspection(Container):
                              'group_b_member_two' : getattr(self, 'group_b_member_two', None),
                              'group_c_member_one' : getattr(self, 'group_c_member_one', None),
                              'group_c_member_two' : getattr(self, 'group_c_member_two', None),
-                             'group_d_member_one' : getattr(self, 'group_d_member_one', None),
-                             'group_e_member_one' : getattr(self, 'group_e_member_one', None),
-                             'group_e_member_two' : getattr(self, 'group_e_member_two', None)}
+                             'group_d_member_one' : getattr(self, 'group_d_member_one', None),}
 
-        for team_id in ['group_a', 'group_b', 'group_c', 'group_d', 'group_e']:
+        for team_id in ['group_a', 'group_b', 'group_c', 'group_d',]:
             member_one = team_members_dict.get('%s_member_one' % team_id)
             member_one_fullname = ''
             member_one_email = ''

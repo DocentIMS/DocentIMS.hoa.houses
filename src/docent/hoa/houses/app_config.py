@@ -10,12 +10,11 @@ GROUP_A_WALKERS_GID = 'walkers_a'
 GROUP_B_WALKERS_GID = 'walkers_b'
 GROUP_C_WALKERS_GID = 'walkers_c'
 GROUP_D_WALKERS_GID = 'walkers_d'
-GROUP_E_WALKERS_GID = 'walkers_e'
+#GROUP_E_WALKERS_GID = 'walkers_e'
 WALKERS_GROUP_IDS = [GROUP_A_WALKERS_GID,
                      GROUP_B_WALKERS_GID,
                      GROUP_C_WALKERS_GID,
-                     GROUP_D_WALKERS_GID,
-                     GROUP_E_WALKERS_GID]
+                     GROUP_D_WALKERS_GID]
 
 GROUP_TITLE_DICT = {BOARD_MEMBERS_GID: u'Board Members',
                     HOME_OWNERS_GID: u'Home Owners',
@@ -25,8 +24,7 @@ GROUP_TITLE_DICT = {BOARD_MEMBERS_GID: u'Board Members',
                     GROUP_A_WALKERS_GID: u'Walkers Group A',
                     GROUP_B_WALKERS_GID: u'Walkers Group B',
                     GROUP_C_WALKERS_GID: u'Walkers Group C',
-                    GROUP_D_WALKERS_GID: u'Walkers Group D',
-                    GROUP_E_WALKERS_GID: u'Walkers Group E',}
+                    GROUP_D_WALKERS_GID: u'Walkers Group D',}
 
 PROPERTY_ROLE_DICT = {HOME_OWNERS_GID: u'Owner',
                       RENTERS_GID: u'Renter',

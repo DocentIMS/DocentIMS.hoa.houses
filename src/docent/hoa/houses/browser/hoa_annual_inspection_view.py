@@ -85,8 +85,8 @@ class View(grok.View):
         self.group_c_member_two = getWalkerAndEmailStructureById(getattr(context, 'group_c_member_two', ''))
         self.group_d_member_one = getWalkerAndEmailStructureById(getattr(context, 'group_d_member_one', ''))
         self.group_d_member_two = getWalkerAndEmailStructureById(getattr(context, 'group_d_member_two', ''))
-        self.group_e_member_one = getWalkerAndEmailStructureById(getattr(context, 'group_e_member_one', ''))
-        self.group_e_member_two = getWalkerAndEmailStructureById(getattr(context, 'group_e_member_two', ''))
+        # self.group_e_member_one = getWalkerAndEmailStructureById(getattr(context, 'group_e_member_one', ''))
+        # self.group_e_member_two = getWalkerAndEmailStructureById(getattr(context, 'group_e_member_two', ''))
 
         # pic_req = 'No'
         # if getattr(context, 'pic_req'):
@@ -107,8 +107,8 @@ class View(grok.View):
         if self.group_d_member_one or self.group_d_member_two:
             self.team_d = True
         self.team_e = False
-        if self.group_e_member_one or self.group_e_member_two:
-            self.team_e = True
+        # if self.group_e_member_one or self.group_e_member_two:
+        #     self.team_e = True
 
         self.house_failure_log_structure = getRowStructureForEmailReports(context, getattr(context, 'house_failure_log'))
         self.house_pass_log_structure = getRowStructureForEmailReports(context, getattr(context, 'house_pass_log'))
