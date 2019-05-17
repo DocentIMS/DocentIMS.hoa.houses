@@ -76,9 +76,25 @@ class HouseInspectionForm(form.SchemaForm):
     schema = IHouseInspectionForm
     ignoreContext = False
 
+
+    @button.buttonAndHandler(u"Cancel")
+    def handleCancel(self, action):
+        """
+        user cancelled go back to the walker assignment page
+        """
+        context = self.context
+        api.portal.show_message(message=u"You cancelled the inspection of %s" % context.Title,
+                                request=context.REQUEST,
+                                type='info')
+
+        request = context.REQUEST
+        parent_container = context.aq_parent
+        response = request.response
+        response.redirect('%s/@@walker-assignments' % parent_container.absolute_url())
+
     @button.buttonAndHandler(u"Pass")
     def handlePass(self, action):
-        """User cancelled. Redirect back to the front page.
+        """
         """
         context = self.context
         annual_inspection_brain = getAnnualInspection()
