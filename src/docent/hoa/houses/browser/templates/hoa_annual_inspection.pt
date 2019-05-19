@@ -16,7 +16,10 @@
     <div tal:replace="structure provider:plone.abovecontenttitle" />
     <h1 tal:content="context/Title"></h1>
     <div tal:replace="structure provider:plone.belowcontenttitle" />
-    <p>This summarizes the annual inspection parameters.</p>
+    <p>This summarizes the annual inspection parameters. <span tal:condition="view/initial_email_sent">
+      Click this link to send annual inspection notification email to all home owners:
+       <a href="" tal:attributes="href view/getEmailLink">Email Home Owners</a>
+    </span></p>
 
     <div tal:replace="structure provider:plone.abovecontentbody" />
         <ul>

@@ -94,6 +94,8 @@ class WalkerAssignments(grok.View):
         self.streets = streets
         self.street_dict = street_dict
         self.completed_listings = sorted(completed_listings, key=itemgetter('div_lot'))
+ 
+        self.portal = api.portal.get()
 
     def getTableRowStructure(self, home_listing_dict):
         table_row_structure = ''
@@ -117,9 +119,9 @@ class WalkerAssignments(grok.View):
 
     def getMapOneURL(self):
         if MAP_GROUP_ONE_GID in self.cu_group_ids:
-            return 'map_one_Url'
+            return '%s/annual-inspection/help/maps/map-team-1-and-2-1.jpg/view' % self.portal.absolute_url()
 
     def getMapTwoURL(self):
         if MAP_GROUP_TWO_GID in self.cu_group_ids:
-            return 'map_two_url'
+            return '%s/annual-inspection/help/maps/map-team-3-and-4-1.jpg/view' % self.portal.absolute_url()
 

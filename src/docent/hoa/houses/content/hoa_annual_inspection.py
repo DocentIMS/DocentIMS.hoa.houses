@@ -93,6 +93,12 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
     )
 
+    form.mode(initial_email_sent='hidden')
+    initial_email_sent = schema.Bool(
+        title = _(u'Initial Email Sent'),
+        description = _(u''),
+        required = False,)
+
     # form.widget(pic_req=RadioFieldWidget)
     # pic_req = schema.Choice(
     #     title=_(u'Picture Rqd if Failed?'),

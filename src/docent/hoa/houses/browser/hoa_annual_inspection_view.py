@@ -114,3 +114,13 @@ class View(grok.View):
         self.house_pass_log_structure = getRowStructureForEmailReports(context, getattr(context, 'house_pass_log'))
         self.rewalk_failure_log_structure = getRowStructureForEmailReports(context, getattr(context, 'rewalk_failure_log'))
         self.rewalk_pass_log_structure = getRowStructureForEmailReports(context, getattr(context, 'rewalk_pass_log'))
+
+        current_state = api.content.get_state(obj=context)
+
+        if current_state == 'draft' and not hasattr(context, 'initial_email_sent'):
+            self.initial_email_sent = False
+        else:
+            self.initial_email_sent = True
+
+    def getEmailLink(self):
+        return '%s/send-initial-email' % self.context.absolute_url()
