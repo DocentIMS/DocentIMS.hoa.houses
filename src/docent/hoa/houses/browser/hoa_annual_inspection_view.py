@@ -117,10 +117,10 @@ class View(grok.View):
 
         current_state = api.content.get_state(obj=context)
 
-        if current_state == 'draft' and not hasattr(context, 'initial_email_sent'):
-            self.initial_email_sent = False
+        if current_state == 'draft' and not getattr(context, 'initial_email_sent'):
+            self.unlock_email = True
         else:
-            self.initial_email_sent = True
+            self.unlock_email = False
 
     def getEmailLink(self):
         return '%s/send-initial-email' % self.context.absolute_url()

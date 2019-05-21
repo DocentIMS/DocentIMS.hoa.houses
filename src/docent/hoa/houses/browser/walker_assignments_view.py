@@ -89,12 +89,12 @@ class WalkerAssignments(grok.View):
 
         current_user = api.user.get_current()
         cu_groups = api.group.get_groups(user=current_user)
-        self.cu_group_ids = [i.getId for i in cu_groups]
+        self.cu_group_ids = [i.getId() for i in cu_groups]
         self.current_inspection = current_inspection
         self.streets = streets
         self.street_dict = street_dict
         self.completed_listings = sorted(completed_listings, key=itemgetter('div_lot'))
- 
+        
         self.portal = api.portal.get()
 
     def getTableRowStructure(self, home_listing_dict):

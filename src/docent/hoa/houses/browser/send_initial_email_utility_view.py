@@ -5,41 +5,59 @@ from five import grok
 
 from plone import api
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
+
 from docent.hoa.houses.content.hoa_house import IHOAHouse
 from zope.component import getMultiAdapter
-from docent.hoa.houses.app_config import HOME_OWNERS_GID
+from docent.hoa.houses.app_config import HOME_OWNERS_GID, PROPERTY_MANAGERS_GID
+
+import smtplib
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+import logging
+logger = logging.getLogger("Plone")
 
 class View(grok.View):
-    grok.context(IHOANeighborhood)
+    grok.context(IHOAAnnualInspection)
     grok.require("cmf.ManagePortal")
     grok.name('send-initial-email')
 
-    def update(self):
+    def render(self):
+
+        return self.sendEmailUtility()
+
+    def sendEmailUtility(self):
         context = self.context
 
         current_state =  api.content.get_state(obj=context)
 
         if current_state != 'draft':
-            self.request.response(context.absolute_url())
+            self.request.response.redirect(context.absolute_url())
 
         if not hasattr(context, 'initial_email_sent'):
-            self.request.response(context.absolute_url())
+            api.portal.show_message(message="Kickoff email has already been sent.",
+                                        request=context.REQUEST,
+                                        type='warning')
 
-        emails_sent = self.sendInitialNotices(lock=True)
+            self.request.response.redirect(context.absolute_url())
+        
+
+        emails_sent = self.sendInitialNotices(context=context, lock=True)
 
         if emails_sent:
             #do something
             setattr(context, 'initial_email_sent', True)
 
-        self.request.response(context.absolute_url())
+        self.request.response.redirect(context.absolute_url())
 
 
-    def sendInitialNotices(self, context=context, lock=False):
+    def sendInitialNotices(self, context=None, lock=False):
+
         if lock:
-
             portal = api.portal.get()
-
-            house_inspection_title = getattr(self, 'house_inspection_title', None)
+            inspection_container = context.aq_parent
+            house_inspection_title = inspection_container.title
             if not house_inspection_title:
                 api.portal.show_message(message="We cannot locate the appropriate home inspections. Please verify this "
                                                 "inspection was properly configured.",
@@ -47,11 +65,20 @@ class View(grok.View):
                                         type='warning')
                 return False
 
-            secretary_email = getattr(neighborhood_container, 'secretary_email', None)
+            secretary_email = getattr(inspection_container, 'secretary_email', None)
 
             home_owners = api.user.get_users(groupname=HOME_OWNERS_GID)
-            home_owner_emails = (md.getProperty('email') for md in home_owners if md)
+            home_owner_emails = {md.getProperty('email') for md in home_owners if md}
 
+            property_managers = api.user.get_users(groupname=PROPERTY_MANAGERS_GID)
+            property_manager_emails = {md.getProperty('email') for md in property_managers if md}
+            
+            emails_to_send = home_owner_emails.union(property_manager_emails)
+
+            current_year = getattr(context, 'start_date').strftime('%Y')
+            start_date = getattr(context, 'start_date').strftime('%B %d, %Y')
+            end_date = getattr(context, 'end_date').strftime('%B %d, %Y')
+            
             txt_msg = 'Hello Meadows Residents,\n\nThe %s Annual Property Inspection will be conducted between %s ' \
                       'and %s.\n\nYour home will be inspected sometime during this period. For important information ' \
                       'on the Annual Property Inspection go to our ' \
@@ -65,10 +92,12 @@ class View(grok.View):
             mime_msg = MIMEMultipart('related')
             mime_msg_alt = MIMEMultipart('alternative')
 
-            mime_msg['Subject'] = house_inspection_title
+            mime_msg['Subject'] = '%s %s' % (house_inspection_title, current_year)
             mime_msg['From'] = secretary_email
             mime_msg['To'] = secretary_email
-            mime_msg['Bcc'] = ','.join(list(home_owner_emails))
+            #mime_msg['Bcc'] = ','.join(list(emails_to_send))
+            lmsg = ','.join(list(home_owner_emails))
+            logger.info('I would have sent to: %s' % lmsg)
             mime_msg.preamble = 'This is a multi-part message in MIME format.'
             mime_msg.attach(mime_msg_alt)
 
