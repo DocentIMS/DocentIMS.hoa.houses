@@ -83,7 +83,7 @@ class HouseInspectionForm(form.SchemaForm):
         user cancelled go back to the walker assignment page
         """
         context = self.context
-        api.portal.show_message(message=u"You cancelled the inspection of %s" % context.Title,
+        api.portal.show_message(message=u"You cancelled the inspection of %s" % context.title,
                                 request=context.REQUEST,
                                 type='info')
 

@@ -15,6 +15,8 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from zope.component import getMultiAdapter
+
 import logging
 logger = logging.getLogger("Plone")
 

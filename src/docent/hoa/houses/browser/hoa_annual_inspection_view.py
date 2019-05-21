@@ -8,6 +8,8 @@ from docent.hoa.houses.content.hoa_house import IHOAHouse
 from docent.hoa.houses.content.hoa_house_inspection import IHOAHouseInspection
 from docent.hoa.houses.content.hoa_annual_inspection import IHOAAnnualInspection
 
+from plone.protect.utils import addTokenToUrl
+
 grok.templatedir('templates')
 
 def getWalkerAndEmailStructureById(member_id):
@@ -123,4 +125,5 @@ class View(grok.View):
             self.unlock_email = False
 
     def getEmailLink(self):
-        return '%s/send-initial-email' % self.context.absolute_url()
+        send_email_url = '%s/send-initial-email' % self.context.absolute_url()
+        return addTokenToUrl(send_email_url)
