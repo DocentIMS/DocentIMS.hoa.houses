@@ -97,13 +97,13 @@ class View(grok.View):
             mime_msg['Subject'] = '%s %s' % (house_inspection_title, current_year)
             mime_msg['From'] = secretary_email
             mime_msg['To'] = secretary_email
-            #mime_msg['Bcc'] = ','.join(list(emails_to_send))
+            mime_msg['Bcc'] = ','.join(list(emails_to_send))
             lmsg = ','.join(list(home_owner_emails))
             logger.info('I would have sent to: %s' % lmsg)
             mime_msg.preamble = 'This is a multi-part message in MIME format.'
             mime_msg.attach(mime_msg_alt)
 
-            meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.jpeg")
+            meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.png")
             if meadows_logo:
                 msg_image = MIMEImage(meadows_logo.GET())
                 msg_image.add_header('Content-ID', '<meadows_logo>')

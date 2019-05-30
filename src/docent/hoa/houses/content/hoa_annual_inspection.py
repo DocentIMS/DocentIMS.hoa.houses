@@ -672,6 +672,8 @@ class HOAAnnualInspection(Container):
         :return:
         """
         context = self
+        portal = api.portal.get()
+        inspector_link = '%s/annual-inspection' % portal.absolute_url()
         start_date = getattr(context, 'start_date')
         end_date = getattr(context, 'end_date')
 
@@ -709,8 +711,7 @@ class HOAAnnualInspection(Container):
                                                message_params[1])
                     msg += " The Inspection begins %s and needs to be completed by %s." % (start_date.strftime('%B %d, %Y'),
                                                                                            end_date.strftime('%B %d, %Y'))
-                    msg += "You'll receive more information shortly from the Inspection manager.\n\nThanks - " \
-                           "The Meadows Inspection Team."
+                    msg += "Follow this link for more information: <%s>\n\nThanks - The Meadows Inspection Team." % inspector_link
 
                     api.portal.send_email(recipient=message_params[3],
                                           subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
@@ -720,8 +721,7 @@ class HOAAnnualInspection(Container):
                 msg += "Thanks for volunteering to help with The Meadows Annual Property Inspection."
                 msg += " The Inspection begins %s and needs to be completed by %s." % (start_date.strftime('%B %d, %Y'),
                                                                                        end_date.strftime('%B %d, %Y'))
-                msg += "You'll receive more information shortly from the Inspection manager.\n\nThanks - " \
-                       "The Meadows Inspection Team."
+                msg += "Follow this link for more information: <%s>\n\nThanks - The Meadows Inspection Team." % inspector_link
 
                 api.portal.send_email(recipient=member_one_email,
                                       subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
@@ -731,8 +731,7 @@ class HOAAnnualInspection(Container):
                 msg += "Thanks for volunteering to help with The Meadows Annual Property Inspection."
                 msg += " The Inspection begins %s and needs to be completed by %s." % (start_date.strftime('%B %d, %Y'),
                                                                                        end_date.strftime('%B %d, %Y'))
-                msg += "You'll receive more information shortly from the Inspection manager.\n\nThanks - " \
-                       "The Meadows Inspection Team."
+                msg += "Follow this link for more information: <%s>\n\nThanks - The Meadows Inspection Team." % inspector_link
 
                 api.portal.send_email(recipient=member_two_email,
                                       subject='The %s Meadows Annual Property Inspection' % start_date.strftime('%Y'),
@@ -1237,7 +1236,7 @@ class HOAAnnualInspection(Container):
                 pass_msg.preamble = 'This is a multi-part message in MIME format.'
                 pass_msg.attach(pass_msg_alt)
 
-                meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.jpeg")
+                meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.png")
                 if meadows_logo:
                     msg_image = MIMEImage(meadows_logo.GET())
                     msg_image.add_header('Content-ID', '<meadows_logo>')
@@ -1449,7 +1448,7 @@ class HOAAnnualInspection(Container):
                 for i_t_a in images_to_attach:
                     msg.attach(i_t_a)
 
-                meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.jpeg")
+                meadows_logo = portal.restrictedTraverse("++resource++docent.hoa.houses/theMeadows.png")
                 if meadows_logo:
                     msg_image = MIMEImage(meadows_logo.GET())
                     msg_image.add_header('Content-ID', '<meadows_logo>')
