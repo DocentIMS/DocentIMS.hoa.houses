@@ -93,7 +93,8 @@ class IHOAAnnualInspection(form.Schema):
         description=_(u""),
     )
 
-    form.mode(initial_email_sent='hidden')
+#    form.mode(initial_email_sent='hidden')
+    form.mode(initial_email_sent='display')
     initial_email_sent = schema.Bool(
         title = _(u'Initial Email Sent'),
         description = _(u''),
